@@ -28,6 +28,7 @@ public class CreateAccountController {
         DangKiDTO dto =new DangKiDTO();
         dto.setPass(taikhoan.getPass());
         dto.setEmail(taikhoan.getEmail());
+        dto.setUserName(taikhoan.getUsername());
 
         accountService.taoVaGuiMaDangKi(dto);
         return "verify";

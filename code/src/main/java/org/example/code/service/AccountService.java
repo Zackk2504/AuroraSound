@@ -5,6 +5,7 @@ import org.example.code.DTO.DangKiDTO;
 import org.example.code.model.Taikhoan;
 import org.example.code.repo.AccountRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.scheduling.annotation.Async;
@@ -18,13 +19,13 @@ public class AccountService {
     AccountRepository accountRepository;
 
     @Autowired
-    private JavaMailSender mailSender;
-
-    @Autowired
     private HttpSession session;
 
     @Autowired
     PasswordEncoder passwordEncoder;
+
+    @Autowired
+    MailService mailService;
 
     public Taikhoan add(Taikhoan taikhoan) {
         taikhoan.setRole("1");
@@ -39,20 +40,12 @@ public class AccountService {
         session.setAttribute("otp", otp);
         session.setAttribute("email", dto.getEmail());
         session.setAttribute("pass", dto.getPass());
-        session.setAttribute("username", dto.getUsername());
+        session.setAttribute("username", dto.getUserName());
+        System.out.println(dto.getUserName() + " :tao ten la");
         session.setAttribute("otpExpire", System.currentTimeMillis() + 5 * 60 * 1000);
 
         // Gửi mail async
-        GuiMaDangKiAsync(dto.getEmail(), otp);
-    }
-
-    @Async("threadPoolTaskExecutor")
-    public void GuiMaDangKiAsync(String email, String otp) {
-        SimpleMailMessage mail = new SimpleMailMessage();
-        mail.setTo(email);
-        mail.setSubject("Mã xác nhận đăng ký");
-        mail.setText("Mã xác nhận của bạn là: " + otp);
-        mailSender.send(mail);
+        mailService.sendOtpEmail(dto.getEmail(), otp);
     }
 
     public boolean XacMinhMa(String maXacNhan) {

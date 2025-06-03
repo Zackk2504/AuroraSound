@@ -10,8 +10,8 @@ import lombok.Setter;
 @Getter
 @Setter
 public class DangKiDTO {
+    private String UserName;
     private String email;
     private String pass;
     private String maXacNhan;
-    private String username;
 }
