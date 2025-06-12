@@ -2,6 +2,7 @@ package org.example.code.config;
 
 import org.example.code.model.Taikhoan;
 import org.example.code.repo.AccountRepository;
+import org.example.code.service.CustomOAuth2UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,6 +18,8 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+    @Autowired
+    CustomOAuth2UserService customOAuth2UserService;
     @Autowired
     AccountRepository accountRepository;
     @Bean
@@ -36,6 +39,14 @@ public class SecurityConfig {
                         .loginPage("/login")
                         .defaultSuccessUrl("/index", true)
                         .permitAll()
+                )
+                .oauth2Login(oauth -> oauth
+                        .loginPage("/login") // nếu muốn dùng chung login page
+//                        .defaultSuccessUrl("/register", true)
+                                .successHandler((request, response, authentication) -> {
+                                    response.sendRedirect("/oauth2/success");
+                                }
+                        )
                 );
 
         return http.build();
