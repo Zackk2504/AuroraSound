@@ -22,13 +22,13 @@ public class KhachHang {
     private String hoTen;
 
     @Column(name = "gioiTinh")
-    private Boolean gioiTinh;
+    private String gioiTinh;
 
     @Nationalized
     @Column(name = "soDT", length = 20)
     private String soDT;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "ID_DiaChi")
     private DiaChi idDiachi;
 
@@ -37,7 +37,7 @@ public class KhachHang {
     private String email;
 
     @Column(name = "ngaySinh")
-    private LocalDate ngaySinh;
+    private String ngaySinh;
 
     @Nationalized
     @Column(name = "tenDangNhap", length = 50)

@@ -41,9 +41,15 @@ public class SecurityConfig {
                         .defaultSuccessUrl("/index", true)
                         .permitAll()
                 )
+                .logout(logout -> logout
+                        .logoutUrl("/logout") // URL để logout
+                        .logoutSuccessUrl("/index") // Sau khi logout sẽ chuyển về đây
+                        .invalidateHttpSession(true)
+                        .clearAuthentication(true)
+                        .deleteCookies("JSESSIONID")
+                )
                 .oauth2Login(oauth -> oauth
                         .loginPage("/login")
-//                        .defaultSuccessUrl("/register", true)
                                 .successHandler((request, response, authentication) -> {
                                     response.sendRedirect("/oauth2/success");
                                 }

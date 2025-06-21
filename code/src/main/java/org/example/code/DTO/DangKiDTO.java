@@ -14,4 +14,8 @@ public class DangKiDTO {
     private String email;
     private String pass;
     private String maXacNhan;
+    private String hoTen;
+    private String gioiTinh;
+    private String soDT;
+    private String ngaySinh;
 }
