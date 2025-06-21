@@ -66,7 +66,7 @@ public class AccountService {
             accountRepository.save(taikhoan);
 
             session.removeAttribute("otp");
-            session.removeAttribute("email");
+//            session.removeAttribute("email");
             session.removeAttribute("pass");
             session.removeAttribute("username");
             session.removeAttribute("otpExpire");
@@ -86,7 +86,7 @@ public class AccountService {
             Taikhoan newUser = new Taikhoan();
             newUser.setEmail(email);
             newUser.setUsername(oauthUser.getAttribute("email")); // Sử dụng email làm username
-            newUser.setPass(passwordEncoder.encode("oauth2_default_password")); // Mật khẩu mặc định hoặc mã hóa
+            newUser.setPass(passwordEncoder.encode("oauth2_default_password")); // Mật khẩu mặc định
             newUser.setHoTen(oauthUser.getAttribute("name"));
             // random avatar hoặc dữ liệu mặc định
             accountRepository.save(newUser);

@@ -33,7 +33,8 @@ public class SecurityConfig {
                 .csrf().disable()
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/**").permitAll()
-                        .anyRequest().authenticated()
+//                        .anyRequest().authenticated()
+                                .anyRequest().permitAll()
                 )
                 .formLogin(form -> form
                         .loginPage("/login")
@@ -41,7 +42,7 @@ public class SecurityConfig {
                         .permitAll()
                 )
                 .oauth2Login(oauth -> oauth
-                        .loginPage("/login") // nếu muốn dùng chung login page
+                        .loginPage("/login")
 //                        .defaultSuccessUrl("/register", true)
                                 .successHandler((request, response, authentication) -> {
                                     response.sendRedirect("/oauth2/success");
