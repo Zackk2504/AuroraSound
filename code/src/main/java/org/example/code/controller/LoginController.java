@@ -29,4 +29,9 @@ public class LoginController {
         accountService.LoginWithGG(authentication);
         return ResponseEntity.ok("Đăng nhập thành công!");
     }
+
+    @GetMapping("/logout")
+    public String logoutPage() {
+        return "index"; // index.html
+    }
 }
