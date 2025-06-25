@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class PhienBanService {
@@ -16,8 +17,8 @@ public class PhienBanService {
         return phienBanRepository.findAll();
     }
 
-    public PhienBan getById(Integer id) {
-        return phienBanRepository.findById(id).orElse(null);
+    public Optional<PhienBan> getById(Integer id) {
+        return phienBanRepository.findById(id);
     }
 
     public PhienBan save(PhienBan phienBan) {

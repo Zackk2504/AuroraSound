@@ -1,9 +1,13 @@
 package org.example.code.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Nationalized;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -15,15 +19,15 @@ public class SanPham {
     @Column(name = "ID", nullable = false)
     private Integer id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "ID_loaiSanPham")
     private LoaiSanPham idLoaisanpham;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "ID_thuongHieu")
     private ThuongHieu idThuonghieu;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "ID_xuatXu")
     private XuatXu idXuatxu;
 
@@ -38,5 +42,10 @@ public class SanPham {
 
     @Column(name = "trangThai")
     private Boolean trangThai;
+
+    @OneToMany(mappedBy = "idSanpham", cascade = CascadeType.ALL)
+    @JsonManagedReference
+    private List<SanPhamChiTiet> sanPhamChiTietList = new ArrayList<>();
+
 
 }
