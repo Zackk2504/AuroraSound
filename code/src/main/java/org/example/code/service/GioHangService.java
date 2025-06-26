@@ -13,4 +13,8 @@ public class GioHangService {
     public GioHang add(GioHang gioHang) {
         return gioHangRepository.save(gioHang);
     }
+
+    public GioHang getGioHangByKhachHang(Integer khachHangId) {
+        return gioHangRepository.findByKhachHangId(khachHangId);
+    }
 }
