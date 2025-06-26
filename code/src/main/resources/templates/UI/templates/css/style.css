@@ -1,0 +1,93 @@
+/* css/style.css */
+body {
+    font-family: Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f8f9fa;
+}
+
+/* Navbar styles */
+.navbar-brand {
+    font-size: 1.8rem;
+    color: #fff !important;
+}
+
+.navbar-nav .nav-link {
+    color: rgba(255, 255, 255, 0.75) !important;
+    text-transform: uppercase;
+    font-weight: bold;
+}
+
+.navbar-nav .nav-link.active,
+.navbar-nav .nav-link:hover {
+    color: #fff !important;
+}
+
+.navbar-nav .nav-item .bi {
+    margin-right: 0.5rem;
+    font-size: 1.1rem;
+    vertical-align: middle;
+}
+
+/* Tiêu đề chính các phần (Tin Tức Mới Nhất, Sản Phẩm Nổi Bật) */
+h2 {
+    text-transform: uppercase;
+    font-weight: bold;
+    font-size: 2.5rem;
+    color: #333;
+}
+
+/* Card styles (Tin tức và Sản phẩm) */
+.card-img-top {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
+
+/* Tùy chỉnh cho ảnh sản phẩm và viền ảnh */
+.product-card .card-img-top {
+    height: 250px;
+    border: 1px solid #dee2e6; /* Viền màu xám nhạt */
+    /* border-radius: .25rem; */ /* Nếu muốn bo góc cho viền */
+}
+
+/* Tùy chỉnh cho thẻ sản phẩm */
+.product-card .card-body {
+    display: flex;
+    flex-direction: column;
+    /* justify-content: space-between; */ /* Bỏ cái này để không đẩy các phần tử ra hai đầu theo chiều dọc */
+    align-items: flex-start; /* Canh lề trái cho nội dung card-body */
+    padding: 1rem; /* Tùy chỉnh padding nếu cần */
+}
+
+.product-card .card-title {
+    text-transform: uppercase;
+    font-weight: bold;
+    font-size: 1.15rem;
+    margin-bottom: 0.5rem;
+    width: 100%; /* Đảm bảo tên sản phẩm chiếm đủ chiều rộng */
+}
+
+.product-card .card-text {
+    /* Đảm bảo giá cũng căn lề trái */
+    width: 100%; /* Đảm bảo giá chiếm đủ chiều rộng */
+    text-align: left; /* Căn lề trái cho giá */
+}
+
+.product-card .btn {
+    align-self: flex-start; /* Đẩy nút về phía lề trái */
+}
+
+
+/* Footer styles */
+footer a {
+    transition: color 0.3s ease;
+}
+
+footer a:hover {
+    color: #ffffff !important;
+}
+
+/* Icon in buttons */
+.btn .bi {
+    margin-right: 0.3rem;
+    vertical-align: middle;
+}

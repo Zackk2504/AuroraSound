@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý Tin tức - TaiNghePro Admin</title>
+    <link rel="shortcut icon" href="templates/img/icon.png" type="image/x-icon">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="templates/css/style.css">
+    <style>
+        /* Custom styles for Admin Dashboard (copied for consistency) */
+        body {
+            background-color: #f8f9fa;
+        }
+        #wrapper {
+            display: flex;
+            width: 100%;
+            min-height: 100vh;
+        }
+        #sidebar-wrapper {
+            min-width: 250px;
+            max-width: 250px;
+            background-color: #343a40;
+            color: rgba(255, 255, 255, 0.8);
+            transition: margin .25s ease-out;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+        }
+        #sidebar-wrapper .sidebar-heading {
+            padding: 1.5rem 1rem;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #ffffff;
+            border-bottom: 1px solid rgba(255,255,255,.1);
+        }
+        #sidebar-wrapper .list-group {
+            width: 100%;
+        }
+        #sidebar-wrapper .list-group-item {
+            background-color: transparent;
+            color: rgba(255, 255, 255, 0.7);
+            border: none;
+            padding: 0.8rem 1.5rem;
+            transition: all 0.3s ease;
+        }
+        #sidebar-wrapper .list-group-item:hover,
+        #sidebar-wrapper .list-group-item.active {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            border-left: 4px solid #007bff;
+            padding-left: 1.3rem;
+        }
+        #page-content-wrapper {
+            width: 100%;
+            overflow-x: hidden;
+        }
+        .navbar-admin {
+            border-bottom: 1px solid #dee2e6;
+            background-color: #ffffff;
+        }
+
+        /* Specific styles for Admin News Page */
+        .news-thumb {
+            width: 70px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: .25rem;
+        }
+        .news-status-badge {
+            min-width: 80px;
+            text-align: center;
+        }
+        /* Styles for image preview within modal */
+        .image-preview-container {
+            width: 150px;
+            height: 100px;
+            border: 1px dashed #ccc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            border-radius: .25rem;
+        }
+        .image-preview-container img {
+            max-width: 100%;
+            max-height: 100%;
+            display: block;
+            object-fit: cover;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="d-flex" id="wrapper">
+        <div class="bg-dark border-right" id="sidebar-wrapper">
+           <div class="sidebar-heading">
+                <i class="bi bi-speedometer me-2"></i>
+                <img src="/templates/img/LogoAuRRoRa.png" alt="" width="200px">
+            </div>
+            <div class="list-group list-group-flush">
+                <a href="admin_dashboard.html" class="list-group-item list-group-item-action">
+                    <i class="bi bi-grid-1x2-fill me-2"></i> Dashboard
+                </a>
+                <a href="admin_products.html" class="list-group-item list-group-item-action">
+                    <i class="bi bi-headset me-2"></i> Quản lý Sản phẩm
+                </a>
+                <a href="admin_orders.html" class="list-group-item list-group-item-action">
+                    <i class="bi bi-receipt-cutoff me-2"></i> Quản lý Đơn hàng
+                </a>
+                <a href="admin_pos.html" class="list-group-item list-group-item-action">
+                    <i class="bi bi-shop-window me-2"></i> Bán hàng tại quầy
+                </a>
+                <a href="admin_users.html" class="list-group-item list-group-item-action">
+                    <i class="bi bi-people-fill me-2"></i> Quản lý Người dùng
+                </a>
+                <a href="admin_news.html" class="list-group-item list-group-item-action active">
+                    <i class="bi bi-newspaper me-2"></i> Quản lý Tin tức
+                </a>
+                <a href="admin_brands.html" class="list-group-item list-group-item-action">
+                    <i class="bi bi-award-fill me-2"></i> Quản lý Thương hiệu
+                </a>
+                <a href="admin_vouchers.html" class="list-group-item list-group-item-action">
+                    <i class="bi bi-ticket-perforated-fill me-2"></i> Quản lý Voucher
+                </a>
+                <a href="#" class="list-group-item list-group-item-action">
+                    <i class="bi bi-gear-fill me-2"></i> Cài đặt hệ thống
+                </a>
+                <a href="admin_login.html" class="list-group-item list-group-item-action text-danger">
+                    <i class="bi bi-box-arrow-right me-2"></i> Đăng xuất
+                </a>
+            </div>
+        </div>
+        <div id="page-content-wrapper">
+            <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom navbar-admin">
+                <div class="container-fluid">
+                    <button class="btn btn-primary" id="sidebarToggle"><i class="bi bi-list"></i></button>
+                    <div class="ms-auto">
+                        <span class="navbar-text me-3">
+                            Chào mừng, <strong class="text-primary">Admin Name</strong>
+                        </span>
+                        <a href="admin_login.html" class="btn btn-outline-danger btn-sm">
+                            <i class="bi bi-box-arrow-right"></i> Đăng xuất
+                        </a>
+                    </div>
+                </div>
+            </nav>
+
+            <div class="container-fluid py-4">
+                <h1 class="mt-4 mb-4">Quản lý Tin tức</h1>
+
+                <div class="card shadow-sm p-3 mb-4">
+                    <div class="row g-3 align-items-center mb-3">
+                        <div class="col-md-5">
+                            <input type="text" class="form-control" placeholder="Tìm kiếm theo Tiêu đề, Nội dung...">
+                        </div>
+                        <div class="col-md-3">
+                            <select class="form-select">
+                                <option selected>Tất cả trạng thái</option>
+                                <option value="published">Đã xuất bản</option>
+                                <option value="draft">Bản nháp</option>
+                                <option value="archived">Lưu trữ</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <input type="date" class="form-control" title="Lọc theo ngày đăng">
+                        </div>
+                        <div class="col-md-2">
+                            <button class="btn btn-primary w-100"><i class="bi bi-search me-1"></i> Lọc</button>
+                        </div>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <button class="btn btn-outline-secondary me-2"><i class="bi bi-x-circle me-1"></i> Đặt lại</button>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#newsFormModal" id="addNewsBtn">
+                                <i class="bi bi-plus-circle me-1"></i> Thêm bài viết mới
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0"><i class="bi bi-newspaper me-2"></i> Danh sách Bài viết</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">#</th>
+                                        <th scope="col">Ảnh đại diện</th>
+                                        <th scope="col">Tiêu đề</th>
+                                        <th scope="col">Tác giả</th>
+                                        <th scope="col">Ngày đăng</th>
+                                        <th scope="col">Trạng thái</th>
+                                        <th scope="col">Hành động</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>1</td>
+                                        <td><img src="https://via.placeholder.com/70x50?text=News1" alt="News 1" class="news-thumb"></td>
+                                        <td>Review chi tiết Tai nghe Bluetooth XYZ</td>
+                                        <td>Admin Name</td>
+                                        <td>25/06/2025</td>
+                                        <td><span class="badge bg-success news-status-badge">Đã xuất bản</span></td>
+                                        <td>
+                                            <button class="btn btn-sm btn-info text-white me-1" title="Xem bài viết">
+                                                <i class="bi bi-eye"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-warning text-dark me-1 edit-news-btn" title="Chỉnh sửa" data-bs-toggle="modal" data-bs-target="#newsFormModal" data-news-id="1">
+                                                <i class="bi bi-pencil"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-danger" title="Xóa">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>2</td>
+                                        <td><img src="https://via.placeholder.com/70x50?text=News2" alt="News 2" class="news-thumb"></td>
+                                        <td>Top 5 tai nghe Gaming tốt nhất năm 2025</td>
+                                        <td>Admin Name</td>
+                                        <td>20/06/2025</td>
+                                        <td><span class="badge bg-warning text-dark news-status-badge">Bản nháp</span></td>
+                                        <td>
+                                            <button class="btn btn-sm btn-info text-white me-1" title="Xem bài viết">
+                                                <i class="bi bi-eye"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-warning text-dark me-1 edit-news-btn" title="Chỉnh sửa" data-bs-toggle="modal" data-bs-target="#newsFormModal" data-news-id="2">
+                                                <i class="bi bi-pencil"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-danger" title="Xóa">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="text-end mt-3">
+                            <a href="#" class="btn btn-outline-primary btn-sm">Xem tất cả</a>
+                        </div>
+                    </div>
+                </div>
+
+                <nav aria-label="Page navigation for admin news" class="mt-4">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item disabled">
+                            <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Trước</a>
+                        </li>
+                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                        <li class="page-item"><a class="page-link" href="#">2</a></li>
+                        <li class="page-item"><a class="page-link" href="#">3</a></li>
+                        <li class="page-item">
+                            <a class="page-link" href="#">Sau</a>
+                        </li>
+                    </ul>
+                </nav>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="newsFormModal" tabindex="-1" aria-labelledby="newsFormModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="newsFormModalLabel"><i class="bi bi-pencil-square me-2"></i> <span id="modalFormTitle">Thêm Bài viết mới</span></h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="newsForm">
+                        <input type="hidden" id="newsId" value=""> <div class="mb-3">
+                            <label for="newsTitle" class="form-label">Tiêu đề bài viết <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="newsTitleInput" placeholder="Tiêu đề hấp dẫn cho bài viết của bạn" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="newsSlug" class="form-label">Đường dẫn (Slug)</label>
+                            <input type="text" class="form-control" id="newsSlugInput" placeholder="tu-dong-tao-tu-tieu-de">
+                            <small class="text-muted">Tự động tạo hoặc nhập thủ công cho SEO.</small>
+                        </div>
+                        <div class="mb-3">
+                            <label for="newsAuthor" class="form-label">Tác giả</label>
+                            <input type="text" class="form-control" id="newsAuthorInput" placeholder="Tên tác giả" value="Admin Name" readonly>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="newsFeaturedImage" class="form-label">Ảnh đại diện</label>
+                                <input class="form-control" type="file" id="newsFeaturedImageInput" accept="image/*">
+                                <div class="mt-2 image-preview-container">
+                                    <img src="https://via.placeholder.com/150x100?text=Ảnh+đại+diện" id="newsImagePreview" alt="Ảnh đại diện bài viết">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="newsStatus" class="form-label">Trạng thái <span class="text-danger">*</span></label>
+                                <select class="form-select" id="newsStatusInput" required>
+                                    <option value="published" selected>Đã xuất bản</option>
+                                    <option value="draft">Bản nháp</option>
+                                    <option value="archived">Lưu trữ</option>
+                                </select>
+                                <label for="newsPublishDate" class="form-label mt-3">Ngày đăng</label>
+                                <input type="datetime-local" class="form-control" id="newsPublishDateInput">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="newsContent" class="form-label">Nội dung bài viết <span class="text-danger">*</span></label>
+                            <textarea class="form-control" id="newsContentInput" rows="15" placeholder="Nhập nội dung chi tiết bài viết của bạn..." required></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="bi bi-x-circle me-2"></i> Hủy</button>
+                    <button type="submit" form="newsForm" class="btn btn-success"><i class="bi bi-save me-2"></i> Lưu Bài viết</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
+    <script>
+        // Toggle the sidebar (copied for consistency)
+        document.getElementById("sidebarToggle").addEventListener("click", function() {
+            document.getElementById("wrapper").classList.toggle("toggled");
+        });
+
+        // Simple Image Preview (for news featured image)
+        const newsImageInput = document.getElementById('newsFeaturedImageInput');
+        const newsImagePreview = document.getElementById('newsImagePreview');
+
+        if (newsImageInput) {
+            newsImageInput.addEventListener('change', function(event) {
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        newsImagePreview.src = e.target.result;
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    newsImagePreview.src = 'https://via.placeholder.com/150x100?text=Ảnh+đại+diện'; // Fallback
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const newsFormModal = document.getElementById('newsFormModal');
+            newsFormModal.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget; // Button that triggered the modal
+                const newsId = button.getAttribute('data-news-id'); // Get news ID if editing
+
+                const modalFormTitle = document.getElementById('modalFormTitle');
+                const newsIdInput = document.getElementById('newsId');
+                const newsTitleInput = document.getElementById('newsTitleInput');
+                const newsSlugInput = document.getElementById('newsSlugInput');
+                const newsAuthorInput = document.getElementById('newsAuthorInput');
+                const newsFeaturedImageInput = document.getElementById('newsFeaturedImageInput');
+                const newsStatusInput = document.getElementById('newsStatusInput');
+                const newsPublishDateInput = document.getElementById('newsPublishDateInput');
+                const newsContentInput = document.getElementById('newsContentInput');
+                const newsPreviewImage = document.getElementById('newsImagePreview');
+
+
+                // Reset form fields
+                newsForm.reset();
+                newsIdInput.value = '';
+                newsPreviewImage.src = 'https://via.placeholder.com/150x100?text=Ảnh+đại+diện'; // Reset image preview
+                newsAuthorInput.value = 'Admin Name'; // Default author
+
+                if (newsId) { // Edit mode
+                    modalFormTitle.textContent = 'Chỉnh sửa Bài viết';
+                    // Populate form with example data for specific newsId
+                    if (newsId === '1') {
+                        newsIdInput.value = '1';
+                        newsTitleInput.value = 'Review chi tiết Tai nghe Bluetooth XYZ';
+                        newsSlugInput.value = 'review-tai-nghe-bluetooth-xyz';
+                        newsAuthorInput.value = 'Admin Name';
+                        newsPreviewImage.src = 'https://via.placeholder.com/150x100?text=News1';
+                        newsStatusInput.value = 'published';
+                        newsPublishDateInput.value = '2025-06-25T14:30';
+                        newsContentInput.value = 'Đây là nội dung chi tiết của bài review tai nghe XYZ Gaming Pro. Bài viết mô tả sâu về hiệu năng, thiết kế, chất âm và trải nghiệm sử dụng thực tế. Đánh giá ưu nhược điểm và đưa ra lời khuyên cho người dùng...';
+                    } else if (newsId === '2') {
+                        newsIdInput.value = '2';
+                        newsTitleInput.value = 'Top 5 tai nghe Gaming tốt nhất năm 2025';
+                        newsSlugInput.value = 'top-5-tai-nghe-gaming-tot-nhat-2025';
+                        newsAuthorInput.value = 'Admin Name';
+                        newsPreviewImage.src = 'https://via.placeholder.com/150x100?text=News2';
+                        newsStatusInput.value = 'draft';
+                        newsPublishDateInput.value = '2025-06-20T10:00';
+                        newsContentInput.value = 'Nội dung chi tiết về top 5 tai nghe gaming. Phân tích ưu nhược điểm của từng loại, phù hợp với từng đối tượng game thủ khác nhau. Chia sẻ kinh nghiệm chọn mua tai nghe gaming...';
+                    }
+                    // Add more conditions for other news IDs
+                } else { // Add mode
+                    modalFormTitle.textContent = 'Thêm Bài viết mới';
+                    const now = new Date();
+                    now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+                    newsPublishDateInput.value = now.toISOString().slice(0, 16);
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>
