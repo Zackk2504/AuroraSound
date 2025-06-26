@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý Sản phẩm - TaiNghePro Admin</title>
+    <link rel="shortcut icon" href="templates/img/icon.png" type="image/x-icon">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="templates/css/style.css">
+    <style>
+        /* Custom styles for Admin Dashboard (copied for consistency) */
+        body {
+            background-color: #f8f9fa; /* Light background for the dashboard */
+        }
+        #wrapper {
+            display: flex;
+            width: 100%;
+            min-height: 100vh; /* Use min-height to allow content to expand */
+        }
+        #sidebar-wrapper {
+            min-width: 250px;
+            max-width: 250px;
+            background-color: #343a40; /* Dark sidebar background */
+            color: rgba(255, 255, 255, 0.8);
+            transition: margin .25s ease-out;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+        }
+        #sidebar-wrapper .sidebar-heading {
+            padding: 1.5rem 1rem;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #ffffff;
+            border-bottom: 1px solid rgba(255,255,255,.1);
+        }
+        #sidebar-wrapper .list-group {
+            width: 100%;
+        }
+        #sidebar-wrapper .list-group-item {
+            background-color: transparent;
+            color: rgba(255, 255, 255, 0.7);
+            border: none;
+            padding: 0.8rem 1.5rem;
+            transition: all 0.3s ease;
+        }
+        #sidebar-wrapper .list-group-item:hover,
+        #sidebar-wrapper .list-group-item.active {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            border-left: 4px solid #007bff; /* Blue border for active/hover */
+            padding-left: 1.3rem; /* Adjust padding due to border */
+        }
+        #page-content-wrapper {
+            width: 100%;
+            overflow-x: hidden; /* Prevent horizontal scroll */
+        }
+        .navbar-admin {
+            border-bottom: 1px solid #dee2e6;
+            background-color: #ffffff;
+        }
+
+        /* Specific styles for Admin Products Page */
+        .product-thumb {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: .25rem;
+        }
+        .product-status-badge {
+            min-width: 80px;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="d-flex" id="wrapper">
+        <div class="bg-dark border-right" id="sidebar-wrapper">
+            <div class="sidebar-heading">
+                <i class="bi bi-speedometer me-2"></i>
+                <img src="/templates/img/LogoAuRRoRa.png" alt="" width="200px">
+            </div>
+            <div class="list-group list-group-flush">
+                <a href="admin_dashboard.html" class="list-group-item list-group-item-action">
+                    <i class="bi bi-grid-1x2-fill me-2"></i> Dashboard
+                </a>
+                <a href="admin_products.html" class="list-group-item list-group-item-action active">
+                    <i class="bi bi-headset me-2"></i> Quản lý Sản phẩm
+                </a>
+                <a href="admin_orders.html" class="list-group-item list-group-item-action">
+                    <i class="bi bi-receipt-cutoff me-2"></i> Quản lý Đơn hàng
+                </a>
+                <a href="admin_pos.html" class="list-group-item list-group-item-action">
+                    <i class="bi bi-shop-window me-2"></i> Bán hàng tại quầy
+                </a>
+                <a href="admin_users.html" class="list-group-item list-group-item-action">
+                    <i class="bi bi-people-fill me-2"></i> Quản lý Người dùng
+                </a>
+                <a href="admin_news.html" class="list-group-item list-group-item-action">
+                    <i class="bi bi-newspaper me-2"></i> Quản lý Tin tức
+                </a>
+                <a href="admin_brands.html" class="list-group-item list-group-item-action">
+                    <i class="bi bi-award-fill me-2"></i> Quản lý Thương hiệu
+                </a>
+                <a href="admin_vouchers.html" class="list-group-item list-group-item-action">
+                    <i class="bi bi-ticket-perforated-fill me-2"></i> Quản lý Voucher
+                </a>
+                <a href="#" class="list-group-item list-group-item-action">
+                    <i class="bi bi-gear-fill me-2"></i> Cài đặt hệ thống
+                </a>
+                <a href="admin_login.html" class="list-group-item list-group-item-action text-danger">
+                    <i class="bi bi-box-arrow-right me-2"></i> Đăng xuất
+                </a>
+            </div>
+        </div>
+        <div id="page-content-wrapper">
+            <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom navbar-admin">
+                <div class="container-fluid">
+                    <button class="btn btn-primary" id="sidebarToggle"><i class="bi bi-list"></i></button>
+                    <div class="ms-auto">
+                        <span class="navbar-text me-3">
+                            Chào mừng, <strong class="text-primary">Admin Name</strong>
+                        </span>
+                        <a href="admin_login.html" class="btn btn-outline-danger btn-sm">
+                            <i class="bi bi-box-arrow-right"></i> Đăng xuất
+                        </a>
+                    </div>
+                </div>
+            </nav>
+
+            <div class="container-fluid py-4">
+                <h1 class="mt-4 mb-4">Quản lý Sản phẩm</h1>
+
+                <div class="card shadow-sm p-3 mb-4">
+                    <div class="row g-3 align-items-center mb-3">
+                        <div class="col-md-4">
+                            <input type="text" class="form-control" placeholder="Tìm kiếm theo Tên SP, SKU...">
+                        </div>
+                        <div class="col-md-3">
+                            <select class="form-select">
+                                <option selected>Tất cả Danh mục</option>
+                                <option value="bluetooth">Tai nghe Bluetooth</option>
+                                <option value="wired">Tai nghe Có dây</option>
+                                <option value="gaming">Tai nghe Gaming</option>
+                                <option value="noise-cancelling">Tai nghe Chống ồn</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <select class="form-select">
+                                <option selected>Tất cả Hãng</option>
+                                <option value="sony">Sony</option>
+                                <option value="jbl">JBL</option>
+                                <option value="apple">Apple</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <select class="form-select">
+                                <option selected>Tất cả trạng thái</option>
+                                <option value="active">Hoạt động</option>
+                                <option value="inactive">Không hoạt động</option>
+                                <option value="draft">Bản nháp</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <button class="btn btn-primary me-2"><i class="bi bi-funnel-fill me-1"></i> Lọc</button>
+                            <button class="btn btn-outline-secondary"><i class="bi bi-x-circle me-1"></i> Đặt lại</button>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addProductModal">
+                                <i class="bi bi-plus-circle me-1"></i> Thêm sản phẩm mới
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0"><i class="bi bi-headset me-2"></i> Danh sách Sản phẩm</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">#</th>
+                                        <th scope="col">Ảnh</th>
+                                        <th scope="col">Tên sản phẩm</th>
+                                        <th scope="col">Hãng</th>
+                                        <th scope="col">Danh mục</th>
+                                        <th scope="col">Giá (VNĐ)</th>
+                                        <th scope="col">Tồn kho</th>
+                                        <th scope="col">Trạng thái</th>
+                                        <th scope="col">Hành động</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>1</td>
+                                        <td><img src="https://via.placeholder.com/50x50?text=SP1" alt="SP1" class="product-thumb"></td>
+                                        <td>Tai nghe Sony WH-1000XM5</td>
+                                        <td>Sony</td>
+                                        <td>Chống ồn</td>
+                                        <td>5.990.000</td>
+                                        <td>50</td>
+                                        <td><span class="badge bg-success product-status-badge">Hoạt động</span></td>
+                                        <td>
+                                            <button class="btn btn-sm btn-info text-white me-1" title="Xem chi tiết" data-bs-toggle="modal" data-bs-target="#productDetailAdminModal" data-product-id="1">
+                                                <i class="bi bi-eye"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-warning text-dark me-1" title="Chỉnh sửa">
+                                                <i class="bi bi-pencil"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-danger" title="Xóa">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>2</td>
+                                        <td><img src="https://via.placeholder.com/50x50?text=SP2" alt="SP2" class="product-thumb"></td>
+                                        <td>Tai nghe JBL Wave Buds</td>
+                                        <td>JBL</td>
+                                        <td>Bluetooth</td>
+                                        <td>990.000</td>
+                                        <td>120</td>
+                                        <td><span class="badge bg-success product-status-badge">Hoạt động</span></td>
+                                        <td>
+                                            <button class="btn btn-sm btn-info text-white me-1" title="Xem chi tiết" data-bs-toggle="modal" data-bs-target="#productDetailAdminModal" data-product-id="2">
+                                                <i class="bi bi-eye"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-warning text-dark me-1" title="Chỉnh sửa">
+                                                <i class="bi bi-pencil"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-danger" title="Xóa">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>3</td>
+                                        <td><img src="https://via.placeholder.com/50x50?text=SP3" alt="SP3" class="product-thumb"></td>
+                                        <td>Apple AirPods Pro 2</td>
+                                        <td>Apple</td>
+                                        <td>Bluetooth</td>
+                                        <td>4.500.000</td>
+                                        <td>80</td>
+                                        <td><span class="badge bg-warning text-dark product-status-badge">Bản nháp</span></td>
+                                        <td>
+                                            <button class="btn btn-sm btn-info text-white me-1" title="Xem chi tiết" data-bs-toggle="modal" data-bs-target="#productDetailAdminModal" data-product-id="3">
+                                                <i class="bi bi-eye"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-warning text-dark me-1" title="Chỉnh sửa">
+                                                <i class="bi bi-pencil"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-danger" title="Xóa">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                     <tr>
+                                        <td>4</td>
+                                        <td><img src="https://via.placeholder.com/50x50?text=SP4" alt="SP4" class="product-thumb"></td>
+                                        <td>Sennheiser HD 660S2</td>
+                                        <td>Sennheiser</td>
+                                        <td>Có dây</td>
+                                        <td>15.000.000</td>
+                                        <td>15</td>
+                                        <td><span class="badge bg-success product-status-badge">Hoạt động</span></td>
+                                        <td>
+                                            <button class="btn btn-sm btn-info text-white me-1" title="Xem chi tiết" data-bs-toggle="modal" data-bs-target="#productDetailAdminModal" data-product-id="4">
+                                                <i class="bi bi-eye"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-warning text-dark me-1" title="Chỉnh sửa">
+                                                <i class="bi bi-pencil"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-danger" title="Xóa">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                            </table>
+                        </div>
+                        <div class="text-end mt-3">
+                            <a href="#" class="btn btn-outline-primary btn-sm">Xem tất cả</a>
+                        </div>
+                    </div>
+                </div>
+
+                <nav aria-label="Page navigation for admin products" class="mt-4">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item disabled">
+                            <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Trước</a>
+                        </li>
+                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                        <li class="page-item"><a class="page-link" href="#">2</a></li>
+                        <li class="page-item"><a class="page-link" href="#">3</a></li>
+                        <li class="page-item">
+                            <a class="page-link" href="#">Sau</a>
+                        </li>
+                    </ul>
+                </nav>
+
+            </div>
+        </div>
+        </div>
+    <div class="modal fade" id="productDetailAdminModal" tabindex="-1" aria-labelledby="productDetailAdminModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="productDetailAdminModalLabel">Chi tiết Sản phẩm: <span id="modalProductName">Tai nghe XYZ Gaming Pro</span></h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-5">
+                            <img src="https://via.placeholder.com/500x500?text=Ảnh+SP+Chi+Tiết" class="img-fluid rounded mb-3" id="detailProductImage" alt="Product Image">
+                            <h6>Các ảnh khác:</h6>
+                            <div class="row row-cols-3 g-2">
+                                <div class="col"><img src="https://via.placeholder.com/100x100?text=Ảnh+1" class="img-fluid rounded border p-1" alt="Ảnh nhỏ 1"></div>
+                                <div class="col"><img src="https://via.placeholder.com/100x100?text=Ảnh+2" class="img-fluid rounded border p-1" alt="Ảnh nhỏ 2"></div>
+                                <div class="col"><img src="https://via.placeholder.com/100x100?text=Ảnh+3" class="img-fluid rounded border p-1" alt="Ảnh nhỏ 3"></div>
+                            </div>
+                        </div>
+                        <div class="col-md-7">
+                            <h5><i class="bi bi-info-circle me-2"></i> Thông tin cơ bản</h5>
+                            <p class="mb-1"><strong>Tên sản phẩm:</strong> <span class="product-info" id="detailProductNameInfo">Tai nghe Sony WH-1000XM5</span></p>
+                            <p class="mb-1"><strong>SKU:</strong> <span class="product-info" id="detailProductSKU">SN-WH1000XM5</span></p>
+                            <p class="mb-1"><strong>Giá:</strong> <span class="product-info text-danger fw-bold" id="detailProductPrice">5.990.000 VNĐ</span></p>
+                            <p class="mb-1"><strong>Giá giảm:</strong> <span class="product-info text-success" id="detailProductDiscountPrice">5.500.000 VNĐ</span></p>
+                            <p class="mb-1"><strong>Hãng:</strong> <span class="product-info" id="detailProductBrand">Sony</span></p>
+                            <p class="mb-1"><strong>Danh mục:</strong> <span class="product-info" id="detailProductCategory">Chống ồn</span></p>
+                            <p class="mb-1"><strong>Tồn kho:</strong> <span class="product-info" id="detailProductStock">50</span></p>
+                            <p class="mb-3"><strong>Trạng thái:</strong> <span class="product-info badge bg-success" id="detailProductStatus">Hoạt động</span></p>
+
+                            <h5 class="mt-4 mb-2"><i class="bi bi-file-text me-2"></i> Mô tả & Thông số</h5>
+                            <p class="mb-1"><strong>Mô tả ngắn:</strong> <span class="product-info" id="detailProductShortDesc">Tai nghe cao cấp với công nghệ chống ồn hàng đầu.</span></p>
+                            <p class="mb-1"><strong>Mô tả chi tiết:</strong> <span class="product-info" id="detailProductLongDesc">Đây là tai nghe chống ồn chủ động được đánh giá cao, mang lại trải nghiệm nghe nhạc không giới hạn. Thiết kế công thái học giúp ôm sát tai một cách thoải mái, lý tưởng cho những chuyến đi dài hay làm việc tại nhà.</span></p>
+                            <p class="mb-1"><strong>Thông số kỹ thuật:</strong> <span class="product-info" id="detailProductSpecs">Dải tần 4Hz-40kHz, Pin 30h, Trọng lượng 250g, Bluetooth 5.2.</span></p>
+                            
+                            <h5 class="mt-4 mb-2"><i class="bi bi-tags me-2"></i> Thuộc tính khác</h5>
+                            <p class="mb-1"><strong>Nổi bật:</strong> <span class="product-info" id="detailProductFeatured">Có</span></p>
+                            <p class="mb-1"><strong>Mới:</strong> <span class="product-info" id="detailProductNew">Không</span></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                    <button type="button" class="btn btn-warning text-dark"><i class="bi bi-pencil me-2"></i> Chỉnh sửa SP</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="addProductModal" tabindex="-1" aria-labelledby="addProductModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-scrollable"> <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title" id="addProductModalLabel"><i class="bi bi-plus-circle me-2"></i> Thêm sản phẩm mới</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <h6 class="mb-3">Thông tin cơ bản</h6>
+                                <div class="mb-3">
+                                    <label for="productName" class="form-label">Tên sản phẩm <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="productName" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="productSKU" class="form-label">Mã SKU</label>
+                                    <input type="text" class="form-control" id="productSKU">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="productPrice" class="form-label">Giá (VNĐ) <span class="text-danger">*</span></label>
+                                    <input type="number" class="form-control" id="productPrice" min="0" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="productDiscountPrice" class="form-label">Giá giảm (VNĐ)</label>
+                                    <input type="number" class="form-control" id="productDiscountPrice" min="0">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="productBrand" class="form-label">Hãng <span class="text-danger">*</span></label>
+                                    <select class="form-select" id="productBrand" required>
+                                        <option selected disabled value="">Chọn hãng...</option>
+                                        <option value="sony">Sony</option>
+                                        <option value="jbl">JBL</option>
+                                        <option value="apple">Apple</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="productCategory" class="form-label">Danh mục <span class="text-danger">*</span></label>
+                                    <select class="form-select" id="productCategory" required>
+                                        <option selected disabled value="">Chọn danh mục...</option>
+                                        <option value="bluetooth">Tai nghe Bluetooth</option>
+                                        <option value="wired">Tai nghe Có dây</option>
+                                        <option value="gaming">Tai nghe Gaming</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="productStock" class="form-label">Tồn kho <span class="text-danger">*</span></label>
+                                    <input type="number" class="form-control" id="productStock" min="0" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="productStatus" class="form-label">Trạng thái <span class="text-danger">*</span></label>
+                                    <select class="form-select" id="productStatus" required>
+                                        <option value="active" selected>Hoạt động</option>
+                                        <option value="inactive">Không hoạt động</option>
+                                        <option value="draft">Bản nháp</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h6 class="mb-3">Mô tả & Hình ảnh</h6>
+                                <div class="mb-3">
+                                    <label for="productShortDesc" class="form-label">Mô tả ngắn</label>
+                                    <textarea class="form-control" id="productShortDesc" rows="3"></textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="productLongDesc" class="form-label">Mô tả chi tiết</label>
+                                    <textarea class="form-control" id="productLongDesc" rows="6"></textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="productSpecs" class="form-label">Thông số kỹ thuật (JSON/Text)</label>
+                                    <textarea class="form-control" id="productSpecs" rows="4" placeholder='{"Dải tần": "4Hz-40kHz", "Pin": "30h"}'></textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="mainImage" class="form-label">Ảnh chính <span class="text-danger">*</span></label>
+                                    <input type="file" class="form-control" id="mainImage" accept="image/*" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="otherImages" class="form-label">Các ảnh khác</label>
+                                    <input type="file" class="form-control" id="otherImages" accept="image/*" multiple>
+                                    <small class="text-muted">Chọn nhiều ảnh cùng lúc.</small>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="isFeatured">
+                                    <label class="form-check-label" for="isFeatured">
+                                        Sản phẩm nổi bật
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="isNew">
+                                    <label class="form-check-label" for="isNew">
+                                        Sản phẩm mới
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-success"><i class="bi bi-save me-2"></i> Lưu sản phẩm</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
+    <script>
+        // Toggle the sidebar (copied for consistency)
+        document.getElementById("sidebarToggle").addEventListener("click", function() {
+            document.getElementById("wrapper").classList.toggle("toggled");
+        });
+
+        // Dynamic Product Detail Admin Modal (for quick view of product details)
+        document.addEventListener('DOMContentLoaded', function() {
+            var productDetailAdminModal = document.getElementById('productDetailAdminModal');
+            productDetailAdminModal.addEventListener('show.bs.modal', function (event) {
+                var button = event.relatedTarget;
+                var productId = button.getAttribute('data-product-id');
+
+                // Get all elements to update in the modal
+                var modalProductName = productDetailAdminModal.querySelector('#modalProductName');
+                var detailProductImage = productDetailAdminModal.querySelector('#detailProductImage');
+                var detailProductNameInfo = productDetailAdminModal.querySelector('#detailProductNameInfo');
+                var detailProductSKU = productDetailAdminModal.querySelector('#detailProductSKU');
+                var detailProductPrice = productDetailAdminModal.querySelector('#detailProductPrice');
+                var detailProductDiscountPrice = productDetailAdminModal.querySelector('#detailProductDiscountPrice');
+                var detailProductBrand = productDetailAdminModal.querySelector('#detailProductBrand');
+                var detailProductCategory = productDetailAdminModal.querySelector('#detailProductCategory');
+                var detailProductStock = productDetailAdminModal.querySelector('#detailProductStock');
+                var detailProductStatus = productDetailAdminModal.querySelector('#detailProductStatus');
+                var detailProductShortDesc = productDetailAdminModal.querySelector('#detailProductShortDesc');
+                var detailProductLongDesc = productDetailAdminModal.querySelector('#detailProductLongDesc');
+                var detailProductSpecs = productDetailAdminModal.querySelector('#detailProductSpecs');
+                var detailProductFeatured = productDetailAdminModal.querySelector('#detailProductFeatured');
+                var detailProductNew = productDetailAdminModal.querySelector('#detailProductNew');
+
+                // Static data for demonstration. In a real app, you'd fetch this from backend.
+                if (productId === '1') {
+                    modalProductName.textContent = 'Tai nghe Sony WH-1000XM5';
+                    detailProductImage.src = 'https://via.placeholder.com/500x500?text=Sony+XM5';
+                    detailProductNameInfo.textContent = 'Tai nghe Sony WH-1000XM5';
+                    detailProductSKU.textContent = 'SN-WH1000XM5';
+                    detailProductPrice.textContent = '5.990.000 VNĐ';
+                    detailProductDiscountPrice.textContent = '5.500.000 VNĐ';
+                    detailProductBrand.textContent = 'Sony';
+                    detailProductCategory.textContent = 'Chống ồn';
+                    detailProductStock.textContent = '50';
+                    detailProductStatus.textContent = 'Hoạt động';
+                    detailProductStatus.className = 'product-info badge bg-success';
+                    detailProductShortDesc.textContent = 'Tai nghe cao cấp với công nghệ chống ồn hàng đầu.';
+                    detailProductLongDesc.textContent = 'Đây là tai nghe chống ồn chủ động được đánh giá cao, mang lại trải nghiệm nghe nhạc không giới hạn. Thiết kế công thái học giúp ôm sát tai một cách thoải mái, lý tưởng cho những chuyến đi dài hay làm việc tại nhà.';
+                    detailProductSpecs.textContent = 'Dải tần 4Hz-40kHz, Pin 30h, Trọng lượng 250g, Bluetooth 5.2.';
+                    detailProductFeatured.textContent = 'Có';
+                    detailProductNew.textContent = 'Không';
+                } else if (productId === '2') {
+                    modalProductName.textContent = 'Tai nghe JBL Wave Buds';
+                    detailProductImage.src = 'https://via.placeholder.com/500x500?text=JBL+Wave+Buds';
+                    detailProductNameInfo.textContent = 'Tai nghe JBL Wave Buds';
+                    detailProductSKU.textContent = 'JBL-WAVE-BUDS';
+                    detailProductPrice.textContent = '990.000 VNĐ';
+                    detailProductDiscountPrice.textContent = '890.000 VNĐ';
+                    detailProductBrand.textContent = 'JBL';
+                    detailProductCategory.textContent = 'Bluetooth';
+                    detailProductStock.textContent = '120';
+                    detailProductStatus.textContent = 'Hoạt động';
+                    detailProductStatus.className = 'product-info badge bg-success';
+                    detailProductShortDesc.textContent = 'Tai nghe true wireless với âm bass mạnh mẽ.';
+                    detailProductLongDesc.textContent = 'JBL Wave Buds mang đến âm thanh sống động với công nghệ JBL Deep Bass. Thiết kế nhỏ gọn, chống nước IPX2, lý tưởng cho mọi hoạt động hàng ngày.';
+                    detailProductSpecs.textContent = 'Pin 32h (tai nghe + hộp sạc), Bluetooth 5.2, Chống nước IPX2.';
+                    detailProductFeatured.textContent = 'Không';
+                    detailProductNew.textContent = 'Có';
+                } else if (productId === '3') {
+                    modalProductName.textContent = 'Apple AirPods Pro 2';
+                    detailProductImage.src = 'https://via.placeholder.com/500x500?text=AirPods+Pro+2';
+                    detailProductNameInfo.textContent = 'Apple AirPods Pro 2';
+                    detailProductSKU.textContent = 'AP-AIRPODS-PRO2';
+                    detailProductPrice.textContent = '4.500.000 VNĐ';
+                    detailProductDiscountPrice.textContent = '4.200.000 VNĐ';
+                    detailProductBrand.textContent = 'Apple';
+                    detailProductCategory.textContent = 'Bluetooth';
+                    detailProductStock.textContent = '80';
+                    detailProductStatus.textContent = 'Bản nháp';
+                    detailProductStatus.className = 'product-info badge bg-warning text-dark';
+                    detailProductShortDesc.textContent = 'Tai nghe không dây chống ồn cao cấp từ Apple.';
+                    detailProductLongDesc.textContent = 'Phiên bản cải tiến của AirPods Pro, với chip H2 mạnh mẽ, khử tiếng ồn chủ động tốt hơn và chế độ xuyên âm thích ứng. Âm thanh không gian cá nhân hóa.';
+                    detailProductSpecs.textContent = 'Chip H2, ANC cải tiến, Chế độ xuyên âm, Âm thanh không gian, Pin 6h (tai nghe), 30h (hộp sạc).';
+                    detailProductFeatured.textContent = 'Có';
+                    detailProductNew.textContent = 'Có';
+                } else if (productId === '4') {
+                    modalProductName.textContent = 'Sennheiser HD 660S2';
+                    detailProductImage.src = 'https://via.placeholder.com/500x500?text=Sennheiser+HD660S2';
+                    detailProductNameInfo.textContent = 'Sennheiser HD 660S2';
+                    detailProductSKU.textContent = 'SN-HD660S2';
+                    detailProductPrice.textContent = '15.000.000 VNĐ';
+                    detailProductDiscountPrice.textContent = '14.000.000 VNĐ';
+                    detailProductBrand.textContent = 'Sennheiser';
+                    detailProductCategory.textContent = 'Có dây';
+                    detailProductStock.textContent = '15';
+                    detailProductStatus.textContent = 'Hoạt động';
+                    detailProductStatus.className = 'product-info badge bg-success';
+                    detailProductShortDesc.textContent = 'Tai nghe audiophile cao cấp, âm thanh tham chiếu.';
+                    detailProductLongDesc.textContent = 'Sennheiser HD 660S2 là phiên bản nâng cấp của huyền thoại HD 660S, mang lại trải nghiệm âm thanh chân thực, chi tiết với dải bass được cải thiện. Lý tưởng cho người đam mê âm nhạc và các chuyên gia.';
+                    detailProductSpecs.textContent = 'Dải tần 10Hz-41kHz, Trở kháng 300 ohm, Cáp rời 6.35mm và 4.4mm Pentaconn.';
+                    detailProductFeatured.textContent = 'Có';
+                    detailProductNew.textContent = 'Không';
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>
