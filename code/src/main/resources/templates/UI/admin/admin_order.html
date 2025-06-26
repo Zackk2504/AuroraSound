@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý Đơn hàng - TaiNghePro Admin</title>
+    <link rel="shortcut icon" href="templates/img/icon.png" type="image/x-icon">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="templates/css/style.css">
+    <style>
+        /* Custom styles for Admin Dashboard (copied for consistency) */
+        body {
+            background-color: #f8f9fa; /* Light background for the dashboard */
+        }
+        #wrapper {
+            display: flex;
+            width: 100%;
+            min-height: 100vh; /* Use min-height to allow content to expand */
+        }
+        #sidebar-wrapper {
+            min-width: 250px;
+            max-width: 250px;
+            background-color: #343a40; /* Dark sidebar background */
+            color: rgba(255, 255, 255, 0.8);
+            transition: margin .25s ease-out;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+        }
+        #sidebar-wrapper .sidebar-heading {
+            padding: 1.5rem 1rem;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #ffffff;
+            border-bottom: 1px solid rgba(255,255,255,.1);
+        }
+        #sidebar-wrapper .list-group {
+            width: 100%;
+        }
+        #sidebar-wrapper .list-group-item {
+            background-color: transparent;
+            color: rgba(255, 255, 255, 0.7);
+            border: none;
+            padding: 0.8rem 1.5rem;
+            transition: all 0.3s ease;
+        }
+        #sidebar-wrapper .list-group-item:hover,
+        #sidebar-wrapper .list-group-item.active {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            border-left: 4px solid #007bff; /* Blue border for active/hover */
+            padding-left: 1.3rem; /* Adjust padding due to border */
+        }
+        #page-content-wrapper {
+            width: 100%;
+            overflow-x: hidden; /* Prevent horizontal scroll */
+        }
+        .navbar-admin {
+            border-bottom: 1px solid #dee2e6;
+            background-color: #ffffff;
+        }
+
+        /* Specific styles for Admin Orders Page */
+        .order-status-badge {
+            min-width: 100px; /* Ensure badges have consistent width */
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="d-flex" id="wrapper">
+        <div class="bg-dark border-right" id="sidebar-wrapper">
+             <div class="sidebar-heading">
+                <i class="bi bi-speedometer me-2"></i>
+                <img src="/templates/img/LogoAuRRoRa.png" alt="" width="200px">
+            </div>
+            <div class="list-group list-group-flush">
+                <a href="admin_dashboard.html" class="list-group-item list-group-item-action">
+                    <i class="bi bi-grid-1x2-fill me-2"></i> Dashboard
+                </a>
+                <a href="admin_products.html" class="list-group-item list-group-item-action">
+                    <i class="bi bi-headset me-2"></i> Quản lý Sản phẩm
+                </a>
+                <a href="admin_orders.html" class="list-group-item list-group-item-action active">
+                    <i class="bi bi-receipt-cutoff me-2"></i> Quản lý Đơn hàng
+                </a>
+                <a href="admin_pos.html" class="list-group-item list-group-item-action">
+                    <i class="bi bi-shop-window me-2"></i> Bán hàng tại quầy
+                </a>
+                <a href="admin_users.html" class="list-group-item list-group-item-action">
+                    <i class="bi bi-people-fill me-2"></i> Quản lý Người dùng
+                </a>
+                <a href="admin_news.html" class="list-group-item list-group-item-action">
+                    <i class="bi bi-newspaper me-2"></i> Quản lý Tin tức
+                </a>
+                <a href="admin_brands.html" class="list-group-item list-group-item-action">
+                    <i class="bi bi-award-fill me-2"></i> Quản lý Thương hiệu
+                </a>
+                <a href="#" class="list-group-item list-group-item-action">
+                    <i class="bi bi-gear-fill me-2"></i> Cài đặt hệ thống
+                </a>
+                <a href="admin_login.html" class="list-group-item list-group-item-action text-danger">
+                    <i class="bi bi-box-arrow-right me-2"></i> Đăng xuất
+                </a>
+            </div>
+        </div>
+        <div id="page-content-wrapper">
+            <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom navbar-admin">
+                <div class="container-fluid">
+                    <button class="btn btn-primary" id="sidebarToggle"><i class="bi bi-list"></i></button>
+                    <div class="ms-auto">
+                        <span class="navbar-text me-3">
+                            Chào mừng, <strong class="text-primary">Admin Name</strong>
+                        </span>
+                        <a href="admin_login.html" class="btn btn-outline-danger btn-sm">
+                            <i class="bi bi-box-arrow-right"></i> Đăng xuất
+                        </a>
+                    </div>
+                </div>
+            </nav>
+
+            <div class="container-fluid py-4">
+                <h1 class="mt-4 mb-4">Quản lý Đơn hàng</h1>
+
+                <div class="card shadow-sm p-3 mb-4">
+                    <div class="row g-3 align-items-center">
+                        <div class="col-md-3">
+                            <input type="text" class="form-control" placeholder="Tìm kiếm Mã ĐH, Tên KH, SĐT...">
+                        </div>
+                        <div class="col-md-3">
+                            <select class="form-select">
+                                <option selected>Tất cả trạng thái</option>
+                                <option value="pending">Chờ xác nhận</option>
+                                <option value="processing">Đang xử lý</option>
+                                <option value="shipping">Đang giao hàng</option>
+                                <option value="delivered">Đã giao</option>
+                                <option value="cancelled">Đã hủy</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <input type="date" class="form-control">
+                        </div>
+                        <div class="col-md-2">
+                            <select class="form-select">
+                                <option selected>Tất cả loại ĐH</option>
+                                <option value="online">Online</option>
+                                <option value="offline">Offline (Tại quầy)</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <button class="btn btn-primary w-100"><i class="bi bi-search me-1"></i> Lọc</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0"><i class="bi bi-receipt-cutoff me-2"></i> Danh sách Đơn hàng</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Mã ĐH</th>
+                                        <th scope="col">Ngày đặt</th>
+                                        <th scope="col">Khách hàng</th>
+                                        <th scope="col">SĐT</th>
+                                        <th scope="col">Tổng tiền</th>
+                                        <th scope="col">Trạng thái ĐH</th>
+                                        <th scope="col">Trạng thái TT</th>
+                                        <th scope="col">Loại ĐH</th>
+                                        <th scope="col">Hành động</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>#DH00128</td>
+                                        <td>26/06/2025</td>
+                                        <td>Nguyễn Thị D</td>
+                                        <td>0912345678</td>
+                                        <td>3.500.000 VNĐ</td>
+                                        <td><span class="badge bg-warning text-dark order-status-badge">Chờ xác nhận</span></td>
+                                        <td><span class="badge bg-secondary order-status-badge">Chưa thanh toán</span></td>
+                                        <td><span class="badge bg-info">Online</span></td>
+                                        <td>
+                                            <button class="btn btn-sm btn-info text-white me-1" title="Xem chi tiết" data-bs-toggle="modal" data-bs-target="#orderDetailModal" data-order-id="128">
+                                                <i class="bi bi-eye"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-success me-1" title="Xác nhận">
+                                                <i class="bi bi-check-circle"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-danger" title="Hủy">
+                                                <i class="bi bi-x-circle"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>#DH00127</td>
+                                        <td>25/06/2025</td>
+                                        <td>Trần Văn E (POS)</td>
+                                        <td>0987654321</td>
+                                        <td>1.200.000 VNĐ</td>
+                                        <td><span class="badge bg-primary order-status-badge">Đang xử lý</span></td>
+                                        <td><span class="badge bg-success order-status-badge">Đã thanh toán</span></td>
+                                        <td><span class="badge bg-dark">Offline</span></td>
+                                        <td>
+                                            <button class="btn btn-sm btn-info text-white me-1" title="Xem chi tiết" data-bs-toggle="modal" data-bs-target="#orderDetailModal" data-order-id="127">
+                                                <i class="bi bi-eye"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-warning text-dark me-1" title="Đang giao">
+                                                <i class="bi bi-truck"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-danger" title="Hủy">
+                                                <i class="bi bi-x-circle"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>#DH00126</td>
+                                        <td>24/06/2025</td>
+                                        <td>Phạm Thu F</td>
+                                        <td>0901234567</td>
+                                        <td>800.000 VNĐ</td>
+                                        <td><span class="badge bg-success order-status-badge">Đã giao</span></td>
+                                        <td><span class="badge bg-success order-status-badge">Đã thanh toán</span></td>
+                                        <td><span class="badge bg-info">Online</span></td>
+                                        <td>
+                                            <button class="btn btn-sm btn-info text-white me-1" title="Xem chi tiết" data-bs-toggle="modal" data-bs-target="#orderDetailModal" data-order-id="126">
+                                                <i class="bi bi-eye"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-secondary" title="Đánh dấu đã hoàn thành" disabled>
+                                                <i class="bi bi-check2-all"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                     <tr>
+                                        <td>#DH00125</td>
+                                        <td>23/06/2025</td>
+                                        <td>Khách lẻ (POS)</td>
+                                        <td>Không có</td>
+                                        <td>2.190.000 VNĐ</td>
+                                        <td><span class="badge bg-danger order-status-badge">Đã hủy</span></td>
+                                        <td><span class="badge bg-danger order-status-badge">Thanh toán thất bại</span></td>
+                                        <td><span class="badge bg-dark">Offline</span></td>
+                                        <td>
+                                            <button class="btn btn-sm btn-info text-white me-1" title="Xem chi tiết" data-bs-toggle="modal" data-bs-target="#orderDetailModal" data-order-id="125">
+                                                <i class="bi bi-eye"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-secondary" title="Xem chi tiết" disabled>
+                                                <i class="bi bi-repeat"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                            </table>
+                        </div>
+                        <div class="text-end mt-3">
+                            <a href="#" class="btn btn-outline-primary btn-sm">Xem tất cả</a>
+                        </div>
+                    </div>
+                </div>
+
+                <nav aria-label="Page navigation for admin orders" class="mt-4">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item disabled">
+                            <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Trước</a>
+                        </li>
+                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                        <li class="page-item"><a class="page-link" href="#">2</a></li>
+                        <li class="page-item"><a class="page-link" href="#">3</a></li>
+                        <li class="page-item">
+                            <a class="page-link" href="#">Sau</a>
+                        </li>
+                    </ul>
+                </nav>
+
+            </div>
+        </div>
+        </div>
+    <div class="modal fade" id="orderDetailModal" tabindex="-1" aria-labelledby="orderDetailModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="orderDetailModalLabel">Chi tiết Đơn hàng: <span id="modalOrderId">#DHXXXXX</span></h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <h5><i class="bi bi-info-circle me-2"></i> Thông tin chung</h5>
+                    <p class="mb-1"><strong>Mã Đơn hàng:</strong> <span class="order-info" id="detailOrderId">#DH00128</span></p>
+                    <p class="mb-1"><strong>Ngày đặt:</strong> <span class="order-info" id="detailOrderDate">26/06/2025</span></p>
+                    <p class="mb-1"><strong>Trạng thái ĐH:</strong> <span class="order-info badge bg-warning text-dark" id="detailOrderStatus">Chờ xác nhận</span></p>
+                    <p class="mb-1"><strong>Trạng thái TT:</strong> <span class="order-info badge bg-secondary" id="detailPaymentStatus">Chưa thanh toán</span></p>
+                    <p class="mb-1"><strong>Phương thức TT:</strong> <span class="order-info" id="detailPaymentMethod">Thanh toán khi nhận hàng (COD)</span></p>
+                    <p class="mb-1"><strong>Loại ĐH:</strong> <span class="order-info badge bg-info" id="detailOrderType">Online</span></p>
+                    <p class="mb-3"><strong>Tổng tiền:</strong> <span class="order-info text-danger fw-bold fs-5" id="detailTotalAmount">3.500.000 VNĐ</span></p>
+
+                    <h5 class="mt-4 mb-2"><i class="bi bi-person-fill me-2"></i> Thông tin khách hàng</h5>
+                    <p class="mb-1"><strong>Tên khách hàng:</strong> <span class="order-info" id="detailCustomerName">Nguyễn Thị D</span></p>
+                    <p class="mb-1"><strong>Email:</strong> <span class="order-info" id="detailCustomerEmail">nguyenthiD@example.com</span></p>
+                    <p class="mb-1"><strong>Số điện thoại:</strong> <span class="order-info" id="detailCustomerPhone">0912345678</span></p>
+
+                    <h5 class="mt-4 mb-2"><i class="bi bi-geo-alt-fill me-2"></i> Địa chỉ giao hàng</h5>
+                    <p class="mb-1"><strong>Địa chỉ:</strong> <span class="order-info" id="detailShippingAddress">Số 456, Đường XYZ, Phường 1, Quận 2, TP. Hồ Chí Minh</span></p>
+                    <p class="mb-3"><strong>Ghi chú:</strong> <span class="order-info" id="detailOrderNotes">Giao hàng sau 10h sáng.</span></p>
+                    
+                    <h5 class="mt-4 mb-2"><i class="bi bi-box-seam me-2"></i> Sản phẩm trong đơn hàng</h5>
+                    <ul class="list-group list-group-flush" id="detailOrderItems">
+                        <li class="list-group-item d-flex align-items-center">
+                            <img src="https://via.placeholder.com/60x60?text=SP1" class="img-fluid rounded me-3" alt="Tai nghe Xịn 1" style="width: 60px; height: 60px; object-fit: cover;">
+                            <div class="flex-grow-1">
+                                <h6 class="mb-0">Tai nghe XYZ Gaming Pro (Mã: TNXYZ)</h6>
+                                <p class="mb-0 small text-muted">Hãng: Sony</p>
+                                <span class="d-block text-danger fw-bold mt-1">1.500.000 VNĐ x 1</span>
+                            </div>
+                        </li>
+                        <li class="list-group-item d-flex align-items-center">
+                            <img src="https://via.placeholder.com/60x60?text=SP2" class="img-fluid rounded me-3" alt="Tai nghe Ngon 2" style="width: 60px; height: 60px; object-fit: cover;">
+                            <div class="flex-grow-1">
+                                <h6 class="mb-0">Tai nghe ABC Bluetooth (Mã: TNABC)</h6>
+                                <p class="mb-0 small text-muted">Hãng: JBL</p>
+                                <span class="d-block text-danger fw-bold mt-1">850.000 VNĐ x 2</span>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                    <button type="button" class="btn btn-primary"><i class="bi bi-pencil-square me-2"></i> Chỉnh sửa ĐH</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
+    <script>
+        // Toggle the sidebar (copied from admin_dashboard.html for consistency)
+        document.getElementById("sidebarToggle").addEventListener("click", function() {
+            document.getElementById("wrapper").classList.toggle("toggled");
+        });
+
+        // Dynamic Modal Content (for demonstration)
+        document.addEventListener('DOMContentLoaded', function() {
+            var orderDetailModal = document.getElementById('orderDetailModal');
+            orderDetailModal.addEventListener('show.bs.modal', function (event) {
+                var button = event.relatedTarget;
+                var orderId = button.getAttribute('data-order-id');
+
+                var modalTitle = orderDetailModal.querySelector('#modalOrderId');
+                var detailOrderId = orderDetailModal.querySelector('#detailOrderId');
+                var detailOrderDate = orderDetailModal.querySelector('#detailOrderDate');
+                var detailOrderStatus = orderDetailModal.querySelector('#detailOrderStatus');
+                var detailPaymentStatus = orderDetailModal.querySelector('#detailPaymentStatus');
+                var detailPaymentMethod = orderDetailModal.querySelector('#detailPaymentMethod');
+                var detailOrderType = orderDetailModal.querySelector('#detailOrderType'); // New
+                var detailTotalAmount = orderDetailModal.querySelector('#detailTotalAmount');
+                var detailCustomerName = orderDetailModal.querySelector('#detailCustomerName');
+                var detailCustomerEmail = orderDetailModal.querySelector('#detailCustomerEmail');
+                var detailCustomerPhone = orderDetailModal.querySelector('#detailCustomerPhone');
+                var detailShippingAddress = orderDetailModal.querySelector('#detailShippingAddress');
+                var detailOrderNotes = orderDetailModal.querySelector('#detailOrderNotes');
+                var detailOrderItems = orderDetailModal.querySelector('#detailOrderItems');
+
+
+                // For static HTML, we'll just update with some example data based on orderId
+                // In a real application, you would fetch data from your backend using the orderId
+                if (orderId === '128') {
+                    modalTitle.textContent = '#DH00128';
+                    detailOrderId.textContent = '#DH00128';
+                    detailOrderDate.textContent = '26/06/2025';
+                    detailOrderStatus.textContent = 'Chờ xác nhận';
+                    detailOrderStatus.className = 'order-info badge bg-warning text-dark';
+                    detailPaymentStatus.textContent = 'Chưa thanh toán';
+                    detailPaymentStatus.className = 'order-info badge bg-secondary';
+                    detailPaymentMethod.textContent = 'Thanh toán khi nhận hàng (COD)';
+                    detailOrderType.textContent = 'Online'; // New
+                    detailOrderType.className = 'order-info badge bg-info'; // New
+                    detailTotalAmount.textContent = '3.500.000 VNĐ';
+                    detailCustomerName.textContent = 'Nguyễn Thị D';
+                    detailCustomerEmail.textContent = 'nguyenthiD@example.com';
+                    detailCustomerPhone.textContent = '0912345678';
+                    detailShippingAddress.textContent = 'Số 456, Đường XYZ, Phường 1, Quận 2, TP. Hồ Chí Minh';
+                    detailOrderNotes.textContent = 'Giao hàng sau 10h sáng.';
+                    detailOrderItems.innerHTML = `
+                        <li class="list-group-item d-flex align-items-center">
+                            <img src="https://via.placeholder.com/60x60?text=SP1" class="img-fluid rounded me-3" alt="Tai nghe XYZ Gaming Pro" style="width: 60px; height: 60px; object-fit: cover;">
+                            <div class="flex-grow-1">
+                                <h6 class="mb-0">Tai nghe XYZ Gaming Pro (Mã: TNXYZ)</h6>
+                                <p class="mb-0 small text-muted">Hãng: Sony</p>
+                                <span class="d-block text-danger fw-bold mt-1">1.500.000 VNĐ x 1</span>
+                            </div>
+                        </li>
+                        <li class="list-group-item d-flex align-items-center">
+                            <img src="https://via.placeholder.com/60x60?text=SP2" class="img-fluid rounded me-3" alt="Tai nghe ABC Bluetooth" style="width: 60px; height: 60px; object-fit: cover;">
+                            <div class="flex-grow-1">
+                                <h6 class="mb-0">Tai nghe ABC Bluetooth (Mã: TNABC)</h6>
+                                <p class="mb-0 small text-muted">Hãng: JBL</p>
+                                <span class="d-block text-danger fw-bold mt-1">850.000 VNĐ x 2</span>
+                            </div>
+                        </li>
+                    `;
+                } else if (orderId === '127') {
+                    modalTitle.textContent = '#DH00127';
+                    detailOrderId.textContent = '#DH00127';
+                    detailOrderDate.textContent = '25/06/2025';
+                    detailOrderStatus.textContent = 'Đang xử lý';
+                    detailOrderStatus.className = 'order-info badge bg-primary';
+                    detailPaymentStatus.textContent = 'Đã thanh toán';
+                    detailPaymentStatus.className = 'order-info badge bg-success';
+                    detailPaymentMethod.textContent = 'Tiền mặt'; // Assuming POS uses cash
+                    detailOrderType.textContent = 'Offline'; // New
+                    detailOrderType.className = 'order-info badge bg-dark'; // New
+                    detailTotalAmount.textContent = '1.200.000 VNĐ';
+                    detailCustomerName.textContent = 'Trần Văn E (POS)';
+                    detailCustomerEmail.textContent = 'Không có';
+                    detailCustomerPhone.textContent = '0987654321';
+                    detailShippingAddress.textContent = 'Mua tại quầy'; // Specific for offline
+                    detailOrderNotes.textContent = 'Không có.';
+                    detailOrderItems.innerHTML = `
+                        <li class="list-group-item d-flex align-items-center">
+                            <img src="https://via.placeholder.com/60x60?text=SP3" class="img-fluid rounded me-3" alt="Tai nghe QWE Bass Mạnh" style="width: 60px; height: 60px; object-fit: cover;">
+                            <div class="flex-grow-1">
+                                <h6 class="mb-0">Tai nghe QWE Bass Mạnh (Mã: TNQWE)</h6>
+                                <p class="mb-0 small text-muted">Hãng: Bose</p>
+                                <span class="d-block text-danger fw-bold mt-1">1.200.000 VNĐ x 1</span>
+                            </div>
+                        </li>
+                    `;
+                } else if (orderId === '126') {
+                    modalTitle.textContent = '#DH00126';
+                    detailOrderId.textContent = '#DH00126';
+                    detailOrderDate.textContent = '24/06/2025';
+                    detailOrderStatus.textContent = 'Đã giao';
+                    detailOrderStatus.className = 'order-info badge bg-success';
+                    detailPaymentStatus.textContent = 'Đã thanh toán';
+                    detailPaymentStatus.className = 'order-info badge bg-success';
+                    detailPaymentMethod.textContent = 'Chuyển khoản ngân hàng';
+                    detailOrderType.textContent = 'Online';
+                    detailOrderType.className = 'order-info badge bg-info';
+                    detailTotalAmount.textContent = '800.000 VNĐ';
+                    detailCustomerName.textContent = 'Phạm Thu F';
+                    detailCustomerEmail.textContent = 'phamthuf@example.com';
+                    detailCustomerPhone.textContent = '0901234567';
+                    detailShippingAddress.textContent = 'Số 10, Đường Ỷ Lan, Phường B, Quận C, TP. Đà Nẵng';
+                    detailOrderNotes.textContent = 'Giao hàng cẩn thận.';
+                    detailOrderItems.innerHTML = `
+                        <li class="list-group-item d-flex align-items-center">
+                            <img src="https://via.placeholder.com/60x60?text=SP4" class="img-fluid rounded me-3" alt="Tai nghe RTY Chống ồn" style="width: 60px; height: 60px; object-fit: cover;">
+                            <div class="flex-grow-1">
+                                <h6 class="mb-0">Tai nghe RTY Chống ồn (Mã: TNRTY)</h6>
+                                <p class="mb-0 small text-muted">Hãng: Sony</p>
+                                <span class="d-block text-danger fw-bold mt-1">800.000 VNĐ x 1</span>
+                            </div>
+                        </li>
+                    `;
+                } else if (orderId === '125') {
+                    modalTitle.textContent = '#DH00125';
+                    detailOrderId.textContent = '#DH00125';
+                    detailOrderDate.textContent = '23/06/2025';
+                    detailOrderStatus.textContent = 'Đã hủy';
+                    detailOrderStatus.className = 'order-info badge bg-danger';
+                    detailPaymentStatus.textContent = 'Thanh toán thất bại';
+                    detailPaymentStatus.className = 'order-info badge bg-danger';
+                    detailPaymentMethod.textContent = 'Tiền mặt'; // Assuming POS uses cash
+                    detailOrderType.textContent = 'Offline';
+                    detailOrderType.className = 'order-info badge bg-dark';
+                    detailTotalAmount.textContent = '2.190.000 VNĐ';
+                    detailCustomerName.textContent = 'Khách lẻ (POS)';
+                    detailCustomerEmail.textContent = 'Không có';
+                    detailCustomerPhone.textContent = 'Không có';
+                    detailShippingAddress.textContent = 'Mua tại quầy';
+                    detailOrderNotes.textContent = 'Khách hàng đổi ý.';
+                    detailOrderItems.innerHTML = `
+                        <li class="list-group-item d-flex align-items-center">
+                            <img src="https://via.placeholder.com/60x60?text=SP5" class="img-fluid rounded me-3" alt="Tai nghe MNO Giá Rẻ" style="width: 60px; height: 60px; object-fit: cover;">
+                            <div class="flex-grow-1">
+                                <h6 class="mb-0">Tai nghe FGH Cao Cấp (Mã: TNFGH)</h6>
+                                <p class="mb-0 small text-muted">Hãng: Audio-Technica</p>
+                                <span class="d-block text-danger fw-bold mt-1">1.200.000 VNĐ x 1</span>
+                            </div>
+                        </li>
+                        <li class="list-group-item d-flex align-items-center">
+                            <img src="https://via.placeholder.com/60x60?text=SP6" class="img-fluid rounded me-3" alt="Tai nghe MNO Giá Rẻ" style="width: 60px; height: 60px; object-fit: cover;">
+                            <div class="flex-grow-1">
+                                <h6 class="mb-0">Tai nghe MNO Giá Rẻ (Mã: TNMNO)</h6>
+                                <p class="mb-0 small text-muted">Hãng: Xiaomi</p>
+                                <span class="d-block text-danger fw-bold mt-1">990.000 VNĐ x 1</span>
+                            </div>
+                        </li>
+                    `;
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

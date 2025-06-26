@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đơn hàng của tôi - TaiNghePro</title>
+    <link rel="shortcut icon" href="templates/img/icon.png" type="image/x-icon">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="/templates/css/style.css">
+</head>
+
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
+        <div class="container">
+            <a class="navbar-brand fw-bold text-primary" href="index.html">
+                <img src="/templates/img/LogoAuRRoRa.png" width="250px" alt="Logo TaiNghePro">
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html">
+                            <i class="bi bi-house-door"></i> Trang chủ
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="sanpham.html">
+                            <i class="bi bi-headset"></i> Sản phẩm
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="thuonghieu.html">
+                            <i class="bi bi-award"></i> Thương hiệu
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="tintuc.html">
+                            <i class="bi bi-newspaper"></i> Tin tức
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="lienhe.html">
+                            <i class="bi bi-telephone"></i> Liên hệ
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="profile.html">
+                            <i class="bi bi-person-circle"></i> Tài khoản
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="giohang.html">
+                            <i class="bi bi-cart"></i> Giỏ hàng
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="bg-dark py-3 shadow-sm">
+        <div class="container">
+            <form class="d-flex w-50 mx-auto">
+                <input class="form-control me-2" type="search" placeholder="Tìm kiếm đơn hàng..." aria-label="Search">
+                <button class="btn btn-outline-light" type="submit" title="Tìm kiếm">
+                    <i class="bi bi-search fs-5"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <main>
+        <section class="container my-5">
+            <nav aria-label="breadcrumb" class="mb-4">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="index.html">Trang chủ</a></li>
+                    <li class="breadcrumb-item"><a href="profile.html">Tài khoản</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Đơn hàng của tôi</li>
+                </ol>
+            </nav>
+
+            <h2 class="text-center mb-4">Danh Sách Đơn Hàng Đã Mua</h2>
+
+            <div class="card shadow-sm p-3 mb-4">
+                <div class="row g-3 align-items-center">
+                    <div class="col-md-4">
+                        <label for="orderStatusFilter" class="form-label mb-0">Trạng thái:</label>
+                        <select class="form-select" id="orderStatusFilter">
+                            <option selected value="">Tất cả trạng thái</option>
+                            <option value="pending">Chờ xác nhận</option>
+                            <option value="processing">Đang xử lý</option>
+                            <option value="shipping">Đang giao hàng</option>
+                            <option value="delivered">Đã giao</option>
+                            <option value="cancelled">Đã hủy</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="orderDateRange" class="form-label mb-0">Thời gian:</label>
+                        <select class="form-select" id="orderDateRange">
+                            <option selected value="">Tất cả</option>
+                            <option value="last7days">7 ngày qua</option>
+                            <option value="last30days">30 ngày qua</option>
+                            <option value="thismonth">Tháng này</option>
+                            <option value="lastmonth">Tháng trước</option>
+                            <option value="thisyear">Năm nay</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="orderSort" class="form-label mb-0">Sắp xếp theo:</label>
+                        <select class="form-select" id="orderSort">
+                            <option selected value="newest">Ngày đặt: Mới nhất</option>
+                            <option value="oldest">Ngày đặt: Cũ nhất</option>
+                            <option value="total-desc">Tổng tiền: Cao đến thấp</option>
+                            <option value="total-asc">Tổng tiền: Thấp đến cao</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-3">
+                    <button class="btn btn-primary" type="button"><i class="bi bi-funnel"></i> Áp dụng bộ lọc</button>
+                    <button class="btn btn-outline-secondary" type="button"><i class="bi bi-x-circle"></i> Đặt
+                        lại</button>
+                </div>
+            </div>
+
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Mã Đơn hàng</th>
+                                    <th scope="col">Ngày đặt</th>
+                                    <th scope="col">Số lượng SP</th>
+                                    <th scope="col">Tổng tiền</th>
+                                    <th scope="col">Trạng thái</th>
+                                    <th scope="col">Hành động</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>#DH00123</td>
+                                    <td>20/06/2025</td>
+                                    <td>2</td>
+                                    <td><span class="text-danger fw-bold">3.200.000 VNĐ</span></td>
+                                    <td><span class="badge bg-success">Đã giao</span></td>
+                                    <td>
+                                        <a href="chitiet_donhang.html?order_id=DH00123"
+                                            class="btn btn-sm btn-outline-primary" title="Xem chi tiết">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        <button class="btn btn-sm btn-outline-secondary ms-1" title="Mua lại">
+                                            <i class="bi bi-arrow-clockwise"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>#DH00124</td>
+                                    <td>19/06/2025</td>
+                                    <td>1</td>
+                                    <td><span class="text-danger fw-bold">2.300.000 VNĐ</span></td>
+                                    <td><span class="badge bg-primary">Đang giao hàng</span></td>
+                                    <td>
+                                        <a href="chitiet_donhang.html?order_id=DH00124"
+                                            class="btn btn-sm btn-outline-primary" title="Xem chi tiết">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        <button class="btn btn-sm btn-warning text-dark ms-1" title="Theo dõi">
+                                            <i class="bi bi-truck"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>#DH00125</td>
+                                    <td>18/06/2025</td>
+                                    <td>2</td>
+                                    <td><span class="text-danger fw-bold">2.190.000 VNĐ</span></td>
+                                    <td><span class="badge bg-danger">Đã hủy</span></td>
+                                    <td>
+                                        <a href="chitiet_donhang.html?order_id=DH00125"
+                                            class="btn btn-sm btn-outline-primary" title="Xem chi tiết">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        <button class="btn btn-sm btn-outline-secondary ms-1" title="Mua lại">
+                                            <i class="bi bi-arrow-clockwise"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <nav aria-label="Page navigation for orders" class="mt-5">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Trước</a>
+                    </li>
+                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                    <li class="page-item"><a class="page-link" href="#">2</a></li>
+                    <li class="page-item"><a class="page-link" href="#">3</a></li>
+                    <li class="page-item">
+                        <a class="page-link" href="#">Sau</a>
+                    </li>
+                </ul>
+            </nav>
+
+        </section>
+    </main>
+
+    <footer class="bg-dark text-white-50 py-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <h5 class="text-white">TaiNghePro</h5>
+                    <p>Cửa hàng tai nghe uy tín hàng đầu Việt Nam. Mang đến trải nghiệm âm thanh tuyệt vời nhất cho bạn.
+                    </p>
+                </div>
+                <div class="col-md-3 mb-4">
+                    <h5 class="text-white">Liên kết nhanh</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="index.html" class="text-white-50 text-decoration-none">Trang chủ</a></li>
+                        <li><a href="sanpham.html" class="text-white-5-text-decoration-none">Sản phẩm</a></li>
+                        <li><a href="tintuc.html" class="text-white-50 text-decoration-none">Tin tức</a></li>
+                        <li><a href="lienhe.html" class="text-white-50 text-decoration-none">Liên hệ</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3 mb-4">
+                    <h5 class="text-white">Chính sách</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="#" class="text-white-50 text-decoration-none">Chính sách bảo mật</a></li>
+                        <li><a href="#" class="text-white-50 text-decoration-none">Chính sách đổi trả</a></li>
+                        <li><a href="#" class="text-white-50 text-decoration-none">Điều khoản dịch vụ</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-2 mb-4">
+                    <h5 class="text-white">Theo dõi chúng tôi</h5>
+                    <a href="#" class="text-white-50 me-2"><i class="bi bi-facebook fs-4"></i></a>
+                    <a href="#" class="text-white-50 me-2"><i class="bi bi-instagram fs-4"></i></a>
+                    <a href="#" class="text-white-50"><i class="bi bi-youtube fs-4"></i></a>
+                </div>
+            </div>
+            <div class="text-center pt-3 border-top border-secondary">
+                <p class="mb-0">© 2025 TaiNghePro. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
+    <script src="js/script.js"></script>
+</body>
+
+</html>
