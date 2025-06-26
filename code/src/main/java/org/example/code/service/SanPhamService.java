@@ -85,7 +85,7 @@ public class SanPhamService {
                 ct.setIdSanpham(sp);
             }
 
-            ct.setIdSanpham(sp); // redundant nhưng để chắc ăn
+            ct.setIdSanpham(sp);
             ct.setIdMausac(mauSac);
             ct.setIdPhienban(phienBan);
             ct.setAnhSP(ctdto.getAnhSP());
@@ -97,7 +97,7 @@ public class SanPhamService {
             chiTietMoi.add(ct);
         }
 
-        // ✅ Thêm lại các bản ghi cũ KHÔNG được gửi từ FE (tức là FE không động tới)
+
         List<Integer> idsFromFE = dto.getChiTietList().stream()
                 .map(SanPhamChiTietDTO::getId)
                 .filter(Objects::nonNull)

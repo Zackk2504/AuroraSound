@@ -2,7 +2,7 @@ package org.example.code.controller;
 
 import org.example.code.DTO.DangKiDTO;
 import org.example.code.model.KhachHang;
-import org.example.code.model.Taikhoan;
+
 import org.example.code.service.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -17,27 +17,21 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class CreateAccountController {
     @Autowired
     AccountService accountService;
-    @Autowired
-    private PasswordEncoder passwordEncoder;
 
     @GetMapping("/register")
     public String register(Model model) {
         System.out.println("Instant.now(): " + java.time.Instant.now());
 
-        model.addAttribute("Taikhoan",new Taikhoan());
+        model.addAttribute("Taikhoan",new KhachHang());
         return "register";
     }
 
     @PostMapping("/register")
     public String register(@ModelAttribute("Taikhoan") KhachHang taikhoan) {
         DangKiDTO dto =new DangKiDTO();
-        dto.setPass(passwordEncoder.encode(taikhoan.getMatKhau()));
+        dto.setPass(taikhoan.getMatKhau());
         dto.setEmail(taikhoan.getEmail());
         dto.setUserName(taikhoan.getTenDangNhap());
-        dto.setHoTen(taikhoan.getHoTen());
-        dto.setGioiTinh(String.valueOf(taikhoan.getGioiTinh()));
-        dto.setSoDT(taikhoan.getSoDT());
-        dto.setNgaySinh(taikhoan.getNgaySinh().toString());
 
         accountService.taoVaGuiMaDangKi(dto);
         return "verify";

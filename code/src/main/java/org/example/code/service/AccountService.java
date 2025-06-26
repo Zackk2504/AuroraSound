@@ -2,9 +2,10 @@ package org.example.code.service;
 
 import jakarta.servlet.http.HttpSession;
 import org.example.code.DTO.DangKiDTO;
+import org.example.code.model.GioHang;
 import org.example.code.model.KhachHang;
-import org.example.code.model.Taikhoan;
-import org.example.code.repo.AccountRepository;
+
+
 import org.example.code.repo.KhachHangRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.MailSender;
@@ -17,6 +18,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
@@ -32,8 +36,16 @@ public class AccountService {
 
     @Autowired
     MailService mailService;
+    @Autowired
+    GioHangService gioHangService;
 
     public void taoVaGuiMaDangKi(DangKiDTO dto) {
+//        Kiểm tra xem email đã tồn tại chưa
+        Optional<KhachHang> existingUser = accountRepository.findByEmail(dto.getEmail());
+        if (existingUser.isPresent()) {
+            throw new RuntimeException("Email đã được sử dụng");
+        }
+
         String otp = String.valueOf((int) (Math.random() * 900000) + 100000);
 
         // Lưu thông tin vào session
@@ -43,10 +55,10 @@ public class AccountService {
         session.setAttribute("username", dto.getUserName());
         System.out.println(dto.getUserName() + " :tao ten la");
         session.setAttribute("otpExpire", System.currentTimeMillis() + 5 * 60 * 1000);
-        session.setAttribute("hoTen", dto.getHoTen());
-        session.setAttribute("soDT", dto.getSoDT());
-        session.setAttribute("ngaySinh", dto.getNgaySinh());
-        session.setAttribute("gioiTinh", dto.getGioiTinh());
+//        session.setAttribute("hoTen", dto.getHoTen());
+//        session.setAttribute("soDT", dto.getSoDT());
+//        session.setAttribute("ngaySinh", dto.getNgaySinh());
+//        session.setAttribute("gioiTinh", dto.getGioiTinh());
         // Gửi mail async
         mailService.sendOtpEmail(dto.getEmail(), otp);
     }
@@ -71,6 +83,12 @@ public class AccountService {
             taikhoan.setNgaySinh(ngaySinh);
             taikhoan.setGioiTinh(gioiTinh);
             accountRepository.save(taikhoan);
+//           Taoj gio hang
+            GioHang gioHang = new GioHang();
+            LocalDate now = LocalDate.now();
+            gioHang.setIdKhachhang(taikhoan);
+            gioHang.setNgayTao(now);
+            gioHangService.add(gioHang);
 
             session.removeAttribute("otp");
 //            session.removeAttribute("email");
@@ -97,7 +115,12 @@ public class AccountService {
             newUser.setHoTen(oauthUser.getAttribute("name"));
             newUser.setSoDT(oauthUser.getAttribute("phone_number")); // Nếu có
             newUser.setNgaySinh(oauthUser.getAttribute("birthdate")); // Nếu có
-            // random avatar hoặc dữ liệu mặc định
+            // tạo giỏ hàng
+            GioHang gioHang = new GioHang();
+            LocalDate now = LocalDate.now();
+            gioHang.setIdKhachhang(newUser);
+            gioHang.setNgayTao(now);
+            gioHangService.add(gioHang);
             accountRepository.save(newUser);
         }
     }

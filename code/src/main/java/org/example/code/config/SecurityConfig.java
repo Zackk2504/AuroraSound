@@ -1,7 +1,9 @@
 package org.example.code.config;
 
-import org.example.code.model.Taikhoan;
-import org.example.code.repo.AccountRepository;
+
+import org.example.code.model.KhachHang;
+
+import org.example.code.repo.KhachHangRepository;
 import org.example.code.service.CustomOAuth2UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -15,13 +17,15 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
+import java.util.Optional;
+
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
     @Autowired
     CustomOAuth2UserService customOAuth2UserService;
     @Autowired
-    AccountRepository accountRepository;
+    KhachHangRepository khachHangRepository;
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -60,15 +64,14 @@ public class SecurityConfig {
     }
 
     @Bean
-    public UserDetailsService userDetailsService(AccountRepository accountRepository) {
+    public UserDetailsService userDetailsService(KhachHangRepository accountRepository) {
         return username -> {
-            Taikhoan user = accountRepository.findByUsername(username);
-            if (user == null) {
-                throw new UsernameNotFoundException("User not found");
+            Optional<KhachHang> user = accountRepository.findByTenDangNhap(username);
+            if (user.isEmpty()) {
+                throw new UsernameNotFoundException("User not found with username: " + username);
             }
-            return User.withUsername(user.getUsername())
-                    .password(user.getPass())
-                    .roles("USER")
+            return User.withUsername(user.get().getTenDangNhap())
+                    .password(user.get().getMatKhau())
                     .build();
         };
     }
