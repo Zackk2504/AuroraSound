@@ -1,7 +1,8 @@
 package org.example.code.service;
 
-import org.example.code.model.Taikhoan;
-import org.example.code.repo.AccountRepository;
+
+
+import org.example.code.repo.KhachHangRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
@@ -14,7 +15,7 @@ import org.springframework.stereotype.Service;
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     @Autowired
-    private AccountRepository accountRepository;
+    private KhachHangRepository accountRepository;
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {

@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.Instant;
+import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -21,9 +22,9 @@ public class GioHang {
     private KhachHang idKhachhang;
 
     @Column(name = "ngayTao")
-    private Instant ngayTao;
+    private LocalDate ngayTao;
 
     @Column(name = "ngayCapNhat")
-    private Instant ngayCapNhat;
+    private LocalDate ngayCapNhat;
 
 }
