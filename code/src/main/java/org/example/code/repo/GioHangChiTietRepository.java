@@ -7,6 +7,6 @@ import java.util.List;
 import java.util.Optional;
 
 public interface GioHangChiTietRepository extends JpaRepository<GioHangChiTiet, Integer> {
-    public List<GioHangChiTiet> findByIdGiohang(Integer idGiohang);
-    public Optional<GioHangChiTiet> findByIdGiohangAndIdSanphamchitiet(Integer idGiohang, Integer idSanphamchitiet);
+    public List<GioHangChiTiet> findByIdGiohang_Id(Integer idGiohang);
+    public Optional<GioHangChiTiet> findByIdGiohang_IdAndIdSanphamchitiet_Id(Integer idGiohang, Integer idSanphamchitiet);
 }

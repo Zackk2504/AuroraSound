@@ -15,6 +15,6 @@ public class GioHangService {
     }
 
     public GioHang getGioHangByKhachHang(Integer khachHangId) {
-        return gioHangRepository.findByKhachHangId(khachHangId);
+        return gioHangRepository.findByIdKhachhang_Id(khachHangId);
     }
 }

@@ -39,7 +39,7 @@ public class GioHangChiTietService {
             gioHang.setIdKhachhang(khachHang);
             gioHangService.add(gioHang);
         }
-        Optional<GioHangChiTiet> gioHangChiTietOpt = gioHangChiTietRepository.findByIdGiohangAndIdSanphamchitiet(gioHang.getId(), sanPhamCTId);
+        Optional<GioHangChiTiet> gioHangChiTietOpt = gioHangChiTietRepository.findByIdGiohang_IdAndIdSanphamchitiet_Id(gioHang.getId(), sanPhamCTId);
         if (!gioHangChiTietOpt.isPresent()) {
             gioHangChiTiet = new GioHangChiTiet();
             Optional<SanPhamChiTiet> sanPhamChiTiet = sanPhamChiTietService.getSanPhamChiTietById(sanPhamCTId);
@@ -67,7 +67,7 @@ public class GioHangChiTietService {
         if (gioHang == null) {
             throw new RuntimeException("Gio hang not found for khach hang");
         }
-        return gioHangChiTietRepository.findByIdGiohang(gioHang.getId());
+        return gioHangChiTietRepository.findByIdGiohang_Id(gioHang.getId());
     }
     public void giamGioHangChiTiet(Integer sanPhamCTId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -82,7 +82,7 @@ public class GioHangChiTietService {
         }
 
         Optional<GioHangChiTiet> gioHangChiTietOpt = gioHangChiTietRepository
-                .findByIdGiohangAndIdSanphamchitiet(gioHang.getId(), sanPhamCTId);
+                .findByIdGiohang_IdAndIdSanphamchitiet_Id(gioHang.getId(), sanPhamCTId);
 
         if (!gioHangChiTietOpt.isPresent()) {
             throw new RuntimeException("San pham chi tiet khong co trong gio hang");
