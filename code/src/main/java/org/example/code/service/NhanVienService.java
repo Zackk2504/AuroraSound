@@ -41,7 +41,7 @@ public class NhanVienService {
             VaiTro vaiTro = vaiTroAdmin.get();
             NhanVien admin = new NhanVien();
             admin.setTenDangNhap("admin");
-            admin.setMatKhau(passwordEncoder.encode("admin")); // bạn nên mã hóa mật khẩu nếu dùng Spring Security
+            admin.setMatKhau(passwordEncoder.encode("admin"));
             admin.setVaiTro(vaiTro);
             admin.setHoTen("Admin");
             admin.setEmail("admin");
