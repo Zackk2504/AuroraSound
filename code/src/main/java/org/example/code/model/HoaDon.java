@@ -38,7 +38,7 @@ public class HoaDon {
     private String hinhThucThanhToan;
 
     @Column(name = "trangThaiHoaDon")
-    private Boolean trangThaiHoaDon;
+    private String trangThaiHoaDon;
 
     @Nationalized
     @Column(name = "diaChiNhanHang")
