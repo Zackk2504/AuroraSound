@@ -19,4 +19,8 @@ public class HoaDonService {
     public void addAndEdit(HoaDon hoaDon) {
         hoaDonRepository.save(hoaDon);
     }
+
+    public void deleteHoaDon(Integer id) {
+        hoaDonRepository.deleteById(id);
+    }
 }

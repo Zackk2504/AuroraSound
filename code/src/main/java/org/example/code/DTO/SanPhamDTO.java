@@ -15,7 +15,7 @@ public class SanPhamDTO {
     private Integer id;
     private String tenSanPham;
     private String moTa;
-    private Boolean trangThai;
+    private String trangThai;
     private Integer idLoaiSanPham;
     private Integer idThuongHieu;
     private Integer idXuatXu;

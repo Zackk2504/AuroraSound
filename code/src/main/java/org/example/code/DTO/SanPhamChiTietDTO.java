@@ -12,5 +12,5 @@ public class SanPhamChiTietDTO {
     private Integer soLuongTon;
     private Double donGia;
     private String moTa;
-    private Boolean trangThai;
+    private String trangThai;
 }
