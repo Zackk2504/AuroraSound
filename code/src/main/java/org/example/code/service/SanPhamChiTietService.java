@@ -18,7 +18,7 @@ public class SanPhamChiTietService {
     }
 
     public List<SanPhamChiTiet> getAllSanPhamChiTiet() {
-        return sanPhamChiTietRepository.findAllByTrangThai(true);
+        return sanPhamChiTietRepository.findAllByTrangThai("hoat_dong");
     }
 
     public void addAndEdit(SanPhamChiTiet sanPhamChiTiet) {

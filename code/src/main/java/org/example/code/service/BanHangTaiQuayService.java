@@ -1,5 +1,6 @@
 package org.example.code.service;
 
+import jakarta.transaction.Transactional;
 import org.example.code.model.HoaDon;
 import org.example.code.model.HoaDonChiTiet;
 import org.example.code.model.SanPhamChiTiet;
@@ -108,6 +109,37 @@ public class BanHangTaiQuayService {
                 throw new RuntimeException("Hoa Don not found");
             }
         }
+
+    }
+    @Transactional
+    public void XoaHoaDon(Integer idhd) {
+        HoaDon hoaDon = hoaDonService.getHoaDonById(idhd)
+                .orElseThrow(() -> new RuntimeException("Hoa Don not found"));
+        List<HoaDonChiTiet> hoaDonChiTietList = hoaDonChiTietService.getListHoaDonChiTietByIdHoaDon(idhd);
+        for (HoaDonChiTiet hoaDonChiTiet : hoaDonChiTietList) {
+            SanPhamChiTiet sanPhamChiTiet = hoaDonChiTiet.getIdSanphamchitiet();
+            sanPhamChiTiet.setSoLuongTon(sanPhamChiTiet.getSoLuongTon() + hoaDonChiTiet.getSoLuong());
+            sanPhamChiTietService.addAndEdit(sanPhamChiTiet);
+            hoaDonChiTietService.delete(hoaDonChiTiet.getId());
+        }
+        hoaDonService.deleteHoaDon(hoaDon.getId());
+
+    }
+
+    public void ThanhToanHoaDon(Integer idhd,String ten,String sdtkhach,String sdtnhan) {
+        List<HoaDonChiTiet> hoaDonChiTietList = hoaDonChiTietService.getListHoaDonChiTietByIdHoaDon(idhd);
+        if (hoaDonChiTietList.isEmpty()) {
+            throw new RuntimeException("Hoa Don Chi Tiet is empty");
+        }
+        HoaDon hoaDon = hoaDonService.getHoaDonById(idhd)
+                .orElseThrow(() -> new RuntimeException("Hoa Don not found"));
+        hoaDon.setTrangThaiHoaDon("Thanh cong");
+        Double Tongtien = 0.0;
+        for (HoaDonChiTiet hoaDonChiTiet : hoaDonChiTietList) {
+            Tongtien += hoaDonChiTiet.getSoLuong() * hoaDonChiTiet.getDonGia();
+        }
+        hoaDon.setThanhTien(Tongtien);
+        hoaDonService.addAndEdit(hoaDon);
 
     }
 

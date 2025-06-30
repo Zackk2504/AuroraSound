@@ -39,4 +39,15 @@ public class BanHangTaiQuayController {
 
         return "redirect:/ban-hang-tai-quay-ban-hang/" + idhd; // Redirect back to the order page
     }
+
+    @GetMapping("/ban-hang-tai-quay-ban-hang/delete/{idhd}")
+    public String deleteHoaDon(@PathVariable("idhd") Integer idhd) {
+        banHangTaiQuayService.XoaHoaDon(idhd);
+        return "redirect:/ban-hang-tai-quay"; }// Redirect back to the main page
+
+    @PostMapping("/ban-hang-tai-quay-ban-hang/thanhtoan/{idhd}")
+    public String thanhToanHoaDon(@PathVariable("idhd") Integer idhd) {
+        banHangTaiQuayService.ThanhToanHoaDon(idhd, "okok", "okok", "okok");
+        return "redirect:/ban-hang-tai-quay"; // Redirect back to the main page
+    }
 }

@@ -41,7 +41,7 @@ public class SanPham {
     private String moTa;
 
     @Column(name = "trangThai")
-    private Boolean trangThai;
+    private String trangThai;
 
     @OneToMany(mappedBy = "idSanpham", cascade = CascadeType.ALL)
     @JsonManagedReference

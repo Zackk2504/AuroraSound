@@ -18,10 +18,10 @@ public class LichSuHoaDon {
     private Integer id;
 
     @Column(name = "trangThaiCu")
-    private Boolean trangThaiCu;
+    private String trangThaiCu;
 
     @Column(name = "trangThaiMoi")
-    private Boolean trangThaiMoi;
+    private String trangThaiMoi;
 
     @Column(name = "ngayCapNhat")
     private Instant ngayCapNhat;

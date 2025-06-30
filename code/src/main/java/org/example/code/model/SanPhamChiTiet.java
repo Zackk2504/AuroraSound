@@ -45,6 +45,6 @@ public class SanPhamChiTiet {
     private String moTa;
 
     @Column(name = "trangThai")
-    private Boolean trangThai;
+    private String trangThai;
 
 }
