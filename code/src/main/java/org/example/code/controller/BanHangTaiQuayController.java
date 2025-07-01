@@ -21,7 +21,7 @@ public class BanHangTaiQuayController {
         return "UI/employee/BanHangTaiQuay";
     }
 
-    @GetMapping("/ban-hang-tai-quay-ban-hang/{idhd}")
+    @GetMapping("/ban-hang-tai-quay/{idhd}")
     public String showBanHangTaiQuayBanHangPage(Model model, @PathVariable ("idhd") Integer id) {
         model.addAttribute("ListSanPham", banHangTaiQuayService.DanhSachSanPham()); // Replace null with actual product list if needed
         model.addAttribute("ListHoaDonChiTiet", banHangTaiQuayService.DanhSachHoaDonChiTiet(id)); // Replace 1 with actual ID if needed
@@ -29,7 +29,7 @@ public class BanHangTaiQuayController {
         return "UI/employee/BanHangTaiQuay2";
     }
 
-    @PostMapping("/ban-hang-tai-quay-ban-hang/addsp")
+    @PostMapping("/ban-hang-tai-quay/addsp")
     public String addSanPhamToHoaDon(@RequestParam("idSanPham") Integer idSanPham,
                                       @RequestParam("soLuong") Integer soLuong,
                                       @RequestParam("idhd") Integer idHoaDon,
@@ -37,17 +37,23 @@ public class BanHangTaiQuayController {
     ) {
         Integer idhd = banHangTaiQuayService.ThemHoaDonChiTiet(idSanPham, soLuong, idHoaDon, nhaptay);
 
-        return "redirect:/ban-hang-tai-quay-ban-hang/" + idhd; // Redirect back to the order page
+        return "redirect:/ban-hang-tai-quay/" + idhd; // Redirect back to the order page
     }
 
-    @GetMapping("/ban-hang-tai-quay-ban-hang/delete/{idhd}")
+    @GetMapping("/ban-hang-tai-quay/delete/{idhd}")
     public String deleteHoaDon(@PathVariable("idhd") Integer idhd) {
         banHangTaiQuayService.XoaHoaDon(idhd);
         return "redirect:/ban-hang-tai-quay"; }// Redirect back to the main page
 
-    @PostMapping("/ban-hang-tai-quay-ban-hang/thanhtoan/{idhd}")
-    public String thanhToanHoaDon(@PathVariable("idhd") Integer idhd) {
-        banHangTaiQuayService.ThanhToanHoaDon(idhd, "okok", "okok", "okok");
+    @PostMapping("/ban-hang-tai-quay/thanhtoan/{idhd}")
+    public String thanhToanHoaDon(@PathVariable("idhd") Integer idhd,@RequestParam String tenNguoiMua,
+                                  @RequestParam String sdtNguoiMua,
+                                  @RequestParam(required = false) String tenNguoiNhan,
+                                  @RequestParam(required = false) String diaChiNguoiNhan,
+                                  @RequestParam(required = false) String sdtNguoiNhan,
+                                  @RequestParam String hinhThucThanhToan) {
+        banHangTaiQuayService.ThanhToanHoaDon(idhd, tenNguoiMua, sdtNguoiMua, diaChiNguoiNhan
+                , tenNguoiNhan, sdtNguoiNhan,hinhThucThanhToan);
         return "redirect:/ban-hang-tai-quay"; // Redirect back to the main page
     }
 }

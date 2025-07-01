@@ -24,9 +24,10 @@
         <!-- Danh sách sản phẩm -->
         <div class="col-md-8">
             <h4>Danh sách sản phẩm</h4>
+            <input type="text" id="searchInput" class="form-control mb-3" placeholder="Tìm sản phẩm...">
             <div class="row" id="product-list">
                 <div th:each="sp : ${ListSanPham}" class="col-md-4">
-                    <form th:action="@{/ban-hang-tai-quay-ban-hang/addsp}" method="post">
+                    <form th:action="@{/ban-hang-tai-quay/addsp}" method="post">
                         <input type="hidden" name="idSanPham" th:value="${sp.id}" />
                         <input type="hidden" name="soLuong" value="1" />
                         <input type="hidden" name="idhd" th:value="0" />
@@ -69,7 +70,7 @@
 
         const form = document.createElement('form');
         form.method = 'POST';
-        form.action = '/ban-hang-tai-quay-ban-hang/addsp';
+        form.action = '/ban-hang-tai-quay/addsp';
 
         const idInput = document.createElement('input');
         idInput.type = 'hidden';
@@ -104,6 +105,20 @@
         onScanSuccess
     ).catch(err => {
         console.error("QR Scan error", err);
+    });
+
+    document.getElementById("searchInput").addEventListener("keyup", function () {
+        let keyword = this.value.toLowerCase();
+        let products = document.querySelectorAll("#product-list .col-md-4");
+
+        products.forEach(function (product) {
+            let name = product.querySelector("strong").innerText.toLowerCase();
+            if (name.includes(keyword)) {
+                product.style.display = "block";
+            } else {
+                product.style.display = "none";
+            }
+        });
     });
 
 </script>
