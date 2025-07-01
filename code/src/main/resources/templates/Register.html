@@ -34,6 +34,29 @@ Trang đăng kí
                     <input type="password" class="form-control" id="password"
                            th:field="*{matKhau}" required>
                 </div>
+                <div class="mb-3">
+                    <label for="hoTen" class="form-label">Họ và tên</label>
+                    <input type="text" class="form-control" id="hoTen" th:field="*{hoTen}" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="soDT" class="form-label">Số điện thoại</label>
+                    <input type="tel" class="form-control" id="soDT" th:field="*{soDT}" required>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Giới tính</label>
+                    <div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" id="nam" th:field="*{gioiTinh}" value="Nam" required>
+                            <label class="form-check-label" for="nam">Nam</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" id="nu" th:field="*{gioiTinh}" value="Nữ">
+                            <label class="form-check-label" for="nu">Nữ</label>
+                        </div>
+                    </div>
+                </div>
 
                 <button type="submit" class="btn btn-primary w-100">Đăng ký</button>
             </form>

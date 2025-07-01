@@ -7,9 +7,10 @@
     <title>Quản lý Mã giảm giá - TaiNghePro Admin</title>
     <link rel="shortcut icon" href="templates/img/icon.png" type="image/x-icon">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="templates/css/style.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
         /* Custom styles for Admin Dashboard (copied for consistency) */
         body {
@@ -70,281 +71,422 @@
 </head>
 
 <body>
-    <div class="d-flex" id="wrapper">
-        <div class="bg-dark border-right" id="sidebar-wrapper">
-            <div class="sidebar-heading">
-                <i class="bi bi-speedometer me-2"></i>
-                <img src="/templates/img/LogoAuRRoRa.png" alt="" width="200px">
-            </div>
-            <div class="list-group list-group-flush">
-                <a href="admin_dashboard.html" class="list-group-item list-group-item-action">
-                    <i class="bi bi-grid-1x2-fill me-2"></i> Dashboard
-                </a>
-                <a href="admin_products.html" class="list-group-item list-group-item-action">
-                    <i class="bi bi-headset me-2"></i> Quản lý Sản phẩm
-                </a>
-                <a href="admin_orders.html" class="list-group-item list-group-item-action">
-                    <i class="bi bi-receipt-cutoff me-2"></i> Quản lý Đơn hàng
-                </a>
-                <a href="admin_pos.html" class="list-group-item list-group-item-action">
-                    <i class="bi bi-shop-window me-2"></i> Bán hàng tại quầy
-                </a>
-                <a href="admin_users.html" class="list-group-item list-group-item-action">
-                    <i class="bi bi-people-fill me-2"></i> Quản lý Người dùng
-                </a>
-                <a href="admin_news.html" class="list-group-item list-group-item-action">
-                    <i class="bi bi-newspaper me-2"></i> Quản lý Tin tức
-                </a>
-                <a href="admin_brands.html" class="list-group-item list-group-item-action">
-                    <i class="bi bi-award-fill me-2"></i> Quản lý Thương hiệu
-                </a>
-                <a href="admin_vouchers.html" class="list-group-item list-group-item-action active">
-                    <i class="bi bi-ticket-perforated-fill me-2"></i> Quản lý Voucher
-                </a>
-                <a href="#" class="list-group-item list-group-item-action">
-                    <i class="bi bi-gear-fill me-2"></i> Cài đặt hệ thống
-                </a>
-                <a href="admin_login.html" class="list-group-item list-group-item-action text-danger">
-                    <i class="bi bi-box-arrow-right me-2"></i> Đăng xuất
-                </a>
-            </div>
+<div class="d-flex" id="wrapper">
+    <div class="bg-dark border-right" id="sidebar-wrapper">
+        <div class="sidebar-heading">
+            <i class="bi bi-speedometer me-2"></i>
+            <img src="/templates/img/LogoAuRRoRa.png" alt="" width="200px">
         </div>
-        <div id="page-content-wrapper">
-            <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom navbar-admin">
-                <div class="container-fluid">
-                    <button class="btn btn-primary" id="sidebarToggle"><i class="bi bi-list"></i></button>
-                    <div class="ms-auto">
+        <div class="list-group list-group-flush">
+            <a href="admin_dashboard.html" class="list-group-item list-group-item-action">
+                <i class="bi bi-grid-1x2-fill me-2"></i> Dashboard
+            </a>
+            <a href="admin_products.html" class="list-group-item list-group-item-action">
+                <i class="bi bi-headset me-2"></i> Quản lý Sản phẩm
+            </a>
+            <a href="admin_orders.html" class="list-group-item list-group-item-action">
+                <i class="bi bi-receipt-cutoff me-2"></i> Quản lý Đơn hàng
+            </a>
+            <a href="admin_pos.html" class="list-group-item list-group-item-action">
+                <i class="bi bi-shop-window me-2"></i> Bán hàng tại quầy
+            </a>
+            <a href="admin_users.html" class="list-group-item list-group-item-action">
+                <i class="bi bi-people-fill me-2"></i> Quản lý Người dùng
+            </a>
+            <a href="admin_news.html" class="list-group-item list-group-item-action">
+                <i class="bi bi-newspaper me-2"></i> Quản lý Tin tức
+            </a>
+            <a href="admin_brands.html" class="list-group-item list-group-item-action">
+                <i class="bi bi-award-fill me-2"></i> Quản lý Thương hiệu
+            </a>
+            <a href="admin_vouchers.html" class="list-group-item list-group-item-action active">
+                <i class="bi bi-ticket-perforated-fill me-2"></i> Quản lý Voucher
+            </a>
+            <a href="#" class="list-group-item list-group-item-action">
+                <i class="bi bi-gear-fill me-2"></i> Cài đặt hệ thống
+            </a>
+            <a href="admin_login.html" class="list-group-item list-group-item-action text-danger">
+                <i class="bi bi-box-arrow-right me-2"></i> Đăng xuất
+            </a>
+        </div>
+    </div>
+    <div id="page-content-wrapper">
+        <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom navbar-admin">
+            <div class="container-fluid">
+                <button class="btn btn-primary" id="sidebarToggle"><i class="bi bi-list"></i></button>
+                <div class="ms-auto">
                         <span class="navbar-text me-3">
                             Chào mừng, <strong class="text-primary">Admin Name</strong>
                         </span>
-                        <a href="admin_login.html" class="btn btn-outline-danger btn-sm">
-                            <i class="bi bi-box-arrow-right"></i> Đăng xuất
-                        </a>
+                    <a href="admin_login.html" class="btn btn-outline-danger btn-sm">
+                        <i class="bi bi-box-arrow-right"></i> Đăng xuất
+                    </a>
+                </div>
+            </div>
+        </nav>
+
+        <div class="container-fluid py-4">
+            <h1 class="mt-4 mb-4">Quản lý Mã giảm giá</h1>
+
+            <div class="card shadow-sm p-3 mb-4">
+                <div class="row g-3 align-items-center mb-3">
+                    <div class="col-md-4">
+                        <input type="text" class="form-control" id="filterCode" placeholder="Tìm kiếm theo Mã giảm giá...">
+                    </div>
+                    <div class="col-md-3">
+                        <select class="form-select" id="filterType">
+                            <option value="">Tất cả loại</option>
+                            <option value="Phần trăm">Phần trăm (%)</option>
+                            <option value="Số tiền cố định">Số tiền cố định</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <select class="form-select" id="filterStatus">
+                            <option value="">Tất cả trạng thái</option>
+                            <option value="active">Đang hoạt động</option>
+                            <option value="inactive">Không hoạt động</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <button class="btn btn-primary w-100" id="btnFilter"><i class="bi bi-search me-1"></i> Lọc</button>
                     </div>
                 </div>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <button class="btn btn-outline-secondary me-2"><i class="bi bi-x-circle me-1"></i> Đặt lại</button>
+                    </div>
+                    <div class="col-md-6 text-end">
+                        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addVoucherModal">
+                            <i class="bi bi-plus-circle me-1"></i> Thêm Voucher mới
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="bi bi-ticket-perforated-fill me-2"></i> Danh sách Mã giảm giá</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Mã giảm giá</th>
+                                <th scope="col">Loại</th>
+                                <th scope="col">Giá trị</th>
+                                <th scope="col">Tối thiểu ĐH</th>
+                                <th scope="col">Ngày bắt đầu</th>
+                                <th scope="col">Ngày kết thúc</th>
+                                <th scope="col">Số lượt dùng tối đa</th>
+                                <th scope="col">Đã dùng</th>
+                                <th scope="col">Trạng thái</th>
+                                <th scope="col">Hành động</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="text-end mt-3">
+                        <a href="#" class="btn btn-outline-primary btn-sm">Xem tất cả</a>
+                    </div>
+                </div>
+            </div>
+
+            <nav aria-label="Page navigation for admin vouchers" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Trước</a>
+                    </li>
+                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                    <li class="page-item"><a class="page-link" href="#">2</a></li>
+                    <li class="page-item"><a class="page-link" href="#">3</a></li>
+                    <li class="page-item">
+                        <a class="page-link" href="#">Sau</a>
+                    </li>
+                </ul>
             </nav>
 
-            <div class="container-fluid py-4">
-                <h1 class="mt-4 mb-4">Quản lý Mã giảm giá</h1>
-
-                <div class="card shadow-sm p-3 mb-4">
-                    <div class="row g-3 align-items-center mb-3">
-                        <div class="col-md-4">
-                            <input type="text" class="form-control" placeholder="Tìm kiếm theo Mã giảm giá...">
-                        </div>
-                        <div class="col-md-3">
-                            <select class="form-select">
-                                <option selected>Tất cả loại</option>
-                                <option value="percentage">Phần trăm (%)</option>
-                                <option value="fixed_amount">Số tiền cố định</option>
-                            </select>
-                        </div>
-                        <div class="col-md-3">
-                            <select class="form-select">
-                                <option selected>Tất cả trạng thái</option>
-                                <option value="active">Đang hoạt động</option>
-                                <option value="inactive">Không hoạt động</option>
-                                <option value="expired">Đã hết hạn</option>
-                            </select>
-                        </div>
-                        <div class="col-md-2">
-                            <button class="btn btn-primary w-100"><i class="bi bi-search me-1"></i> Lọc</button>
-                        </div>
-                    </div>
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <button class="btn btn-outline-secondary me-2"><i class="bi bi-x-circle me-1"></i> Đặt lại</button>
-                        </div>
-                        <div class="col-md-6 text-end">
-                            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addVoucherModal">
-                                <i class="bi bi-plus-circle me-1"></i> Thêm Voucher mới
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card shadow-sm mb-4">
-                    <div class="card-header bg-primary text-white">
-                        <h5 class="mb-0"><i class="bi bi-ticket-perforated-fill me-2"></i> Danh sách Mã giảm giá</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table table-hover align-middle">
-                                <thead>
-                                    <tr>
-                                        <th scope="col">#</th>
-                                        <th scope="col">Mã giảm giá</th>
-                                        <th scope="col">Loại</th>
-                                        <th scope="col">Giá trị</th>
-                                        <th scope="col">Tối thiểu ĐH</th>
-                                        <th scope="col">Ngày bắt đầu</th>
-                                        <th scope="col">Ngày kết thúc</th>
-                                        <th scope="col">Số lượt dùng tối đa</th>
-                                        <th scope="col">Đã dùng</th>
-                                        <th scope="col">Trạng thái</th>
-                                        <th scope="col">Hành động</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>1</td>
-                                        <td>SUMMER20</td>
-                                        <td>Phần trăm</td>
-                                        <td>20%</td>
-                                        <td>500.000 VNĐ</td>
-                                        <td>01/06/2025</td>
-                                        <td>31/08/2025</td>
-                                        <td>100</td>
-                                        <td>45</td>
-                                        <td><span class="badge bg-success voucher-status-badge">Đang hoạt động</span></td>
-                                        <td>
-                                            <button class="btn btn-sm btn-warning text-dark me-1" title="Chỉnh sửa">
-                                                <i class="bi bi-pencil"></i>
-                                            </button>
-                                            <button class="btn btn-sm btn-danger" title="Xóa">
-                                                <i class="bi bi-trash"></i>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>2</td>
-                                        <td>FREESHIP</td>
-                                        <td>Số tiền cố định</td>
-                                        <td>Miễn phí VC</td>
-                                        <td>0 VNĐ</td>
-                                        <td>01/01/2025</td>
-                                        <td>31/12/2025</td>
-                                        <td>Vô hạn</td>
-                                        <td>230</td>
-                                        <td><span class="badge bg-success voucher-status-badge">Đang hoạt động</span></td>
-                                        <td>
-                                            <button class="btn btn-sm btn-warning text-dark me-1" title="Chỉnh sửa">
-                                                <i class="bi bi-pencil"></i>
-                                            </button>
-                                            <button class="btn btn-sm btn-danger" title="Xóa">
-                                                <i class="bi bi-trash"></i>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>3</td>
-                                        <td>NEWUSER100</td>
-                                        <td>Số tiền cố định</td>
-                                        <td>100.000 VNĐ</td>
-                                        <td>1.000.000 VNĐ</td>
-                                        <td>01/01/2025</td>
-                                        <td>31/05/2025</td>
-                                        <td>50</td>
-                                        <td>50</td>
-                                        <td><span class="badge bg-danger voucher-status-badge">Đã hết hạn</span></td>
-                                        <td>
-                                            <button class="btn btn-sm btn-warning text-dark me-1" title="Chỉnh sửa" disabled>
-                                                <i class="bi bi-pencil"></i>
-                                            </button>
-                                            <button class="btn btn-sm btn-danger" title="Xóa">
-                                                <i class="bi bi-trash"></i>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                    </tbody>
-                            </table>
-                        </div>
-                        <div class="text-end mt-3">
-                            <a href="#" class="btn btn-outline-primary btn-sm">Xem tất cả</a>
-                        </div>
-                    </div>
-                </div>
-
-                <nav aria-label="Page navigation for admin vouchers" class="mt-4">
-                    <ul class="pagination justify-content-center">
-                        <li class="page-item disabled">
-                            <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Trước</a>
-                        </li>
-                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                        <li class="page-item"><a class="page-link" href="#">2</a></li>
-                        <li class="page-item"><a class="page-link" href="#">3</a></li>
-                        <li class="page-item">
-                            <a class="page-link" href="#">Sau</a>
-                        </li>
-                    </ul>
-                </nav>
-
-            </div>
-        </div>
-        </div>
-    <div class="modal fade" id="addVoucherModal" tabindex="-1" aria-labelledby="addVoucherModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header bg-success text-white">
-                    <h5 class="modal-title" id="addVoucherModalLabel"><i class="bi bi-plus-circle me-2"></i> Thêm Mã giảm giá mới</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form>
-                        <div class="mb-3">
-                            <label for="voucherCode" class="form-label">Mã giảm giá <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="voucherCode" required placeholder="Ví dụ: SUMMER20">
-                        </div>
-                        <div class="mb-3">
-                            <label for="voucherType" class="form-label">Loại giảm giá <span class="text-danger">*</span></label>
-                            <select class="form-select" id="voucherType" required>
-                                <option value="" disabled selected>Chọn loại...</option>
-                                <option value="percentage">Phần trăm (%)</option>
-                                <option value="fixed_amount">Số tiền cố định</option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label for="voucherValue" class="form-label">Giá trị giảm <span class="text-danger">*</span></label>
-                            <input type="number" class="form-control" id="voucherValue" min="0" required placeholder="Ví dụ: 20 (cho 20%) hoặc 50000 (cho 50.000 VNĐ)">
-                            <small class="text-muted">Nhập giá trị phần trăm hoặc số tiền giảm.</small>
-                        </div>
-                        <div class="mb-3">
-                            <label for="minOrderAmount" class="form-label">Giá trị đơn hàng tối thiểu</label>
-                            <input type="number" class="form-control" id="minOrderAmount" min="0" placeholder="Ví dụ: 500000">
-                            <small class="text-muted">Đơn hàng phải đạt giá trị này để áp dụng voucher. Để 0 nếu không yêu cầu.</small>
-                        </div>
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <label for="startDate" class="form-label">Ngày bắt đầu <span class="text-danger">*</span></label>
-                                <input type="date" class="form-control" id="startDate" required>
-                            </div>
-                            <div class="col-md-6">
-                                <label for="endDate" class="form-label">Ngày kết thúc <span class="text-danger">*</span></label>
-                                <input type="date" class="form-control" id="endDate" required>
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <label for="maxUsage" class="form-label">Số lượt sử dụng tối đa</label>
-                            <input type="number" class="form-control" id="maxUsage" min="0" placeholder="Để trống hoặc 0 nếu vô hạn">
-                            <small class="text-muted">Tổng số lần voucher này có thể được sử dụng.</small>
-                        </div>
-                        <div class="mb-3">
-                            <label for="voucherStatus" class="form-label">Trạng thái <span class="text-danger">*</span></label>
-                            <select class="form-select" id="voucherStatus" required>
-                                <option value="active" selected>Hoạt động</option>
-                                <option value="inactive">Không hoạt động</option>
-                            </select>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                    <button type="submit" class="btn btn-success"><i class="bi bi-save me-2"></i> Lưu Voucher</button>
-                </div>
-            </div>
         </div>
     </div>
+</div>
+<div class="modal fade" id="addVoucherModal" tabindex="-1" aria-labelledby="addVoucherModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="addVoucherModalLabel"><i class="bi bi-plus-circle me-2"></i> Thêm Mã giảm giá mới</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="voucherForm">
+                    <div class="mb-3">
+                        <label for="voucherCode" class="form-label">Mã giảm giá <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="voucherCode" required placeholder="Ví dụ: SUMMER20">
+                    </div>
+                    <div class="mb-3">
+                        <label for="voucherType" class="form-label">Loại giảm giá <span class="text-danger">*</span></label>
+                        <select class="form-select" id="voucherType" required>
+                            <option value="" disabled selected>Chọn loại...</option>
+                            <option value="percentage">Phần trăm (%)</option>
+                            <option value="fixed_amount">Số tiền cố định</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="voucherValue" class="form-label">Giá trị giảm <span class="text-danger">*</span></label>
+                        <input type="number" class="form-control" id="voucherValue" min="0" required placeholder="Ví dụ: 20 (cho 20%) hoặc 50000 (cho 50.000 VNĐ)">
+                        <small class="text-muted">Nhập giá trị phần trăm hoặc số tiền giảm.</small>
+                    </div>
+                    <div class="mb-3">
+                        <label for="minOrderAmount" class="form-label">Giá trị đơn hàng tối thiểu</label>
+                        <input type="number" class="form-control" id="minOrderAmount" min="0" placeholder="Ví dụ: 500000">
+                        <small class="text-muted">Đơn hàng phải đạt giá trị này để áp dụng voucher. Để 0 nếu không yêu cầu.</small>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="startDate" class="form-label">Ngày bắt đầu <span class="text-danger">*</span></label>
+                            <input type="date" class="form-control" id="startDate" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="endDate" class="form-label">Ngày kết thúc <span class="text-danger">*</span></label>
+                            <input type="date" class="form-control" id="endDate" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="maxUsage" class="form-label">Số lượt sử dụng tối đa</label>
+                        <input type="number" class="form-control" id="maxUsage" min="0" placeholder="Để trống hoặc 0 nếu vô hạn">
+                        <small class="text-muted">Tổng số lần voucher này có thể được sử dụng.</small>
+                    </div>
+                    <div class="mb-3">
+                        <label for="voucherStatus" class="form-label">Trạng thái <span class="text-danger">*</span></label>
+                        <select class="form-select" id="voucherStatus" required>
+                            <option value="active" selected>Hoạt động</option>
+                            <option value="inactive">Không hoạt động</option>
+                        </select>
+                    </div>
+
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-success">Lưu Voucher</button>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
 
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
         crossorigin="anonymous"></script>
-    <script>
-        // Toggle the sidebar (copied for consistency)
-        document.getElementById("sidebarToggle").addEventListener("click", function() {
-            document.getElementById("wrapper").classList.toggle("toggled");
+<script>
+    // Toggle the sidebar (copied for consistency)
+    document.getElementById("sidebarToggle").addEventListener("click", function() {
+        document.getElementById("wrapper").classList.toggle("toggled");
+    });
+
+    let editingVoucherId = null;
+    let allVouchers = [];
+
+    function renderVouchers(data) {
+        const tbody = document.querySelector('table tbody');
+        tbody.innerHTML = '';
+        data.forEach((voucher, index) => {
+            tbody.innerHTML += `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td>${voucher.maVoucher}</td>
+                        <td>${voucher.kieuGiam || ''}</td>
+                        <td>${voucher.giaTriVoucher}</td>
+                        <td>${voucher.giaTriToiThieuApDung}</td>
+                        <td>${voucher.ngayBatDau}</td>
+                        <td>${voucher.ngayKetThuc}</td>
+                        <td>${voucher.soLuongVoucher}</td>
+                        <td>-</td>
+                        <td>
+                            <span class="badge ${voucher.trangThai ? 'bg-success' : 'bg-danger'} voucher-status-badge">
+                                ${voucher.trangThai ? 'Đang hoạt động' : 'Không hoạt động'}
+                            </span>
+                        </td>
+                        <td>
+                            <button class="btn btn-sm btn-warning text-dark me-1" title="Chỉnh sửa" onclick="editVoucher(${voucher.id})">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                            <button class="btn btn-sm btn-danger" title="Xóa" onclick="deleteVoucher(${voucher.id})">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
         });
-    </script>
+    }
+
+    function loadVouchers() {
+        fetch('/api/vouchers')
+            .then(response => response.json())
+            .then(data => {
+                allVouchers = data;
+                renderVouchers(data);
+            });
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        loadVouchers();
+
+        document.getElementById("btnFilter").addEventListener("click", function() {
+            filterVouchers();
+        });
+        document.getElementById("filterCode").addEventListener("input", function(e) {
+            if (e.target.value === "") filterVouchers();
+        });
+        document.getElementById("filterType").addEventListener("change", filterVouchers);
+        document.getElementById("filterStatus").addEventListener("change", filterVouchers);
+
+        document.getElementById("voucherForm").addEventListener("submit", function(e) {
+            e.preventDefault();
+            const voucherData = getVoucherFormData();
+            if (editingVoucherId) {
+                updateVoucher(editingVoucherId, voucherData);
+            } else {
+                addVoucher(voucherData);
+            }
+            var modal = bootstrap.Modal.getInstance(document.getElementById('addVoucherModal'));
+            modal.hide();
+            this.reset();
+            editingVoucherId = null;
+            document.querySelector("#addVoucherModalLabel").innerText = "Thêm Mã giảm giá mới";
+            document.querySelector("#addVoucherModal button[type=submit]").innerHTML = '<i class="bi bi-save me-2"></i> Lưu Voucher';
+        });
+
+        document.querySelector('[data-bs-target="#addVoucherModal"]').addEventListener("click", function() {
+            document.getElementById("voucherForm").reset();
+            editingVoucherId = null;
+            document.querySelector("#addVoucherModalLabel").innerText = "Thêm Mã giảm giá mới";
+            document.querySelector("#addVoucherModal button[type=submit]").innerHTML = '<i class="bi bi-save me-2"></i> Lưu Voucher';
+        });
+    });
+
+    function filterVouchers() {
+        let code = document.getElementById("filterCode").value.trim().toLowerCase();
+        let type = document.getElementById("filterType").value;
+        let status = document.getElementById("filterStatus").value;
+        let filtered = allVouchers.filter(voucher => {
+            let matchCode = code === "" || (voucher.maVoucher && voucher.maVoucher.toLowerCase().includes(code));
+            let matchType = type === "" || (voucher.kieuGiam && voucher.kieuGiam.includes(type));
+            let matchStatus = status === "" || (status === "active" && voucher.trangThai) || (status === "inactive" && !voucher.trangThai);
+            return matchCode && matchType && matchStatus;
+        });
+        renderVouchers(filtered);
+    }
+
+    function getVoucherFormData() {
+        const maVoucher = document.getElementById('voucherCode').value.trim();
+        const kieuGiam = document.getElementById('voucherType').value;
+        const giaTriVoucher = document.getElementById('voucherValue').value;
+        const ngayBatDau = document.getElementById('startDate').value;
+        const ngayKetThuc = document.getElementById('endDate').value;
+
+        if (!maVoucher || !kieuGiam || !giaTriVoucher || !ngayBatDau || !ngayKetThuc) {
+            // alert("Vui lòng nhập đầy đủ thông tin bắt buộc!");
+            return null;
+        }
+
+        return {
+            maVoucher: maVoucher,
+            tenVoucher: '', // Có thể bổ sung thêm input nếu muốn
+            giaTriVoucher: parseFloat(giaTriVoucher),
+            giaTriToiDaApDung: 0,
+            giaTriToiThieuApDung: parseFloat(document.getElementById('minOrderAmount').value) || 0,
+            soLuongVoucher: parseInt(document.getElementById('maxUsage').value) || 0,
+            ngayBatDau: ngayBatDau,
+            ngayKetThuc: ngayKetThuc,
+            trangThai: document.getElementById('voucherStatus').value === 'active',
+            kieuGiam: document.getElementById('voucherType').selectedOptions[0].text
+        };
+    }
+
+    function addVoucher(voucherData) {
+        fetch('/api/vouchers', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(voucherData)
+        })
+            .then(res => {
+                if (res.ok) {
+                    alert('Thêm thành công!');
+                    loadVouchers();
+                } else {
+                    res.text().then(msg => alert('Thêm thất bại!\n' + msg));
+                }
+            })
+            .catch(err => {
+                alert('Lỗi khi thêm voucher: ' + err);
+                console.error(err);
+            });
+    }
+
+    function editVoucher(id) {
+        fetch('/api/vouchers/' + id)
+            .then(res => res.json())
+            .then(voucher => {
+                editingVoucherId = id;
+                document.getElementById('voucherCode').value = voucher.maVoucher;
+                document.getElementById('voucherValue').value = voucher.giaTriVoucher;
+                document.getElementById('minOrderAmount').value = voucher.giaTriToiThieuApDung;
+                document.getElementById('startDate').value = voucher.ngayBatDau;
+                document.getElementById('endDate').value = voucher.ngayKetThuc;
+                document.getElementById('maxUsage').value = voucher.soLuongVoucher;
+                document.getElementById('voucherStatus').value = voucher.trangThai ? 'active' : 'inactive';
+                // Chọn loại giảm giá
+                let type = voucher.kieuGiam === 'Phần trăm' ? 'percentage' : 'fixed_amount';
+                document.getElementById('voucherType').value = type;
+                // Đổi tiêu đề modal
+                document.querySelector("#addVoucherModalLabel").innerText = "Chỉnh sửa Mã giảm giá";
+                document.querySelector("#addVoucherModal button[type=submit]").innerHTML = '<i class="bi bi-save me-2"></i> Cập nhật Voucher';
+                // Hiện modal
+                var modal = new bootstrap.Modal(document.getElementById('addVoucherModal'));
+                modal.show();
+            });
+    }
+
+    function updateVoucher(id, voucherData) {
+        fetch('/api/vouchers/' + id, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(voucherData)
+        })
+            .then(res => {
+                if (res.ok) {
+                    alert('Cập nhật thành công!');
+                    loadVouchers();
+                } else {
+                    res.text().then(msg => alert('Cập nhật thất bại!\n' + msg));
+                }
+            })
+            .catch(err => {
+                alert('Lỗi khi cập nhật voucher: ' + err);
+                console.error(err);
+            });
+    }
+
+    function deleteVoucher(id) {
+        if (confirm('Bạn có chắc muốn xóa voucher này?')) {
+            fetch('/api/vouchers/' + id, { method: 'DELETE' })
+                .then(res => {
+                    if (res.ok) {
+                        alert('Xóa thành công!');
+                        loadVouchers();
+                    } else {
+                        res.text().then(msg => alert('Xóa thất bại!\n' + msg));
+                    }
+                })
+                .catch(err => {
+                    alert('Lỗi khi xóa voucher: ' + err);
+                    console.error(err);
+                });
+        }
+    }
+</script>
 </body>
 
 </html>

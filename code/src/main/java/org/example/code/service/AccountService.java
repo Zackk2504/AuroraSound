@@ -59,10 +59,10 @@ public class AccountService {
         session.setAttribute("username", dto.getUserName());
         System.out.println(dto.getUserName() + " :tao ten la");
         session.setAttribute("otpExpire", System.currentTimeMillis() + 5 * 60 * 1000);
-//        session.setAttribute("hoTen", dto.getHoTen());
-//        session.setAttribute("soDT", dto.getSoDT());
+        session.setAttribute("hoTen", dto.getHoTen());
+        session.setAttribute("soDT", dto.getSoDT());
 //        session.setAttribute("ngaySinh", dto.getNgaySinh());
-//        session.setAttribute("gioiTinh", dto.getGioiTinh());
+        session.setAttribute("gioiTinh", dto.getGioiTinh());
         // Gửi mail async
         mailService.sendOtpEmail(dto.getEmail(), otp);
     }
@@ -76,9 +76,17 @@ public class AccountService {
         String soDT = (String) session.getAttribute("soDT");
         String ngaySinh = (String) session.getAttribute("ngaySinh");
         String gioiTinh = (String) session.getAttribute("gioiTinh");
-
+        KhachHang taikhoan;
         if (otp != null && otp.equals(maXacNhan)) {
-            KhachHang taikhoan = new KhachHang();
+            if (email == null || pass == null || username == null || hoTen == null || soDT == null || ngaySinh == null || gioiTinh == null) {
+                throw new RuntimeException("Thông tin đăng ký không đầy đủ");
+            }
+            Optional<KhachHang> khachHang = accountRepository.findBySoDT(soDT);
+            if (khachHang.isPresent() && khachHang.get().getEmail() == null) {
+               taikhoan = khachHang.get();
+            }else {
+                taikhoan = new KhachHang();
+            }
             taikhoan.setEmail(email);
             taikhoan.setMatKhau(passwordEncoder.encode(pass));
             taikhoan.setTenDangNhap(username);
