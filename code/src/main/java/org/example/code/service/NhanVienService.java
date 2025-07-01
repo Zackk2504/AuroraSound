@@ -51,4 +51,11 @@ public class NhanVienService {
             System.out.println("✅ Đã tạo tài khoản admin mặc định.");
         }
     }
+
+    public NhanVien getNhanVienById(Integer id) {
+        return nhanVienRepository.findById(id).orElse(null);
+    }
+    public NhanVien getNhanVienByTenDangNhap(String tenDangNhap) {
+        return nhanVienRepository.findByTenDangNhap(tenDangNhap).orElse(null);
+    }
 }

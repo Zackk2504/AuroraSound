@@ -1,10 +1,10 @@
 package org.example.code.service;
 
 import jakarta.transaction.Transactional;
-import org.example.code.model.HoaDon;
-import org.example.code.model.HoaDonChiTiet;
-import org.example.code.model.SanPhamChiTiet;
+import org.example.code.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,6 +23,12 @@ public class BanHangTaiQuayService {
 
     @Autowired
     private HoaDonChiTietService hoaDonChiTietService;
+
+    @Autowired
+    private NhanVienService nhanVienService;
+
+    @Autowired
+    private KhachHangService khachHangService;
 
     public List<SanPhamChiTiet> DanhSachSanPham() {
         return sanPhamChiTietService.getAllSanPhamChiTiet();
@@ -126,8 +132,35 @@ public class BanHangTaiQuayService {
 
     }
 
-    public void ThanhToanHoaDon(Integer idhd,String ten,String sdtkhach,String sdtnhan) {
+    public void ThanhToanHoaDon(Integer idhd,String tenKhach,String sdtkhach,String diaChiNguoiNhan,String tenNguoiNhan,String sdtNguoiNhan, String hinhThucThanhToan) {
         List<HoaDonChiTiet> hoaDonChiTietList = hoaDonChiTietService.getListHoaDonChiTietByIdHoaDon(idhd);
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String tenDangNhap = auth.getName();
+
+        if (tenDangNhap == null || tenDangNhap.isEmpty()) {
+            throw new RuntimeException("Ten dang nhap khong hop le");
+        }
+
+        if (tenNguoiNhan == null || tenNguoiNhan.trim().isEmpty()) {
+            tenNguoiNhan = tenKhach;
+        }
+        if (diaChiNguoiNhan == null || diaChiNguoiNhan.trim().isEmpty()) {
+            diaChiNguoiNhan = "Cửa hàng"; // hoặc diaChi nếu muốn dùng địa chỉ khách
+        }
+        if (sdtNguoiNhan == null || sdtNguoiNhan.trim().isEmpty()) {
+            sdtNguoiNhan = sdtkhach;
+        }
+
+        NhanVien nhanVien = nhanVienService.getNhanVienByTenDangNhap(tenDangNhap);
+        Optional<KhachHang> khachHangOptional = khachHangService.getKhachHangBySDT(sdtkhach);
+        KhachHang khachHang = null;
+        if (!khachHangOptional.isPresent()){
+            khachHang = new KhachHang();
+            khachHang.setSoDT(sdtkhach);
+            khachHang.setHoTen(tenKhach);
+            khachHangService.addAndEdit(khachHang);
+        }
+
         if (hoaDonChiTietList.isEmpty()) {
             throw new RuntimeException("Hoa Don Chi Tiet is empty");
         }
@@ -139,6 +172,16 @@ public class BanHangTaiQuayService {
             Tongtien += hoaDonChiTiet.getSoLuong() * hoaDonChiTiet.getDonGia();
         }
         hoaDon.setThanhTien(Tongtien);
+        hoaDon.setIdNhanvien(nhanVien);
+        hoaDon.setTenNguoiNhan(tenNguoiNhan);
+        hoaDon.setSdtNguoiNhan(sdtNguoiNhan);
+        hoaDon.setDiaChiNhanHang(diaChiNguoiNhan);
+        hoaDon.setThanhTien(Tongtien);
+        hoaDon.setHinhThucThanhToan(hinhThucThanhToan);
+        if (khachHang != null) {
+            hoaDon.setIdKhachhang(khachHang);
+        }
+        hoaDon.setLoaiHoaDon("OFFLINE");
         hoaDonService.addAndEdit(hoaDon);
 
     }

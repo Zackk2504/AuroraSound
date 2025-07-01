@@ -11,6 +11,16 @@
         .cart-item { border-bottom: 1px solid #ddd; padding: 8px 0; }
         .cart-summary { background: white; padding: 15px; border-radius: 6px; box-shadow: 0 0 5px rgba(0,0,0,0.1); }
         .btn-pay { width: 100%; font-size: 1.2rem; }
+        .tab-pane {
+            display: block !important;
+            visibility: hidden;
+            height: 0;
+            overflow: hidden;
+        }
+        .tab-pane.active {
+            visibility: visible;
+            height: auto;
+        }
     </style>
 </head>
 <body>
@@ -24,9 +34,10 @@
         <!-- Danh sách sản phẩm -->
         <div class="col-md-8">
             <h4>Danh sách sản phẩm</h4>
+            <input type="text" id="searchInput" class="form-control mb-3" placeholder="Tìm sản phẩm...">
             <div class="row" id="product-list">
                 <div th:each="sp : ${ListSanPham}" class="col-md-4">
-                    <form th:action="@{/ban-hang-tai-quay-ban-hang/addsp}" method="post">
+                    <form th:action="@{/ban-hang-tai-quay/addsp}" method="post">
                         <input type="hidden" name="idSanPham" th:value="${sp.id}" />
                         <input type="hidden" name="soLuong" value="1" />
                         <input type="hidden" name="idhd" th:value="${idHoaDon}" />
@@ -34,6 +45,7 @@
                             <!--                            <img th:src="@{${sp.hinhAnh}}" class="img-fluid mb-2" alt="Ảnh sản phẩm">-->
                             <div><strong th:text="${sp.idSanpham.tenSanPham}">Tên sản phẩm</strong></div>
                             <div class="text-muted" th:text="${sp.donGia } + '₫'">Giá</div>
+                            <div class="text-muted" th:text="${sp.soLuongTon } + 'số lượng còn' ">Số lượng</div>
                         </button>
                     </form>
                 </div>
@@ -51,16 +63,16 @@
                         </div>
                         <div class="d-flex align-items-center mt-1">
                             <!-- Nút trừ -->
-                            <form th:action="@{/ban-hang-tai-quay-ban-hang/addsp}" method="post" class="me-2">
-                                <input type="hidden" name="idSanPham" th:value="${ct.idSanphamchitiet.idSanpham.id}" />
+                            <form th:action="@{/ban-hang-tai-quay/addsp}" method="post" class="me-2">
+                                <input type="hidden" name="idSanPham" th:value="${ct.idSanphamchitiet.id}" />
                                 <input type="hidden" name="idhd" th:value="${idHoaDon}" />
                                 <input type="hidden" name="soLuong" value="-1" />
                                 <button type="submit" class="btn btn-sm btn-outline-secondary">−</button>
                             </form>
 
                             <!-- Số lượng -->
-                            <form th:action="@{/ban-hang-tai-quay-ban-hang/addsp}" method="post" class="update-form ms-2 me-2">
-                                <input type="hidden" name="idSanPham" th:value="${ct.idSanphamchitiet.idSanpham.id}" />
+                            <form th:action="@{/ban-hang-tai-quay/addsp}" method="post" class="update-form ms-2 me-2">
+                                <input type="hidden" name="idSanPham" th:value="${ct.idSanphamchitiet.id}" />
                                 <input type="hidden" name="idhd" th:value="${idHoaDon}" />
                                 <input type="hidden" name="nhaptay" value="true" />
                                 <input type="number" name="soLuong"
@@ -70,8 +82,8 @@
                             </form>
 
                             <!-- Nút cộng -->
-                            <form th:action="@{/ban-hang-tai-quay-ban-hang/addsp}" method="post" class="ms-2">
-                                <input type="hidden" name="idSanPham" th:value="${ct.idSanphamchitiet.idSanpham.id}" />
+                            <form th:action="@{/ban-hang-tai-quay/addsp}" method="post" class="ms-2">
+                                <input type="hidden" name="idSanPham" th:value="${ct.idSanphamchitiet.id}" />
                                 <input type="hidden" name="idhd" th:value="${idHoaDon}" />
                                 <input type="hidden" name="soLuong" value="1" />
                                 <button type="submit" class="btn btn-sm btn-outline-secondary">+</button>
@@ -89,27 +101,76 @@
 
                 <!-- Modal -->
                 <div class="modal fade" id="thanhToanModal" tabindex="-1" aria-labelledby="thanhToanModalLabel" aria-hidden="true">
-                    <div class="modal-dialog">
+                    <div class="modal-dialog modal-lg">
                         <div class="modal-content">
-                            <form th:action="@{/ban-hang-tai-quay-ban-hang/thanhtoan/{idhd}(idhd=${idHoaDon})}" method="post">
+                            <form th:action="@{/ban-hang-tai-quay/thanhtoan/{idhd}(idhd=${idHoaDon})}" method="post">
                                 <div class="modal-header">
-                                    <h5 class="modal-title" id="thanhToanModalLabel">Thông tin khách hàng</h5>
+                                    <h5 class="modal-title" id="thanhToanModalLabel">Thông tin thanh toán</h5>
                                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
                                 </div>
-                                <div class="modal-body">
-                                    <div class="mb-3">
-                                        <label for="tenKhach" class="form-label">Tên khách hàng</label>
-                                        <input type="text" class="form-control" id="tenKhach" name="tenKhach" required>
+
+                                <!-- Tabs -->
+                                <ul class="nav nav-tabs" id="thanhToanTab" role="tablist">
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link active" id="mua-tab" data-bs-toggle="tab" data-bs-target="#mua" type="button" role="tab">
+                                            Mua hàng
+                                        </button>
+                                    </li>
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link" id="nhan-tab" data-bs-toggle="tab" data-bs-target="#nhan" type="button" role="tab">
+                                            Nhận hàng
+                                        </button>
+                                    </li>
+                                </ul>
+
+                                <!-- Tab content -->
+                                <div class="tab-content p-3">
+                                    <!-- Tab mua hàng -->
+                                    <div class="tab-pane  active" id="mua" role="tabpanel" aria-labelledby="mua-tab">
+                                        <div class="mb-3">
+                                            <label for="tenNguoiMua" class="form-label">Tên người mua</label>
+                                            <input type="text" class="form-control" id="tenNguoiMua" name="tenNguoiMua">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="sdtNguoiMua" class="form-label">Số điện thoại người mua</label>
+                                            <input type="tel" class="form-control" id="sdtNguoiMua" name="sdtNguoiMua">
+                                        </div>
+                                        <div class="mt-4">
+                                            <label class="form-label">Hình thức thanh toán</label>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="hinhThucThanhToan" id="tienMat" value="TIEN_MAT" checked>
+                                                <label class="form-check-label" for="tienMat">
+                                                    Tiền mặt
+                                                </label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="hinhThucThanhToan" id="chuyenKhoan" value="CHUYEN_KHOAN">
+                                                <label class="form-check-label" for="chuyenKhoan">
+                                                    Chuyển khoản
+                                                </label>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="mb-3">
-                                        <label for="diaChi" class="form-label">Địa chỉ</label>
-                                        <input type="text" class="form-control" id="diaChi" name="diaChi" required>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="sdt" class="form-label">Số điện thoại</label>
-                                        <input type="tel" class="form-control" id="sdt" name="sdt" required>
+
+                                    <!-- Tab nhận hàng -->
+                                    <p>* Khách lấy hàng tại quầy không cần nhập</p>
+                                    <div class="tab-pane " id="nhan" role="tabpanel" aria-labelledby="nhan-tab">
+                                        <div class="mb-3">
+                                            <label for="tenNguoiNhan" class="form-label">Tên người nhận</label>
+                                            <input type="text" class="form-control" id="tenNguoiNhan" name="tenNguoiNhan" >
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="sdtNguoiNhan" class="form-label">Số điện thoại người nhận</label>
+                                            <input type="tel" class="form-control" id="sdtNguoiNhan" name="sdtNguoiNhan" >
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="diaChiNguoiNhan" class="form-label">Địa chỉ người nhận</label>
+                                            <input type="text" class="form-control" id="diaChiNguoiNhan" name="diaChiNguoiNhan" >
+                                        </div>
                                     </div>
                                 </div>
+
+                                <!-- Nút submit -->
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Huỷ</button>
                                     <button type="submit" class="btn btn-primary">Xác nhận thanh toán</button>
@@ -119,10 +180,12 @@
                     </div>
                 </div>
 
+
+
                 <button type="button" class="btn btn-success mt-3 btn-pay" data-bs-toggle="modal" data-bs-target="#thanhToanModal">
                     Thanh toán
                 </button>
-                <a type="button" class="btn btn-success mt-3 btn-pay" th:href="@{/ban-hang-tai-quay-ban-hang/delete/{idhd}(idhd=${idHoaDon})}"> Hủy hóa đơn</a>
+                <a type="button" class="btn btn-success mt-3 btn-pay" th:href="@{/ban-hang-tai-quay/delete/{idhd}(idhd=${idHoaDon})}"> Hủy hóa đơn</a>
 
             </div>
         </div>
@@ -149,7 +212,7 @@
 
             const form = document.createElement('form');
             form.method = 'POST';
-            form.action = '/ban-hang-tai-quay-ban-hang/addsp';
+            form.action = '/ban-hang-tai-quay/addsp';
 
             const idInput = document.createElement('input');
             idInput.type = 'hidden';
@@ -185,6 +248,20 @@
         ).catch(err => {
         console.error("QR Scan error", err);
     });
+    document.getElementById("searchInput").addEventListener("keyup", function () {
+        let keyword = this.value.toLowerCase();
+        let products = document.querySelectorAll("#product-list .col-md-4");
+
+        products.forEach(function (product) {
+            let name = product.querySelector("strong").innerText.toLowerCase();
+            if (name.includes(keyword)) {
+                product.style.display = "block";
+            } else {
+                product.style.display = "none";
+            }
+        });
+    });
+
 
 </script>
 </body>

@@ -16,4 +16,11 @@ public class KhachHangService {
         return khachHangRepository.findByTenDangNhap(username);
 
     }
+
+    public Optional<KhachHang> getKhachHangBySDT(String id) {
+        return khachHangRepository.findBySoDT(id);
+    }
+    public void addAndEdit(KhachHang khachHang) {
+        khachHangRepository.save(khachHang);
+    }
 }

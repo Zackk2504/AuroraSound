@@ -45,6 +45,10 @@ public class AccountService {
         if (existingUser.isPresent()) {
             throw new RuntimeException("Email đã được sử dụng");
         }
+        Optional<KhachHang> khachHangOptional = accountRepository.findByTenDangNhap(dto.getUserName());
+        if (khachHangOptional.isPresent()) {
+            throw new RuntimeException("Tên đăng nhập đã được sử dụng");
+        }
 
         String otp = String.valueOf((int) (Math.random() * 900000) + 100000);
 
