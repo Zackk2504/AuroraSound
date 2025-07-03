@@ -5,6 +5,7 @@ import org.example.code.repo.HoaDonRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -22,5 +23,9 @@ public class HoaDonService {
 
     public void deleteHoaDon(Integer id) {
         hoaDonRepository.deleteById(id);
+    }
+
+    public List<HoaDon> getbytrangthai(String trangThaiHoaDon) {
+        return hoaDonRepository.findByTrangThaiHoaDon(trangThaiHoaDon);
     }
 }

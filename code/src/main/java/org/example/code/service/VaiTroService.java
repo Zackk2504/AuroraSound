@@ -33,6 +33,10 @@ public class VaiTroService {
             System.out.println("Đã tạo vai trò: " + tenVaiTro);
         }
     }
+    public VaiTro getVaiTroByName(String tenVaiTro) {
+        return vaiTroRepository.findByTenVaiTro(tenVaiTro)
+                .orElseThrow(() -> new RuntimeException("Vai trò không tồn tại: " + tenVaiTro));
+    }
 
 
 }

@@ -20,6 +20,9 @@ public class SanPhamChiTietService {
     public List<SanPhamChiTiet> getAllSanPhamChiTiet() {
         return sanPhamChiTietRepository.findAllByTrangThai("hoat_dong");
     }
+    public List<SanPhamChiTiet> getBySanPhamId(Integer sanPhamId) {
+        return sanPhamChiTietRepository.findByIdSanpham_Id(sanPhamId);
+    }
 
     public void addAndEdit(SanPhamChiTiet sanPhamChiTiet) {
         sanPhamChiTietRepository.save(sanPhamChiTiet);

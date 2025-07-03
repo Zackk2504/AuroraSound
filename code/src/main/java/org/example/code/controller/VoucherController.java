@@ -73,6 +73,6 @@ public class VoucherController {
 class AdminVoucherViewController {
     @GetMapping("/admin/voucher")
     public String adminVoucherPage() {
-        return "UI/admin/admin_voucher";
+        return "admin/voucher"; // Return the view name for the admin voucher page
     }
 }

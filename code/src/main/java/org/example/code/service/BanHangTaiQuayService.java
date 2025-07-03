@@ -3,6 +3,7 @@ package org.example.code.service;
 import jakarta.transaction.Transactional;
 import org.example.code.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -33,7 +34,7 @@ public class BanHangTaiQuayService {
     public List<SanPhamChiTiet> DanhSachSanPham() {
         return sanPhamChiTietService.getAllSanPhamChiTiet();
     }
-    public List<HoaDonChiTiet> DanhSachHoaDonChiTiet(Integer idhd) {
+    public List<HoaDonChiTiet> DanhSachHoaDonChiTietbyidhoadon(Integer idhd) {
         return hoaDonChiTietService.getListHoaDonChiTietByIdHoaDon(idhd);
     }
 
@@ -145,21 +146,14 @@ public class BanHangTaiQuayService {
             tenNguoiNhan = tenKhach;
         }
         if (diaChiNguoiNhan == null || diaChiNguoiNhan.trim().isEmpty()) {
-            diaChiNguoiNhan = "Cửa hàng"; // hoặc diaChi nếu muốn dùng địa chỉ khách
+            diaChiNguoiNhan = "Cua hang"; // hoặc diaChi nếu muốn dùng địa chỉ khách
         }
         if (sdtNguoiNhan == null || sdtNguoiNhan.trim().isEmpty()) {
             sdtNguoiNhan = sdtkhach;
         }
 
         NhanVien nhanVien = nhanVienService.getNhanVienByTenDangNhap(tenDangNhap);
-        Optional<KhachHang> khachHangOptional = khachHangService.getKhachHangBySDT(sdtkhach);
-        KhachHang khachHang = null;
-        if (!khachHangOptional.isPresent()){
-            khachHang = new KhachHang();
-            khachHang.setSoDT(sdtkhach);
-            khachHang.setHoTen(tenKhach);
-            khachHangService.addAndEdit(khachHang);
-        }
+
 
         if (hoaDonChiTietList.isEmpty()) {
             throw new RuntimeException("Hoa Don Chi Tiet is empty");
@@ -178,15 +172,45 @@ public class BanHangTaiQuayService {
         hoaDon.setDiaChiNhanHang(diaChiNguoiNhan);
         hoaDon.setThanhTien(Tongtien);
         hoaDon.setHinhThucThanhToan(hinhThucThanhToan);
-        if (khachHang != null) {
-            hoaDon.setIdKhachhang(khachHang);
-        }
         hoaDon.setLoaiHoaDon("OFFLINE");
+        hoaDon.setTenNguoiMua(tenKhach);
+        hoaDon.setSdtNguoiMua(sdtkhach);
         hoaDonService.addAndEdit(hoaDon);
 
     }
 
+    public HoaDon taomoihoadoncho(){
+        HoaDon hoaDon = new HoaDon();
+        hoaDon.setTrangThaiHoaDon("CHO_THANH_TOAN");
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String tenDangNhap = auth.getName();
+        NhanVien nhanVien = nhanVienService.getNhanVienByTenDangNhap(tenDangNhap);
+        if (nhanVien == null) {
+            throw new RuntimeException("Nhan vien khong ton tai");
+        }
+        hoaDon.setIdNhanvien(nhanVien);
+        hoaDonService.addAndEdit(hoaDon);
+        return hoaDon;
+    }
 
+    @Transactional
+    public void xoaHoaDonChoCu() {
+        List<HoaDon> danhSachCho = hoaDonService.getbytrangthai("CHO_THANH_TOAN");
+        for (HoaDon hd : danhSachCho) {
+            List<HoaDonChiTiet> hoaDonChiTietList = hoaDonChiTietService.getListHoaDonChiTietByIdHoaDon(hd.getId());
+            for (HoaDonChiTiet hoaDonChiTiet : hoaDonChiTietList) {
+                SanPhamChiTiet sanPhamChiTiet = hoaDonChiTiet.getIdSanphamchitiet();
+                sanPhamChiTiet.setSoLuongTon(sanPhamChiTiet.getSoLuongTon() + hoaDonChiTiet.getSoLuong());
+                sanPhamChiTietService.addAndEdit(sanPhamChiTiet);
+                hoaDonChiTietService.delete(hoaDonChiTiet.getId());
+            }
+            hoaDonService.deleteHoaDon(hd.getId());
+        }
+    }
 
+    @Scheduled(cron = "0 59 23 * * *")
+    public void xoaHoaDonChoCuoiNgay() {
+        this.xoaHoaDonChoCu();
+    }
 
 }

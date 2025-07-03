@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/index}">
+<head>
+    <title>Thêm biến thể sản phẩm</title>
+</head>
+<body>
+<div layout:fragment="content" class="container mt-4">
+
+    <h3>Thêm biến thể cho sản phẩm: <span th:text="${sanPham.tenSanPham}">Tên sản phẩm</span></h3>
+
+    <form th:action="@{/sanphamct/add}" method="post" enctype="multipart/form-data">
+        <input type="hidden" name="id" th:value="${sanPham.id}" />
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label class="form-label">Tên sản phẩm</label>
+                <input type="text" class="form-control" th:field="*{sanPham.tenSanPham}" required>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Trạng thái</label>
+                <select class="form-select" th:field="*{sanPham.trangThai}" required>
+                    <option value="" disabled selected>-- Chọn trạng thái --</option>
+                    <option value="Hoạt động">Hoạt động</option>
+                    <option value="Ngưng">Ngưng</option>
+                </select>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Loại sản phẩm</label>
+                <select class="form-select" th:field="*{sanPham.idLoaisanpham.id}" required>
+                    <option value="" disabled selected>-- Chọn loại --</option>
+                    <option th:each="loai : ${dsLoai}"
+                            th:value="${loai.id}"
+                            th:text="${loai.tenLoaiSanPham}"></option>
+                </select>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Thương hiệu</label>
+                <select class="form-select" th:field="*{sanPham.idThuonghieu.id}" required>
+                    <option value="" disabled selected>-- Chọn thương hiệu --</option>
+                    <option th:each="th : ${dsThuongHieu}"
+                            th:value="${th.id}"
+                            th:text="${th.tenThuongHieu}"></option>
+                </select>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Xuất xứ</label>
+                <select class="form-select" th:field="*{sanPham.idXuatxu.id}" required>
+                    <option value="" disabled selected>-- Chọn xuất xứ --</option>
+                    <option th:each="xx : ${dsXuatXu}"
+                            th:value="${xx.id}"
+                            th:text="${xx.noiXuatXu}"></option>
+                </select>
+            </div>
+
+            <div class="col-md-12">
+                <label class="form-label">Mô tả</label>
+                <textarea class="form-control" th:field="*{sanPham.moTa}" rows="3"></textarea>
+            </div>
+        </div>
+
+        <hr>
+        <h1 class="mt-4">Thông tin biến thể sản phẩm</h1>
+
+        <div id="chiTietContainer">
+            <div class="chiTietRow mb-3 border rounded p-3" th:each="ct, iStat : ${sanPhamdto.chiTietList}">
+                <div class="row g-2">
+                    <div class="col-md-4">
+                        <label>Màu sắc</label>
+                        <select class="form-select" th:name="'chiTietList[' + ${iStat.index} + '].idMausac'" th:value="${ct.idMausac}">
+                            <option th:each="m : ${danhsachmausac}" th:value="${m.id}" th:text="${m.tenMauSac}"></option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label>Phiên bản</label>
+                        <select class="form-select" th:name="'chiTietList[' + ${iStat.index} + '].idPhienban'" th:value="${ct.idPhienban}">
+                            <option th:each="p : ${danhsachphienban}" th:value="${p.id}" th:text="${p.tenPhienBan}"></option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label>Ảnh sản phẩm</label>
+                        <input type="text" class="form-control" th:name="'chiTietList[' + ${iStat.index} + '].anhSP'" th:value="${ct.anhSP}">
+                    </div>
+                    <div class="col-md-3">
+                        <label>Số lượng tồn</label>
+                        <input type="number" class="form-control" th:name="'chiTietList[' + ${iStat.index} + '].soLuongTon'" th:value="${ct.soLuongTon}">
+                    </div>
+                    <div class="col-md-3">
+                        <label>Đơn giá</label>
+                        <input type="number" class="form-control" th:name="'chiTietList[' + ${iStat.index} + '].donGia'" th:value="${ct.donGia}">
+                    </div>
+                    <div class="col-md-4">
+                        <label>Mô tả</label>
+                        <input type="text" class="form-control" th:name="'chiTietList[' + ${iStat.index} + '].moTa'" th:value="${ct.moTa}">
+                    </div>
+                    <div class="col-md-2">
+                        <label>Trạng thái</label>
+                        <select class="form-select" th:name="'chiTietList[' + ${iStat.index} + '].trangThai'" th:value="${ct.trangThai}">
+                            <option value="true">Hoạt động</option>
+                            <option value="false">Ngưng</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dòng mẫu để clone -->
+        <div id="chiTietTemplate" class="chiTietRow mb-3 border rounded p-3 d-none">
+            <div class="row g-2">
+                <div class="col-md-4">
+                    <label>Màu sắc</label>
+                    <select class="form-select" name="chiTietList[__index__].idMausac">
+                        <option th:each="m : ${danhsachmausac}" th:value="${m.id}" th:text="${m.tenMauSac}"></option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label>Phiên bản</label>
+                    <select class="form-select" name="chiTietList[__index__].idPhienban">
+                        <option th:each="p : ${danhsachphienban}" th:value="${p.id}" th:text="${p.tenPhienBan}"></option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label>Ảnh sản phẩm</label>
+                    <input type="text" class="form-control" name="chiTietList[__index__].anhSP">
+                </div>
+                <div class="col-md-3">
+                    <label>Số lượng tồn</label>
+                    <input type="number" class="form-control" name="chiTietList[__index__].soLuongTon">
+                </div>
+                <div class="col-md-3">
+                    <label>Đơn giá</label>
+                    <input type="number" class="form-control" name="chiTietList[__index__].donGia">
+                </div>
+                <div class="col-md-4">
+                    <label>Mô tả</label>
+                    <input type="text" class="form-control" name="chiTietList[__index__].moTa">
+                </div>
+                <div class="col-md-2">
+                    <label>Trạng thái</label>
+                    <select class="form-select" name="chiTietList[__index__].trangThai">
+                        <option value="true">Hoạt động</option>
+                        <option value="false">Ngưng</option>
+                    </select>
+                </div>
+                <div class="col-md-1 d-flex align-items-end">
+                    <button type="button" class="btn btn-danger btn-sm" onclick="this.closest('.chiTietRow').remove()">❌</button>
+                </div>
+            </div>
+        </div>
+
+        <button type="button" class="btn btn-outline-secondary my-3" onclick="addChiTiet()">+ Thêm biến thể</button>
+
+        <div>
+            <button type="submit" class="btn btn-success">Lưu toàn bộ</button>
+            <a href="/san-pham" class="btn btn-secondary">Quay lại</a>
+        </div>
+    </form>
+
+    <script>
+        let chiTietIndex = document.querySelectorAll("#chiTietContainer .chiTietRow").length;
+
+        function addChiTiet() {
+            const template = document.getElementById("chiTietTemplate");
+            const container = document.getElementById("chiTietContainer");
+
+            if (!template || !container) {
+                console.error("Không tìm thấy template hoặc container");
+                return;
+            }
+
+            const newRow = template.cloneNode(true);
+            newRow.classList.remove("d-none");
+
+            // Cập nhật index trong tất cả input/select
+            newRow.querySelectorAll("input, select").forEach(input => {
+                if (input.name) {
+                    input.name = input.name.replace(/__index__/g, chiTietIndex);
+                }
+            });
+
+            // Thêm dòng mới vào container
+            container.appendChild(newRow);
+            chiTietIndex++;
+        }
+    </script>
+
+
+
+</div>
+
+</body>
+</html>
