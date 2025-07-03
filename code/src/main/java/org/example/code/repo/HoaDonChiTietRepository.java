@@ -10,4 +10,6 @@ public interface HoaDonChiTietRepository extends JpaRepository<HoaDonChiTiet, In
     List<HoaDonChiTiet> findAllByIdHoadon_Id(Integer idHoaDon);
 
     Optional<HoaDonChiTiet> findByIdSanphamchitiet_IdAndIdHoadon_Id(Integer idSanPhamChiTiet, Integer idHoaDon);
+
+    void deleteAllByIdHoadon_Id(Integer idHoaDon);
 }

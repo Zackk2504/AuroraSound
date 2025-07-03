@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -39,6 +40,14 @@ public class SanPhamService {
 
     public List<SanPham> getAllSanPhams() {
         return sanPhamRepository.findAll();
+    }
+
+    public Optional<SanPham> getSanPhamById(Integer id) {
+        return sanPhamRepository.findById(id);
+    }
+
+    public SanPham themSanPham(SanPham sanPham) {
+        return sanPhamRepository.save(sanPham);
     }
 
     public ResponseEntity<?> addSp(SanPhamDTO dto) {

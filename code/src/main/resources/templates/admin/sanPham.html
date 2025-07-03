@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/index}">
+<head>
+    <title>Thêm sản phẩm</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="container mt-4">
+        <h2 class="mb-4">Thêm sản phẩm mới</h2>
+
+        <form th:action="@{/admin/sanpham/add}" method="post" th:object="${sanPham}">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label">Tên sản phẩm</label>
+                    <input type="text" class="form-control" th:field="*{tenSanPham}" required>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Trạng thái</label>
+                    <select class="form-select" th:field="*{trangThai}" required>
+                        <option value="" disabled selected>-- Chọn trạng thái --</option>
+                        <option value="Hoạt động">Hoạt động</option>
+                        <option value="Ngưng">Ngưng</option>
+                    </select>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Loại sản phẩm</label>
+                    <select class="form-select" th:field="*{idLoaisanpham.id}" required>
+                        <option value="" disabled selected>-- Chọn loại --</option>
+                        <option th:each="loai : ${dsLoai}"
+                                th:value="${loai.id}"
+                                th:text="${loai.tenLoaiSanPham}"></option>
+                    </select>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Thương hiệu</label>
+                    <select class="form-select" th:field="*{idThuonghieu.id}" required>
+                        <option value="" disabled selected>-- Chọn thương hiệu --</option>
+                        <option th:each="th : ${dsThuongHieu}"
+                                th:value="${th.id}"
+                                th:text="${th.tenThuongHieu}"></option>
+                    </select>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Xuất xứ</label>
+                    <select class="form-select" th:field="*{idXuatxu.id}" required>
+                        <option value="" disabled selected>-- Chọn xuất xứ --</option>
+                        <option th:each="xx : ${dsXuatXu}"
+                                th:value="${xx.id}"
+                                th:text="${xx.noiXuatXu}"></option>
+                    </select>
+                </div>
+
+                <div class="col-md-12">
+                    <label class="form-label">Mô tả</label>
+                    <textarea class="form-control" th:field="*{moTa}" rows="3"></textarea>
+                </div>
+            </div>
+
+            <div class="mt-4">
+                <button type="submit" class="btn btn-success">Lưu sản phẩm</button>
+            </div>
+        </form>
+        <hr class="my-5">
+
+        <h3 class="mb-3">Danh sách sản phẩm</h3>
+        <table class="table table-bordered table-hover">
+            <thead class="table-dark">
+            <tr>
+                <th>ID</th>
+                <th>Tên sản phẩm</th>
+                <th>Loại</th>
+                <th>Thương hiệu</th>
+                <th>Xuất xứ</th>
+                <th>Trạng thái</th>
+                <th>Hành động</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="sp : ${dsSanPham}">
+                <td th:text="${sp.id}"></td>
+                <td th:text="${sp.tenSanPham}"></td>
+                <td th:text="${sp.idLoaisanpham.tenLoaiSanPham}"></td>
+                <td th:text="${sp.idThuonghieu.tenThuongHieu}"></td>
+                <td th:text="${sp.idXuatxu.noiXuatXu}"></td>
+                <td>
+                    <span class="badge bg-success" th:if="${sp.trangThai == 'Hoạt động'}">Hoạt động</span>
+                    <span class="badge bg-secondary" th:if="${sp.trangThai != 'Hoạt động'}">Ngưng</span>
+                </td>
+                <td>
+                    <a class="btn btn-primary btn-sm" th:href="@{/admin/sanphamct/add(id=${sp.id})}">Sửa</a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>

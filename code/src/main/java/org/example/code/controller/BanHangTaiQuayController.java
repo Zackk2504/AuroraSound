@@ -2,6 +2,7 @@ package org.example.code.controller;
 
 import org.example.code.model.HoaDon;
 import org.example.code.service.BanHangTaiQuayService;
+import org.example.code.service.HoaDonService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -10,22 +11,34 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.List;
+
 @Controller
 public class BanHangTaiQuayController {
     @Autowired
     private BanHangTaiQuayService banHangTaiQuayService;
+    @Autowired
+    private HoaDonService hoaDonService;
 
     @GetMapping("/ban-hang-tai-quay")
-    public String showBanHangTaiQuayPage(Model model) {
-        model.addAttribute("ListSanPham", banHangTaiQuayService.DanhSachSanPham()); // Replace null with actual product list if needed
-        return "UI/employee/BanHangTaiQuay";
-    }
+    public String showBanHangTaiQuayBanHangPage(Model model,@RequestParam (value = "idhd",required = false) Integer idhd) {
+        List<HoaDon> listCho = hoaDonService.getbytrangthai("CHO_THANH_TOAN"); // trạng thái CHO_THANH_TOAN
+        HoaDon hoaDonDangChon;
 
-    @GetMapping("/ban-hang-tai-quay/{idhd}")
-    public String showBanHangTaiQuayBanHangPage(Model model, @PathVariable ("idhd") Integer id) {
+        if (idhd != null) {
+            hoaDonDangChon = hoaDonService.getHoaDonById(idhd)
+                    .orElseThrow(() -> new RuntimeException("Không tìm thấy hóa đơn"));
+        } else if (!listCho.isEmpty()) {
+            hoaDonDangChon = listCho.get(0);
+        } else {
+            hoaDonDangChon = banHangTaiQuayService.taomoihoadoncho(); // tạo mới hóa đơn chờ
+            listCho.add(hoaDonDangChon);
+        }
         model.addAttribute("ListSanPham", banHangTaiQuayService.DanhSachSanPham()); // Replace null with actual product list if needed
-        model.addAttribute("ListHoaDonChiTiet", banHangTaiQuayService.DanhSachHoaDonChiTiet(id)); // Replace 1 with actual ID if needed
-        model.addAttribute("idHoaDon", id);
+        model.addAttribute("ListHoaDonChiTiet", banHangTaiQuayService.DanhSachHoaDonChiTietbyidhoadon(idhd)); // Replace 1 with actual ID if needed
+        model.addAttribute("idHoaDon", hoaDonDangChon.getId());
+        model.addAttribute("listHoaDonCho", listCho);
+
         return "UI/employee/BanHangTaiQuay2";
     }
 
@@ -37,7 +50,7 @@ public class BanHangTaiQuayController {
     ) {
         Integer idhd = banHangTaiQuayService.ThemHoaDonChiTiet(idSanPham, soLuong, idHoaDon, nhaptay);
 
-        return "redirect:/ban-hang-tai-quay/" + idhd; // Redirect back to the order page
+        return "redirect:/ban-hang-tai-quay?idhd=" + idhd; // Redirect back to the order page
     }
 
     @GetMapping("/ban-hang-tai-quay/delete/{idhd}")
@@ -55,5 +68,11 @@ public class BanHangTaiQuayController {
         banHangTaiQuayService.ThanhToanHoaDon(idhd, tenNguoiMua, sdtNguoiMua, diaChiNguoiNhan
                 , tenNguoiNhan, sdtNguoiNhan,hinhThucThanhToan);
         return "redirect:/ban-hang-tai-quay"; // Redirect back to the main page
+    }
+
+    @PostMapping("/ban-hang-tai-quay/tao-moi")
+    public String taoHoaDonMoi() {
+        HoaDon idhdcho = banHangTaiQuayService.taomoihoadoncho();
+        return "redirect:/ban-hang-tai-quay?idhd=" + idhdcho.getId();
     }
 }

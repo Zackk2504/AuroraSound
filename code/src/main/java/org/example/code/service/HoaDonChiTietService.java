@@ -32,4 +32,8 @@ public class HoaDonChiTietService {
     public void delete(Integer id) {
         hoaDonChiTietRepository.deleteById(id);
     }
+
+    public void deleteAllByIdHoaDon(Integer idHoaDon) {
+        hoaDonChiTietRepository.deleteAllByIdHoadon_Id(idHoaDon);
+    }
 }

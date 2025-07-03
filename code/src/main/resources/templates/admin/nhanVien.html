@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/index}">
+<head>
+    <title>Trang chính</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <h1 class="text-center my-4">Quản lý nhân viên</h1>
+    <div class="container">
+        <h2 class="mb-4">Thêm mới nhân viên</h2>
+
+        <form th:action="@{/admin/nhan-vien/create}" method="post" th:object="${nhanVien}">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label">Họ tên</label>
+                    <input type="text" class="form-control" th:field="*{hoTen}" required>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Giới tính</label>
+                    <select class="form-select" th:field="*{gioiTinh}">
+                        <option th:value="true">Nam</option>
+                        <option th:value="false">Nữ</option>
+                        <option th:value="null">Không muốn nói</option>
+                    </select>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Ngày sinh</label>
+                    <input type="date" class="form-control" th:field="*{ngaySinh}" required>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Số điện thoại</label>
+                    <input type="text" class="form-control" th:field="*{soDT}" required>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-control" th:field="*{email}" required>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Địa chỉ</label>
+                    <input type="text" class="form-control" th:field="*{diaChi}">
+                </div>
+
+
+            </div>
+
+            <div class="mt-4">
+                <button type="submit" class="btn btn-success">Thêm mới</button>
+            </div>
+        </form>
+
+        <hr class="my-5">
+
+        <h3 class="mb-4">Danh sách nhân viên</h3>
+
+        <table  class="table table-bordered table-hover">
+            <thead class="table-dark">
+            <tr>
+                <th>ID</th>
+                <th>Họ tên</th>
+                <th>Giới tính</th>
+                <th>Ngày sinh</th>
+                <th>Email</th>
+                <th>SĐT</th>
+                <th>Trạng thái</th>
+                <th>Hành động</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="nv : ${nhanVienPage.content}">
+                <td th:text="${nv.id}"></td>
+                <td th:text="${nv.hoTen}"></td>
+                <td th:text="${nv.gioiTinh == null ? 'ko muon noi' : (nv.gioiTinh ? 'Nam' : 'Nu')}"></td>
+                <td th:text="${nv.ngaySinh}"></td>
+                <td th:text="${nv.email}"></td>
+                <td th:text="${nv.soDT}"></td>
+                <td>
+                    <span class="badge bg-success" th:if="${nv.trangThai}">Đang hoạt động</span>
+                    <span class="badge bg-secondary" th:unless="${nv.trangThai}">Ngưng</span>
+                </td>
+                <td>
+                    <a href="#" class="btn btn-primary btn-sm"
+                       th:attr="data-id=${nv.id},
+            data-hoTen=${nv.hoTen},
+            data-gioiTinh=${nv.gioiTinh},
+            data-ngaySinh=${nv.ngaySinh},
+            data-email=${nv.email},
+            data-soDT=${nv.soDT},
+            data-diaChi=${nv.diaChi},
+            data-trangThai=${nv.trangThai},
+            data-vaiTro=${nv.vaiTro.id}"
+                       data-bs-toggle="modal" data-bs-target="#editModal"
+                       onclick="fillModal(this)">
+                        Sửa
+                    </a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+        <div class="d-flex justify-content-center mt-3">
+            <nav>
+                <ul class="pagination">
+                    <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                        <a class="page-link" th:href="@{/admin/nhan-vien(page=${currentPage - 1})}">Trước</a>
+                    </li>
+
+                    <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+                        th:classappend="${i == currentPage} ? 'active'">
+                        <a class="page-link" th:href="@{/admin/nhan-vien(page=${i})}" th:text="${i + 1}"></a>
+                    </li>
+
+                    <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
+                        <a class="page-link" th:href="@{/admin/nhan-vien(page=${currentPage + 1})}">Tiếp</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+    <!-- Modal sửa nhân viên -->
+    <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <form th:action="@{/admin/nhan-vien/edit}" method="post">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editModalLabel">Sửa nhân viên</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body row g-3">
+                        <input type="hidden" name="id" id="edit-id">
+
+                        <div class="col-md-6">
+                            <label>Họ tên</label>
+                            <input type="text" name="hoTen" class="form-control" id="edit-hoTen">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label>Giới tính</label>
+                            <select name="gioiTinh" class="form-select" id="edit-gioiTinh">
+                                <option value="true">Nam</option>
+                                <option value="false">Nữ</option>
+                                <option value="">Không muốn nói</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label>Ngày sinh</label>
+                            <input type="date" name="ngaySinh" class="form-control" id="edit-ngaySinh">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label>SĐT</label>
+                            <input type="text" name="soDT" class="form-control" id="edit-soDT">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label>Địa chỉ</label>
+                            <input type="text" name="diaChi" class="form-control" id="edit-diaChi">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label>Trạng thái</label>
+                            <select name="trangThai" class="form-select" id="edit-trangThai">
+                                <option value="true">Đang hoạt động</option>
+                                <option value="false">Ngưng hoạt động</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-success">Lưu</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script>
+        function fillModal(button) {
+            const fields = ['id', 'hoTen', 'gioiTinh', 'ngaySinh', 'email', 'soDT', 'diaChi', 'trangThai', 'vaiTro'];
+
+            fields.forEach(field => {
+                const value = button.getAttribute(`data-${field}`);
+                const input = document.getElementById(`edit-${field}`);
+                if (input) {
+                    input.value = value ?? '';
+                }
+            });
+        }
+    </script>
+
+</div>
+</body>
+</html>

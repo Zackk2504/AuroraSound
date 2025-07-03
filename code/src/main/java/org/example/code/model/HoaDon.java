@@ -60,4 +60,11 @@ public class HoaDon {
     @Column(name = "ghiChu")
     private String ghiChu;
 
+    @Nationalized
+    @Column(name = "tenNguoiMua", length = 100)
+    private String tenNguoiMua;
+
+    @Nationalized
+    @Column(name = "sdtNguoiMua", length = 100)
+    private String sdtNguoiMua;
 }

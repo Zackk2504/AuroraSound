@@ -85,7 +85,7 @@ public class SecurityConfig {
                 )
                 .formLogin(form -> form
                         .loginPage("/nhan-vien/login")
-                        .defaultSuccessUrl("/ban-hang/trang-chu", true)
+                        .defaultSuccessUrl("/nhan-vien/home", true)
                         .permitAll()
                 )
                 .logout(logout -> logout

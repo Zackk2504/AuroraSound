@@ -6,14 +6,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
 
 @Controller
+@RequestMapping("/admin")
 public class MauSacController {
     @Autowired
     private MauSacService mauSacService;
@@ -21,7 +19,7 @@ public class MauSacController {
     @GetMapping("/mau-sac")
     public String getMauSacPage(Model model) {
         model.addAttribute("mauSacList", mauSacService.getAll());
-        return "mauSac"; // Assuming you have a Thymeleaf template named mauSac.html
+        return "admin/macSac"; // Assuming you have a Thymeleaf template named mauSac.html
     }
 
     @GetMapping("/mau-sac/add")
