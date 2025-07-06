@@ -77,7 +77,6 @@ public class SanPhamController {
                 return ct;
             }).collect(Collectors.toList()));
 
-        model.addAttribute("sanPham", sanPham);
         model.addAttribute("sanPhamdto", dto);
         model.addAttribute("danhsachmausac", mauSacService.getAll());
         model.addAttribute("danhsachphienban", phienBanService.getall());
@@ -92,7 +91,7 @@ public class SanPhamController {
     @PostMapping("/sanphamct/add")
     public String saveSanPhamct(@ModelAttribute SanPhamDTO dto,Model model) {
         sanPhamService.addSp(dto);
-        return "redirect:/sanpham"; // Redirect to the list after saving
+        return "redirect:/admin/san-pham";
 //        return ResponseEntity.ok(dto);
     }
     @PostMapping("/sanpham/add")

@@ -7,7 +7,72 @@
 </head>
 <body>
 <div layout:fragment="content">
-    Màu sắc
+
+    <h3 th:text="${mauSac.id == null} ? 'Thêm Màu Sắc Mới' : 'Chỉnh Sửa Màu Sắc'"></h3>
+
+    <form th:action="@{/admin/mau-sac/add}" th:object="${mauSac}" method="post">
+        <input type="hidden" th:field="*{id}"/>
+
+        <div class="mb-3">
+            <label class="form-label">Mã Màu Sắc</label>
+            <input type="text" class="form-control" th:field="*{maMauSac}" required/>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Tên Màu Sắc</label>
+            <input type="text" class="form-control" th:field="*{tenMauSac}" required/>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Trạng Thái</label>
+            <select class="form-select" th:field="*{trangThai}" required>
+                <option th:value="true" th:selected="*{trangThai} == true">Hoạt động</option>
+                <option th:value="false" th:selected="*{trangThai} == false">Ngưng</option>
+            </select>
+        </div>
+
+        <div class="mt-3">
+            <button type="submit" class="btn btn-success" th:text="${mauSac.id == null ? 'Thêm mới' : 'Cập nhật'}"></button>
+
+            <!-- Nút Reset để quay về trạng thái thêm mới -->
+            <a href="/admin/mau-sac" class="btn btn-secondary">Reset</a>
+        </div>
+    </form>
+
+    <hr/>
+
+    <!-- Bảng Danh sách màu sắc -->
+    <h4 class="mt-4">Danh sách màu sắc</h4>
+    <table class="table table-bordered">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Mã màu</th>
+            <th>Tên màu</th>
+            <th>Trạng thái</th>
+            <th>Hành động</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="ms : ${dsMauSac}">
+            <td th:text="${ms.id}"></td>
+            <td th:text="${ms.maMauSac}"></td>
+            <td th:text="${ms.tenMauSac}"></td>
+            <td>
+                <span th:text="${ms.trangThai} ? 'Hoạt động' : 'Ngưng hoạt động'"></span>
+            </td>
+            <td>
+                <a th:href="@{'/admin/mau-sac/edit/' + ${ms.id}}" class="btn btn-primary btn-sm">Sửa</a>
+<!--                <a th:href="@{'/admin/mausac/delete/' + ${ms.id}}"-->
+<!--                   class="btn btn-danger btn-sm"-->
+<!--                   onclick="return confirm('Bạn có chắc muốn xóa?')">Xóa</a>-->
+            </td>
+        </tr>
+        <tr th:if="${#lists.isEmpty(dsMauSac)}">
+            <td colspan="5" class="text-center">Chưa có màu sắc nào</td>
+        </tr>
+        </tbody>
+    </table>
 </div>
 </body>
 </html>

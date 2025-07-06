@@ -18,14 +18,11 @@ public class MauSacController {
 
     @GetMapping("/mau-sac")
     public String getMauSacPage(Model model) {
-        model.addAttribute("mauSacList", mauSacService.getAll());
+        model.addAttribute("dsMauSac", mauSacService.getAll());
+        model.addAttribute("mauSac", new MauSac()); // Add an empty MauSac object for the form
         return "admin/macSac"; // Assuming you have a Thymeleaf template named mauSac.html
     }
 
-    @GetMapping("/mau-sac/add")
-    public String addMauSacPage() {
-        return "addMauSac"; // Assuming you have a Thymeleaf template named addMauSac.html
-    }
 
     @PostMapping("/mau-sac/add")
     public String addMau(@ModelAttribute MauSac mauSac) {
@@ -33,15 +30,16 @@ public class MauSacController {
         return "redirect:/mau-sac"; // Redirect to the list page after adding
     }
 
-    @GetMapping("/mau-sac/edit?id={id}")
-    public String editMauSacPage(Model model,@RequestParam Integer id) {
+    @GetMapping("/mau-sac/edit/{id}")
+    public String editMauSacPage(Model model,@PathVariable Integer id) {
         Optional<MauSac> mauSacOptional = mauSacService.getById(id);
         if (mauSacOptional.isPresent()) {
+            model.addAttribute("dsMauSac", mauSacService.getAll());
             model.addAttribute("mauSac", mauSacOptional.get());
         } else {
             model.addAttribute("error", "Mau Sac not found");
         }
-        return "editMauSac"; // Assuming you have a Thymeleaf template named editMauSac.html
+        return "admin/macSac"; // Assuming you have a Thymeleaf template named editMauSac.html
     }
     @PostMapping("/mau-sac/edit?id={id}")
     public String editMauSac(@ModelAttribute MauSac mauSac,@RequestParam Integer id) {
@@ -54,6 +52,6 @@ public class MauSacController {
         mauSac1.setTenMauSac(mauSac.getTenMauSac());
         mauSac1.setTrangThai(mauSac.getTrangThai());
         mauSacService.save(mauSac1);
-        return "redirect:/mau-sac"; // Redirect to the list page after editing
+        return "redirect:/admin/mau-sac"; // Redirect to the list page after editing
     }
 }
