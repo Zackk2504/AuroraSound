@@ -6,44 +6,44 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
 
 @Controller
+@RequestMapping("/admin")
 public class PhienBanController {
     @Autowired
     PhienBanService phienBanService;
 
     @GetMapping("/phien-ban")
-    public ResponseEntity<List<PhienBan>> getPhienBan(Model model) {
-        model.addAttribute("phienbanlist", phienBanService.getall());
-        return ResponseEntity.ok(phienBanService.getall()); // This should correspond to a view template named 'phienban'
+    public String list(Model model) {
+        model.addAttribute("list", phienBanService.getall());
+        model.addAttribute("phienBan", new PhienBan());
+        return "admin/phienBan";
     }
 
-    @GetMapping("/phienban/add")
+    @GetMapping("/phienban/save")
     public String addPhienBan(Model model) {
         return "add_phienban";
     }
 
-    @PostMapping("/phienban/add")
+    @PostMapping("/phienban/save")
     public String savePhienBan(@ModelAttribute PhienBan phienBan) {
         phienBanService.save(phienBan);
-        return "redirect:/phienban"; // Redirect to the list after saving
+        return "redirect:/admin/phien-ban"; // Redirect to the list after saving
     }
 
-    @GetMapping("/phienban/edit?id={id}")
-    public String editPhienBan(Model model,@RequestParam Integer id) {
+    @GetMapping("/phienban/edit/{id}")
+    public String editPhienBan(Model model,@PathVariable Integer id) {
         PhienBan phienBan = phienBanService.getById(id).orElse(null);
         if (phienBan != null) {
-            model.addAttribute("phienban", phienBan);
-            return "edit_phienban"; // This should correspond to a view template named 'edit_phienban'
+            model.addAttribute("phienBan", phienBan);
+            model.addAttribute("list", phienBanService.getall());
+            return "admin/phienBan"; // This should correspond to a view template named 'edit_phienban'
         } else {
-            return "redirect:/phienban"; // Redirect if not found
+            return "redirect:/admin/phien-ban"; // Redirect if not found
         }
     }
 
@@ -51,13 +51,13 @@ public class PhienBanController {
     public String updatePhienBan(@ModelAttribute PhienBan phienBan, @RequestParam Integer id) {
         Optional<PhienBan> existingPhienBan = Optional.ofNullable(phienBanService.getById(id).orElse(null));
         if (existingPhienBan.isEmpty()) {
-            return "redirect:/phienban"; // Redirect if not found
+            return "admin/phienBan"; // Redirect if not found
         }
         PhienBan updatedPhienBan = existingPhienBan.get();
         updatedPhienBan.setMaPhienBan(phienBan.getMaPhienBan());
         updatedPhienBan.setTenPhienBan(phienBan.getTenPhienBan());
         updatedPhienBan.setTrangThai(phienBan.getTrangThai());
         phienBanService.save(phienBan);
-        return "redirect:/phienban"; // Redirect to the list after updating
+        return "redirect:/admin/phien-ban"; // Redirect to the list after updating
     }
 }

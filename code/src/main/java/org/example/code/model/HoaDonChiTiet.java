@@ -14,11 +14,11 @@ public class HoaDonChiTiet {
     @Column(name = "ID", nullable = false)
     private Integer id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "ID_hoaDon")
     private HoaDon idHoadon;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "ID_sanPhamChiTiet")
     private SanPhamChiTiet idSanphamchitiet;
 

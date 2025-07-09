@@ -7,7 +7,54 @@
 </head>
 <body>
 <div layout:fragment="content">
-    Xuất xứ
+        <h3>Thêm/Sửa Xuất Xứ</h3>
+        <form th:action="@{/xuatxu/save}" method="post">
+            <input type="hidden" th:field="*{xuatXu.id}"/>
+            <div class="mb-3">
+                <label>Mã xuất xứ</label>
+                <input type="text" class="form-control" th:field="*{xuatXu.maXuatXu}" required/>
+            </div>
+            <div class="mb-3">
+                <label>Nơi xuất xứ</label>
+                <input type="text" class="form-control" th:field="*{xuatXu.noiXuatXu}" required/>
+            </div>
+            <div class="mb-3">
+                <label>Trạng thái</label>
+                <select class="form-select" th:field="*{xuatXu.trangThai}">
+                    <option value="true">Hoạt động</option>
+                    <option value="false">Ngưng</option>
+                </select>
+            </div>
+            <div>
+                <button type="submit" class="btn btn-success" th:text="${xuatXu.id == null ? 'Thêm mới' : 'Cập nhật'}"></button>
+                <a href="/admin/xuat-xu" class="btn btn-secondary">Reset</a>
+            </div>
+        </form>
+
+        <hr>
+        <h3>Danh sách Xuất Xứ</h3>
+        <table class="table table-bordered">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Mã</th>
+                <th>Nơi</th>
+                <th>Trạng thái</th>
+                <th>Hành động</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="xx : ${list}">
+                <td th:text="${xx.id}"></td>
+                <td th:text="${xx.maXuatXu}"></td>
+                <td th:text="${xx.noiXuatXu}"></td>
+                <td th:text="${xx.trangThai ? 'Hoạt động' : 'Ngưng'}"></td>
+                <td>
+                    <a th:href="@{'/admin/xuat-xu/edit/' + ${xx.id}}" class="btn btn-warning btn-sm">Sửa</a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
 </div>
 </body>
 </html>

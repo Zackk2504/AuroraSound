@@ -1,8 +1,11 @@
 package org.example.code.controller;
 
 import org.example.code.model.HoaDon;
+import org.example.code.model.HoaDonChiTiet;
+import org.example.code.model.Voucher;
 import org.example.code.service.BanHangTaiQuayService;
 import org.example.code.service.HoaDonService;
+import org.example.code.service.VoucherService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -19,10 +22,13 @@ public class BanHangTaiQuayController {
     private BanHangTaiQuayService banHangTaiQuayService;
     @Autowired
     private HoaDonService hoaDonService;
+    @Autowired
+    private VoucherService voucherService;
 
     @GetMapping("/ban-hang-tai-quay")
     public String showBanHangTaiQuayBanHangPage(Model model,@RequestParam (value = "idhd",required = false) Integer idhd) {
         List<HoaDon> listCho = hoaDonService.getbytrangthai("CHO_THANH_TOAN"); // trạng thái CHO_THANH_TOAN
+        List<HoaDonChiTiet> hoaDonChiTietList = banHangTaiQuayService.DanhSachHoaDonChiTietbyidhoadon(idhd);
         HoaDon hoaDonDangChon;
 
         if (idhd != null) {
@@ -30,14 +36,19 @@ public class BanHangTaiQuayController {
                     .orElseThrow(() -> new RuntimeException("Không tìm thấy hóa đơn"));
         } else if (!listCho.isEmpty()) {
             hoaDonDangChon = listCho.get(0);
+            hoaDonChiTietList = banHangTaiQuayService.DanhSachHoaDonChiTietbyidhoadon(hoaDonDangChon.getId());
         } else {
             hoaDonDangChon = banHangTaiQuayService.taomoihoadoncho(); // tạo mới hóa đơn chờ
             listCho.add(hoaDonDangChon);
         }
+        List<Voucher> dsVoucherDangHoatDong = voucherService.getvoucherBytrangThaiHoatDong();
+        model.addAttribute("dsVoucherDangHoatDong", dsVoucherDangHoatDong);
         model.addAttribute("ListSanPham", banHangTaiQuayService.DanhSachSanPham()); // Replace null with actual product list if needed
-        model.addAttribute("ListHoaDonChiTiet", banHangTaiQuayService.DanhSachHoaDonChiTietbyidhoadon(idhd)); // Replace 1 with actual ID if needed
+        model.addAttribute("ListHoaDonChiTiet", hoaDonChiTietList); // Replace 1 with actual ID if needed
         model.addAttribute("idHoaDon", hoaDonDangChon.getId());
+        model.addAttribute("hoaDon", hoaDonDangChon);
         model.addAttribute("listHoaDonCho", listCho);
+        model.addAttribute("tongTien", hoaDonService.tinhThanhTien(hoaDonDangChon)); // Tính tổng tiền cho hóa đơn
 
         return "UI/employee/BanHangTaiQuay2";
     }
@@ -49,7 +60,6 @@ public class BanHangTaiQuayController {
                                      @RequestParam(name = "nhaptay", required = false,defaultValue = "false") String nhaptay
     ) {
         Integer idhd = banHangTaiQuayService.ThemHoaDonChiTiet(idSanPham, soLuong, idHoaDon, nhaptay);
-
         return "redirect:/ban-hang-tai-quay?idhd=" + idhd; // Redirect back to the order page
     }
 
@@ -74,5 +84,11 @@ public class BanHangTaiQuayController {
     public String taoHoaDonMoi() {
         HoaDon idhdcho = banHangTaiQuayService.taomoihoadoncho();
         return "redirect:/ban-hang-tai-quay?idhd=" + idhdcho.getId();
+    }
+    @PostMapping("/ban-hang-tai-quay/them-voucher")
+    public String themVoucher(@RequestParam("idhd") Integer idHoaDon,
+                              @RequestParam("idVoucher") Integer idVoucher) {
+        hoaDonService.apDungVoucher(idHoaDon, idVoucher);
+        return "redirect:/ban-hang-tai-quay?idhd=" + idHoaDon;
     }
 }
