@@ -7,7 +7,55 @@
 </head>
 <body>
 <div layout:fragment="content">
-    Phiên bản
+    <h3>Thêm/Sửa Phiên Bản</h3>
+    <form th:action="@{/phienban/save}" method="post">
+        <input type="hidden" th:field="*{phienBan.id}"/>
+        <div class="mb-3">
+            <label>Mã phiên bản</label>
+            <input type="text" class="form-control" th:field="*{phienBan.maPhienBan}" required/>
+        </div>
+        <div class="mb-3">
+            <label>Tên phiên bản</label>
+            <input type="text" class="form-control" th:field="*{phienBan.tenPhienBan}" required/>
+        </div>
+        <div class="mb-3">
+            <label>Trạng thái</label>
+            <select class="form-select" th:field="*{phienBan.trangThai}">
+                <option value="true">Hoạt động</option>
+                <option value="false">Ngưng</option>
+            </select>
+        </div>
+        <div>
+            <button type="submit" class="btn btn-success" th:text="${phienBan.id == null ? 'Thêm mới' : 'Cập nhật'}"></button>
+            <a href="/admin/phien-ban" class="btn btn-secondary">Reset</a>
+        </div>
+    </form>
+
+    <hr>
+    <h3>Danh sách Phiên Bản</h3>
+    <table class="table table-bordered">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Mã</th>
+            <th>Tên</th>
+            <th>Trạng thái</th>
+            <th>Hành động</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="pb : ${list}">
+            <td th:text="${pb.id}"></td>
+            <td th:text="${pb.maPhienBan}"></td>
+            <td th:text="${pb.tenPhienBan}"></td>
+            <td th:text="${pb.trangThai ? 'Hoạt động' : 'Ngưng'}"></td>
+            <td>
+                <a th:href="@{'/admin/phienban/edit/' + ${pb.id}}" class="btn btn-warning btn-sm">Sửa</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
 </div>
 </body>
 </html>

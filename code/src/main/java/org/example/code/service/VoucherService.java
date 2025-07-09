@@ -25,6 +25,10 @@ public class VoucherService {
         return voucherRepository.save(voucher);
     }
 
+    public List<Voucher> getvoucherBytrangThaiHoatDong() {
+        return voucherRepository.findByTrangThai("hoat_dong");
+    }
+
     public Voucher updateVoucher(Integer id, Voucher voucher) {
         voucher.setId(id);
         return voucherRepository.save(voucher);
@@ -40,12 +44,12 @@ public class VoucherService {
 
     // Áp dụng voucher: kiểm tra điều kiện, trả về true/false hoặc giá trị giảm
     public boolean isVoucherApplicable(Voucher voucher, double tongTien) {
-        if (voucher == null || !voucher.getTrangThai()) return false;
-        if (voucher.getSoLuongVoucher() <= 0) return false;
-        if (tongTien < voucher.getGiaTriToiThieuApDung()) return false;
+//        if (voucher == null || !voucher.getTrangThai()) return false;
+//        if (voucher.getSoLuongVoucher() <= 0) return false;
+//        if (tongTien < voucher.getGiaTriToiThieuApDung()) return false;
         // Kiểm tra ngày hiệu lực
         java.time.LocalDate now = java.time.LocalDate.now();
-        if (now.isBefore(voucher.getNgayBatDau()) || now.isAfter(voucher.getNgayKetThuc())) return false;
+//        if (now.isBefore(voucher.getNgayBatDau()) || now.isAfter(voucher.getNgayKetThuc())) return false;
         return true;
     }
 }

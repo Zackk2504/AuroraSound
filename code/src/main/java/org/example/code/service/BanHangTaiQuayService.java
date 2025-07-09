@@ -137,18 +137,22 @@ public class BanHangTaiQuayService {
         List<HoaDonChiTiet> hoaDonChiTietList = hoaDonChiTietService.getListHoaDonChiTietByIdHoaDon(idhd);
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String tenDangNhap = auth.getName();
+        String trangThaiHoaDon = "THANH_CONG";
 
         if (tenDangNhap == null || tenDangNhap.isEmpty()) {
             throw new RuntimeException("Ten dang nhap khong hop le");
         }
 
         if (tenNguoiNhan == null || tenNguoiNhan.trim().isEmpty()) {
+            trangThaiHoaDon = "DA_THANH_TOAN";
             tenNguoiNhan = tenKhach;
         }
         if (diaChiNguoiNhan == null || diaChiNguoiNhan.trim().isEmpty()) {
+            trangThaiHoaDon = "DA_THANH_TOAN";
             diaChiNguoiNhan = "Cua hang"; // hoặc diaChi nếu muốn dùng địa chỉ khách
         }
         if (sdtNguoiNhan == null || sdtNguoiNhan.trim().isEmpty()) {
+            trangThaiHoaDon = "DA_THANH_TOAN";
             sdtNguoiNhan = sdtkhach;
         }
 
@@ -160,17 +164,16 @@ public class BanHangTaiQuayService {
         }
         HoaDon hoaDon = hoaDonService.getHoaDonById(idhd)
                 .orElseThrow(() -> new RuntimeException("Hoa Don not found"));
-        hoaDon.setTrangThaiHoaDon("Thanh cong");
+        hoaDon.setTrangThaiHoaDon(trangThaiHoaDon);
         Double Tongtien = 0.0;
         for (HoaDonChiTiet hoaDonChiTiet : hoaDonChiTietList) {
             Tongtien += hoaDonChiTiet.getSoLuong() * hoaDonChiTiet.getDonGia();
         }
-        hoaDon.setThanhTien(Tongtien);
         hoaDon.setIdNhanvien(nhanVien);
         hoaDon.setTenNguoiNhan(tenNguoiNhan);
         hoaDon.setSdtNguoiNhan(sdtNguoiNhan);
         hoaDon.setDiaChiNhanHang(diaChiNguoiNhan);
-        hoaDon.setThanhTien(Tongtien);
+        hoaDon.setThanhTien(hoaDonService.tinhThanhTien(hoaDon));
         hoaDon.setHinhThucThanhToan(hinhThucThanhToan);
         hoaDon.setLoaiHoaDon("OFFLINE");
         hoaDon.setTenNguoiMua(tenKhach);

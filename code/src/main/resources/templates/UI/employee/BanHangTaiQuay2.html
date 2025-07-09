@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="vi"  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{admin/index}">>
+      layout:decorate="~{admin/index}">
 <head>
     <meta charset="UTF-8">
     <title>POS - Bán Hàng Tại Quầy</title>
@@ -21,6 +21,26 @@
         .tab-pane.active {
             visibility: visible;
             height: auto;
+        }
+        .voucher-box {
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            max-height: 300px;
+        }
+
+        .voucher-scroll {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .voucher-item {
+            background-color: #ffffff;
+            padding: 8px;
+            margin-bottom: 8px;
+            border-radius: 4px;
+            border: 1px solid #e0e0e0;
         }
     </style>
 </head>
@@ -113,7 +133,7 @@
                 <hr>
                 <div class="d-flex justify-content-between">
                     <strong>Tổng cộng:</strong>
-<!--                    <strong th:text="${#numbers.formatDecimal(ListHoaDonChiTiet.stream().mapToDouble(ct -> ct.soLuong * ct.donGia).sum(), 0, 'POINT', '.', ',')} + '₫'">0₫</strong>-->
+                    <span th:text="${tongTien} + '₫'">0₫</span>
                 </div>
 
                 <!-- Modal -->
@@ -180,21 +200,29 @@
                                     </div>
 
                                     <!-- Tab nhận hàng -->
-                                    <div class="tab-pane " id="nhan" role="tabpanel" aria-labelledby="nhan-tab">
+                                    <div class="tab-pane" id="nhan" role="tabpanel" aria-labelledby="nhan-tab">
                                         <p>* Khách lấy hàng tại quầy không cần nhập</p>
+
                                         <div class="mb-3">
                                             <label for="tenNguoiNhan" class="form-label">Tên người nhận</label>
-                                            <input type="text" class="form-control" id="tenNguoiNhan" name="tenNguoiNhan" >
+                                            <input type="text" class="form-control" id="tenNguoiNhan" name="tenNguoiNhan">
                                         </div>
+
                                         <div class="mb-3">
                                             <label for="sdtNguoiNhan" class="form-label">Số điện thoại người nhận</label>
-                                            <input type="tel" class="form-control" id="sdtNguoiNhan" name="sdtNguoiNhan" >
+                                            <input type="tel" class="form-control" id="sdtNguoiNhan" name="sdtNguoiNhan">
                                         </div>
+
                                         <div class="mb-3">
-                                            <label for="diaChiNguoiNhan" class="form-label">Địa chỉ người nhận</label>
-                                            <input type="text" class="form-control" id="diaChiNguoiNhan" name="diaChiNguoiNhan" >
+                                            <label class="form-label">Địa chỉ người nhận</label>
+                                            <select id="province" class="form-select mt-2"></select>
+                                            <select id="district" class="form-select mt-2"></select>
+                                            <select id="ward" class="form-select mt-2"></select>
+                                            <input type="text" class="form-control mb-2" id="chiTietDiaChi" placeholder="Số nhà, đường..." />
+                                            <input type="hidden" name="diaChiNguoiNhan" id="diaChiNguoiNhan" />
                                         </div>
                                     </div>
+
                                 </div>
 
                                 <!-- Nút submit -->
@@ -214,13 +242,35 @@
                 </button>
                 <a type="button" class="btn btn-success mt-3 btn-pay" th:href="@{/ban-hang-tai-quay/delete/{idhd}(idhd=${idHoaDon})}"> Hủy hóa đơn</a>
 
+        </div>
+            <div class="voucher-scroll">
+                <div th:each="vc : ${dsVoucherDangHoatDong}" class="voucher-item">
+                    <div th:if="${hoaDon.idVoucher != null and hoaDon.idVoucher.id != null and vc.id == hoaDon.idVoucher.id
+}">
+                        <strong th:text="${vc.tenVoucher}">Tên voucher</strong><br>
+                        <small th:text="'Giảm: ' + ${vc.giaTriVoucher} + '%'"></small><br>
+                        <button class="btn btn-sm btn-secondary mt-1" disabled>Đã áp dụng</button>
+                    </div>
+                    <div th:unless="${hoaDon.idVoucher != null and hoaDon.idVoucher.id != null and vc.id == hoaDon.idVoucher.id}">
+                        <form th:action="@{/ban-hang-tai-quay/them-voucher}" method="post">
+                            <input type="hidden" name="idhd" th:value="${idHoaDon}" />
+                            <input type="hidden" name="idVoucher" th:value="${vc.id}" />
+                            <strong th:text="${vc.tenVoucher}">Tên voucher</strong><br>
+                            <small th:text="'Giảm: ' + ${vc.giaTriVoucher} + '%'"></small><br>
+                            <button type="submit" class="btn btn-sm btn-outline-primary mt-1">Thêm</button>
+                        </form>
+                    </div>
+                </div>
             </div>
+
+
         </div>
     </div>
 </div>
-</div>
+
 <script src="https://unpkg.com/html5-qrcode"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
 <script>
     document.querySelectorAll('.quantity-input').forEach(input => {
         input.addEventListener('keydown', function (event) {
@@ -314,6 +364,86 @@
             });
     }
 
+    const diaChiInput = document.getElementById("diaChiNguoiNhan");
+    const provinceSelect = document.getElementById("province");
+    const districtSelect = document.getElementById("district");
+    const wardSelect = document.getElementById("ward");
+
+    // Tải danh sách tỉnh
+    fetch("https://provinces.open-api.vn/api/p/")
+        .then(res => res.json())
+        .then(provinces => {
+            provinceSelect.innerHTML = '<option value="">-- Chọn tỉnh/thành --</option>';
+            provinces.forEach(p => {
+                const opt = document.createElement("option");
+                opt.value = p.code;
+                opt.text = p.name;
+                provinceSelect.appendChild(opt);
+                console.log(`Tải tỉnh: ${p.name} (${p.code})`);
+            });
+        });
+
+    // Khi chọn tỉnh thì load huyện
+    provinceSelect.addEventListener("change", () => {
+        const provinceCode = provinceSelect.value;
+        if (!provinceCode) return;
+        fetch(`https://provinces.open-api.vn/api/p/${provinceCode}?depth=2`)
+            .then(res => res.json())
+            .then(data => {
+                districtSelect.innerHTML = '<option value="">-- Chọn quận/huyện --</option>';
+                wardSelect.innerHTML = '<option value="">-- Chọn phường/xã --</option>';
+                data.districts.forEach(d => {
+                    const opt = document.createElement("option");
+                    opt.value = d.code;
+                    opt.text = d.name;
+                    districtSelect.appendChild(opt);
+                });
+                capNhatDiaChi(); // cập nhật lại địa chỉ
+            });
+    });
+
+    // Khi chọn huyện thì load xã
+    districtSelect.addEventListener("change", () => {
+        const districtCode = districtSelect.value;
+        if (!districtCode) return;
+        fetch(`https://provinces.open-api.vn/api/d/${districtCode}?depth=2`)
+            .then(res => res.json())
+            .then(data => {
+                wardSelect.innerHTML = '<option value="">-- Chọn phường/xã --</option>';
+                data.wards.forEach(w => {
+                    const opt = document.createElement("option");
+                    opt.value = w.code;
+                    opt.text = w.name;
+                    wardSelect.appendChild(opt);
+                });
+                capNhatDiaChi();
+            });
+    });
+
+    // Khi chọn xã hoặc nhập địa chỉ cụ thể, tự động gộp địa chỉ đầy đủ
+    wardSelect.addEventListener("change", capNhatDiaChi);
+    diaChiInput.addEventListener("blur", capNhatDiaChi);
+
+    function capNhatDiaChi() {
+        const diaChiCuThe = document.getElementById("chiTietDiaChi").value.trim();
+
+        const tinh = provinceSelect.value
+            ? provinceSelect.options[provinceSelect.selectedIndex].text
+            : "";
+
+        const huyen = districtSelect.value
+            ? districtSelect.options[districtSelect.selectedIndex].text
+            : "";
+
+        const xa = wardSelect.value
+            ? wardSelect.options[wardSelect.selectedIndex].text
+            : "";
+
+        const full = [diaChiCuThe, xa, huyen, tinh].filter(Boolean).join(", ");
+        document.getElementById("diaChiNguoiNhan").value = full;
+    }
+
 </script>
+</div>
 </body>
 </html>

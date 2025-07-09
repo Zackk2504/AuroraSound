@@ -44,7 +44,7 @@ public class Voucher {
     private LocalDate ngayKetThuc;
 
     @Column(name = "trangThai")
-    private Boolean trangThai;
+    private String trangThai;
 
     @Nationalized
     @Column(name = "kieuGiam", length = 50)

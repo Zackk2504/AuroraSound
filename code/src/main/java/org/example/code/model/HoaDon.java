@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Nationalized;
 
+import java.math.BigDecimal;
+
 @Getter
 @Setter
 @Entity
@@ -15,15 +17,15 @@ public class HoaDon {
     @Column(name = "ID", nullable = false)
     private Integer id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "ID_khachHang")
     private KhachHang idKhachhang;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "ID_nhanVien")
     private NhanVien idNhanvien;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "ID_voucher")
     private Voucher idVoucher;
 
@@ -31,7 +33,7 @@ public class HoaDon {
     private Double giaTriThanhToan;
 
     @Column(name = "thanhTien")
-    private Double thanhTien;
+    private BigDecimal thanhTien;
 
     @Nationalized
     @Column(name = "hinhThucThanhToan", length = 100)
