@@ -106,7 +106,7 @@ public class NhanVienService {
         String pass = generateRandomPassword(8);
         mailService.sendWelcomeEmailForNewStaff(nhanVien.getHoTen(), nhanVien.getEmail(), pass);
         passwordEncoder.encode(pass);
-        nhanVien.setMatKhau(pass);
+        nhanVien.setMatKhau(passwordEncoder.encode(pass));
         nhanVien.setTenDangNhap(nhanVien.getEmail());
         nhanVien.setVaiTro(vaiTro);
         nhanVien.setTrangThai(true);
