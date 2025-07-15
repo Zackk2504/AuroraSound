@@ -78,6 +78,7 @@ public class SanPhamController {
             }).collect(Collectors.toList()));
 
         model.addAttribute("sanPhamdto", dto);
+        model.addAttribute("listChiTiet", chiTietList);
         model.addAttribute("danhsachmausac", mauSacService.getAll());
         model.addAttribute("danhsachphienban", phienBanService.getall());
         model.addAttribute("danhsachsanpham",sanPhamService.getAllSanPhams());
