@@ -43,18 +43,20 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf().disable()
-                .securityMatcher("/khach-hang/**","gio-hang-chi-tiet/**") // hoặc "/khach-hang/**", "/index", "/san-pham/**"...
+                .securityMatcher("/khach-hang/**") // hoặc "/khach-hang/**", "/index", "/san-pham/**"...
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/index", "/khach-hang/**", "/login", "/oauth2/**").permitAll()
+                        .requestMatchers("/", "/index", "/khach-hang/login","/login", "/oauth2/**").permitAll()
+                                .requestMatchers("/khach-hang/**").hasRole("USER")
 //                        .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
                         .loginPage("/login")
+                        .loginProcessingUrl("/khach-hang/login")
                         .defaultSuccessUrl("/index", true)
                         .permitAll()
                 )
                 .logout(logout -> logout
-                        .logoutUrl("/logout") // URL để logout
+                        .logoutUrl("/khach-hang/logout") // URL để logout
                         .logoutSuccessUrl("/index") // Sau khi logout sẽ chuyển về đây
                         .invalidateHttpSession(true)
                         .clearAuthentication(true)
@@ -80,7 +82,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/nhan-vien/login").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/ban-hang/**").hasAnyRole("ADMIN", "EMPLOYEE")
+                        .requestMatchers("/ban-hang-tai-quay/**").hasAnyRole("ADMIN", "EMPLOYEE")
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
@@ -95,6 +97,19 @@ public class SecurityConfig {
 
         return http.build();
     }
+    @Bean
+    @Order(3)
+    public SecurityFilterChain defaultSecurity(HttpSecurity http) throws Exception {
+        http
+                .csrf().disable()
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/", "/index", "/login", "/oauth2/**").permitAll()
+                        .anyRequest().authenticated()
+                );
+
+        return http.build();
+    }
+
 
     @Bean
     public UserDetailsService userDetailsService() {

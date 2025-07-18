@@ -9,4 +9,5 @@ import java.util.Optional;
 public interface GioHangChiTietRepository extends JpaRepository<GioHangChiTiet, Integer> {
     public List<GioHangChiTiet> findByIdGiohang_Id(Integer idGiohang);
     public Optional<GioHangChiTiet> findByIdGiohang_IdAndIdSanphamchitiet_Id(Integer idGiohang, Integer idSanphamchitiet);
+//    public void d(Integer idGiohang);
 }

@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Nationalized;
 
+import java.util.Objects;
+
 @Getter
 @Setter
 @Entity
@@ -25,5 +27,18 @@ public class PhienBan {
 
     @Column(name = "trangThai")
     private Boolean trangThai;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        PhienBan that = (PhienBan) o;
+        return Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
 
 }

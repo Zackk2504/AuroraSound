@@ -23,6 +23,17 @@ public class GioHangChiTietService {
 
     @Autowired
     private KhachHangService khachHangService;
+
+    public List<GioHangChiTiet> findByIds(List<Integer> ids) {
+        return gioHangChiTietRepository.findAllById(ids);
+    }
+
+    public GioHangChiTiet getGioHangChiTietById(Integer id) {
+        return gioHangChiTietRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Gio hang chi tiet not found with id: " + id));
+    }
+
+
     public void addGioHangChiTiet(Integer sanPhamCTId, Integer soLuong) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
@@ -69,7 +80,7 @@ public class GioHangChiTietService {
         }
         return gioHangChiTietRepository.findByIdGiohang_Id(gioHang.getId());
     }
-    public void giamGioHangChiTiet(Integer sanPhamCTId) {
+    public void thaydoisoluongGioHangChiTiet(Integer sanPhamCTId,int soLuong) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
 
@@ -91,12 +102,26 @@ public class GioHangChiTietService {
         GioHangChiTiet gioHangChiTiet = gioHangChiTietOpt.get();
         int soLuongHienTai = gioHangChiTiet.getSoLuong();
 
-        if (soLuongHienTai <= 1) {
-            gioHangChiTietRepository.delete(gioHangChiTiet);
+        if (soLuongHienTai == 1 && soLuong == -1) {
+            gioHangChiTietRepository.deleteById(sanPhamCTId);
         } else {
-            gioHangChiTiet.setSoLuong(soLuongHienTai - 1);
+            gioHangChiTiet.setSoLuong(soLuongHienTai + soLuong);
             gioHangChiTietRepository.save(gioHangChiTiet);
         }
+    }
+
+    public void xoaGioHangChiTiet(Integer id) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        Optional<KhachHang> kh = khachHangService.getKhachHangByUsername(username);
+        if (!kh.isPresent()) {
+            throw new RuntimeException("Khach hang not found");
+        }
+        GioHang gioHang = gioHangService.getGioHangByKhachHang(kh.get().getId());
+        if (gioHang == null) {
+            throw new RuntimeException("Gio hang not found for khach hang");
+        }
+        gioHangChiTietRepository.deleteById(id);
     }
 
 }
