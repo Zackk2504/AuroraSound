@@ -33,6 +33,9 @@ public class CreateAccountController {
         dto.setEmail(taikhoan.getEmail());
         dto.setUserName(taikhoan.getTenDangNhap());
         dto.setSoDT(taikhoan.getSoDT());
+        dto.setHoTen(taikhoan.getHoTen());
+        dto.setGioiTinh(taikhoan.getGioiTinh());
+        dto.setNgaySinh(taikhoan.getNgaySinh());
 
         accountService.taoVaGuiMaDangKi(dto);
         return "verify";

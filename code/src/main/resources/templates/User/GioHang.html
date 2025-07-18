@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Giỏ hàng</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f5f5f5;
+            color: #000;
+            font-family: 'Segoe UI', sans-serif;
+            padding-bottom: 100px;
+        }
+
+        .cart-item {
+            background: #fff;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+        }
+
+        .cart-item img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-right: 15px;
+        }
+
+        .cart-details {
+            flex: 1;
+        }
+
+        .cart-actions {
+            text-align: right;
+        }
+
+        .price {
+            font-weight: bold;
+        }
+
+        .quantity-control {
+            display: flex;
+            align-items: center;
+        }
+
+        .quantity-control button {
+            border: 1px solid #000;
+            background: #fff;
+            width: 30px;
+            height: 30px;
+        }
+
+        .quantity-control input {
+            width: 50px;
+            text-align: center;
+            border: 1px solid #ccc;
+            margin: 0 5px;
+        }
+
+        .bottom-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: #fff;
+            padding: 15px 30px;
+            border-top: 1px solid #ddd;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 999; /* đảm bảo không bị che khuất */
+            box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+
+        .btn-checkout {
+            background: #000;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+        }
+
+        .form-check-input:checked {
+            background-color: #000;
+            border-color: #000;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container mt-4">
+
+    <h3 class="mb-4">🛒 Giỏ hàng của bạn</h3>
+
+    <form id="cartForm" th:action="@{/khach-hang/thanh-toan}" method="post">
+
+        <!-- Một sản phẩm -->
+        <div class="cart-item" th:each="item : ${gioHangChiTietList}">
+            <input class="form-check-input me-3 item-checkbox"
+                   type="checkbox"
+                   name="selectedIds"
+                   onsubmit="return kiemTraCheckbox();"
+                   th:value="${item.id}"
+                   th:data-price="${item.idSanphamchitiet.donGia}"
+                   th:data-quantity="${item.soLuong}">
+
+            <img th:src="@{/images/sanpham/placeholder.jpg}" alt="Ảnh sản phẩm">
+
+            <div class="cart-details">
+                <div th:text="${item.idSanphamchitiet.idSanpham.tenSanPham}" class="fw-bold">Tên sản phẩm</div>
+                <div class="text-muted small">
+                    Phân loại:
+                    <span th:text="${item.idSanphamchitiet.idPhienban.tenPhienBan}"></span>,
+                    <span th:text="${item.idSanphamchitiet.idMausac.tenMauSac}"></span>
+                </div>
+                <div class="price mt-1" th:text="${#numbers.formatDecimal(item.idSanphamchitiet.donGia, 0, 'COMMA', 0, 'POINT')} + ' ₫'">Giá</div>
+                <div class="quantity-control d-flex align-items-center">
+                    <button type="button"
+                            class="btn btn-outline-dark btn-sm btn-minus"
+                            th:data-id="${item.idSanphamchitiet.id}">−</button>
+                    <input type="text" class="form-control text-center mx-2 qty-input" th:value="${item.soLuong}" readonly>
+                    <button type="button"
+                            class="btn btn-outline-dark btn-sm btn-plus"
+                            th:data-id="${item.idSanphamchitiet.id}">+</button>
+                </div>
+            </div>
+
+            <div class="cart-actions">
+                <a th:href="@{'/khach-hang/gio-hang/xoa?idGioHang=' + ${item.id}}"
+                   onclick="return confirm('Bạn có chắc chắn muốn xóa sản phẩm này khỏi giỏ hàng?')"
+                   class="text-danger small">Xóa</a>            </div>
+        </div>
+        <!-- /Một sản phẩm -->
+
+        <div class="bottom-bar mt-4">
+            <div>
+                <input type="checkbox" id="chonTatCa" class="form-check-input me-2">
+                <label for="chonTatCa">Chọn tất cả</label>
+            </div>
+            <div>
+                Tổng cộng: <span id="tongTien" class="fw-bold">0 ₫</span>
+                <button type="submit" class="btn btn-checkout ms-3" id="btnMuaHang" disabled>Mua hàng</button>
+
+            </div>
+        </div>
+    </form>
+
+    <!-- Thanh dưới cùng -->
+
+
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const checkboxes = document.querySelectorAll(".item-checkbox");
+        const chonTatCaCheckbox = document.getElementById("chonTatCa");
+        const tongTienEl = document.getElementById("tongTien");
+        const btnMuaHang = document.getElementById("btnMuaHang");
+
+        function formatCurrency(amount) {
+            return amount.toLocaleString("vi-VN") + " ₫";
+        }
+
+        function tinhTongTien() {
+            let total = 0;
+            let hasChecked = false;
+            checkboxes.forEach(cb => {
+                if (cb.checked) {
+                    const price = parseFloat(cb.getAttribute("data-price"));
+                    const qtyInput = cb.closest(".cart-item").querySelector(".qty-input");
+                    const qty = parseInt(qtyInput.value);
+                    total += price * qty;
+                    hasChecked = true;
+                }
+            });
+            tongTienEl.textContent = formatCurrency(total);
+            btnMuaHang.disabled = !hasChecked;
+        }
+
+        chonTatCaCheckbox.addEventListener("change", function () {
+            checkboxes.forEach(cb => cb.checked = chonTatCaCheckbox.checked);
+            tinhTongTien();
+        });
+
+        checkboxes.forEach(cb => cb.addEventListener("change", function () {
+            chonTatCaCheckbox.checked = [...checkboxes].every(c => c.checked);
+            tinhTongTien();
+        }));
+
+        // Tăng số lượng
+        document.querySelectorAll(".btn-plus").forEach(btn => {
+            btn.addEventListener("click", function () {
+                const card = this.closest(".cart-item");
+                const input = card.querySelector(".qty-input");
+                const id = this.getAttribute("data-id");
+                const qty = parseInt(input.value);
+
+                fetch(`/khach-hang/gio-hang/${id}/increase`, {
+                    method: 'POST'
+                }).then(response => {
+                    if (response.ok) {
+                        input.value = qty + 1;
+                        tinhTongTien();
+                    } else {
+                        alert("Tăng số lượng thất bại");
+                    }
+                });
+            });
+        });
+
+        // Giảm số lượng
+        document.querySelectorAll(".btn-minus").forEach(btn => {
+            btn.addEventListener("click", function () {
+                const card = this.closest(".cart-item");
+                const input = card.querySelector(".qty-input");
+                const id = this.getAttribute("data-id");
+                const qty = parseInt(input.value);
+                if (qty <= 1) return;
+
+                fetch(`/khach-hang/gio-hang/${id}/decrease`, {
+                    method: 'POST'
+                }).then(response => {
+                    if (response.ok) {
+                        input.value = qty - 1;
+                        tinhTongTien();
+                    } else {
+                        alert("Giảm số lượng thất bại");
+                    }
+                });
+            });
+        });
+    });
+    function kiemTraCheckbox() {
+        const checkboxes = document.querySelectorAll('.item-checkbox');
+        const coCheckboxDuocChon = Array.from(checkboxes).some(cb => cb.checked);
+
+        if (!coCheckboxDuocChon) {
+            alert("Vui lòng chọn ít nhất một sản phẩm để thanh toán.");
+            return false; // chặn submit
+        }
+
+        return true; // cho phép submit
+    }
+
+</script>
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

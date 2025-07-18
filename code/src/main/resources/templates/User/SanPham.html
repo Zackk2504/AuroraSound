@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{index}">
+
+<head>
+    <title>Chi tiết sản phẩm</title>
+    <style>
+        .option-btn {
+            border: 1px solid #ccc;
+            padding: 8px 16px;
+            border-radius: 6px;
+            margin: 5px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .option-btn:hover {
+            border-color: #dc3545;
+        }
+
+        .option-btn.active {
+            background-color: #dc3545;
+            color: white;
+            border-color: #dc3545;
+        }
+
+        .disabled {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+    </style>
+</head>
+
+<body>
+<div layout:fragment="khachhangcontent">
+    <div class="container bg-white shadow-sm p-4 rounded mt-4">
+        <div class="row">
+            <!-- Ảnh sản phẩm -->
+            <div class="col-md-5">
+<!--                <img th:src="@{${spChiTiet[0].hinhAnh}}" class="img-fluid rounded mb-3" alt="Ảnh sản phẩm">-->
+<!--                <div class="d-flex gap-2">-->
+<!--                    <img th:each="ct : ${spChiTiet}" th:src="@{${ct.hinhAnh}}" class="img-thumbnail"-->
+<!--                         style="width: 60px; height: 60px;" alt="Ảnh phụ">-->
+<!--                </div>-->
+            </div>
+
+            <!-- Thông tin sản phẩm -->
+            <div class="col-md-7">
+                <h3 th:text="${sp.tenSanPham}">Tên sản phẩm</h3>
+                <p><strong>Thương hiệu:</strong> <span th:text="${sp.idThuonghieu.tenThuongHieu}"></span></p>
+                <p><strong>Loại sản phẩm:</strong> <span th:text="${sp.idLoaisanpham.tenLoaiSanPham}"></span></p>
+                <p><strong>Xuất xứ:</strong> <span th:text="${sp.idXuatxu.noiXuatXu}"></span></p>
+
+                <!-- Màu sắc -->
+                <div class="mb-3">
+                    <h5>Chọn màu sắc:</h5>
+                    <div id="mauOptions">
+                <span th:each="ten : ${mauSacList}" class="option-btn"
+                      th:data-value="${ten.id}" th:text="${ten.tenMauSac}" onclick="chonMau(this)">
+                </span>
+                    </div>
+                </div>
+
+                <!-- Phiên bản -->
+                <div class="mb-3">
+                    <h5>Chọn phiên bản:</h5>
+                    <div id="phienbanOptions">
+                <span th:each="ten : ${phienBanList}" class="option-btn"
+                      th:data-value="${ten.id}" th:text="${ten.tenPhienBan}" onclick="chonPhienBan(this)">
+                </span>
+                    </div>
+                </div>
+
+
+                <!-- Giá -->
+                <div class="mb-3">
+                    <h5>Giá:</h5>
+                    <p id="giaSanPham" class="fs-4 text-danger fw-bold">Vui lòng chọn đủ màu và phiên bản</p>
+                </div>
+
+                <div class="mt-4">
+                    <label for="soLuong">Số lượng:</label>
+                    <input type="number" id="soLuong" name="soLuong" min="1" value="1" class="form-control w-25">
+                </div>
+
+                <!-- Nút thao tác -->
+                <div class="mt-4">
+                    <button class="btn btn-outline-danger" id="btnThemGio" disabled onclick="themVaoGio()" ><i class="bi bi-cart-plus"></i> Thêm vào giỏ</button>
+                    <button class="btn btn-danger" id="btnMuaNgay" disabled>Mua ngay</button>
+                </div>
+            </div>
+        </div>
+
+        <hr class="my-4">
+
+        <!-- Mô tả -->
+        <div>
+            <h5>Mô tả sản phẩm:</h5>
+            <p th:text="${sp.moTa}">Mô tả sản phẩm sẽ hiển thị ở đây</p>
+        </div>
+    </div>
+
+    <!-- Dữ liệu JS -->
+    <script th:inline="javascript">
+        const chiTietList = /*[[${spChiTiet}]]*/ [];
+
+        let selectedMauId = null;
+        let selectedPhienbanId = null;
+
+        function chonMau(el) {
+            document.querySelectorAll('#mauOptions .option-btn').forEach(btn => btn.classList.remove('active'));
+            el.classList.add('active');
+            selectedMauId = el.getAttribute('data-value');
+            capNhatGia();
+        }
+
+        function chonPhienBan(el) {
+            document.querySelectorAll('#phienbanOptions .option-btn').forEach(btn => btn.classList.remove('active'));
+            el.classList.add('active');
+            selectedPhienbanId = el.getAttribute('data-value');
+            capNhatGia();
+        }
+
+        function capNhatGia() {
+            const giaEl = document.getElementById('giaSanPham');
+            const btnThem = document.getElementById('btnThemGio');
+            const btnMua = document.getElementById('btnMuaNgay');
+
+            if (selectedMauId && selectedPhienbanId) {
+                const sp = chiTietList.find(ct =>
+                    ct.idMausac.id == selectedMauId && ct.idPhienban.id == selectedPhienbanId);
+                if (sp) {
+                    giaEl.textContent = sp.donGia.toLocaleString('vi-VN') + ' ₫';
+                    btnThem.disabled = false;
+                    btnMua.disabled = false;
+                } else {
+                    giaEl.textContent = 'Không tìm thấy phiên bản phù hợp';
+                    btnThem.disabled = true;
+                    btnMua.disabled = true;
+                }
+            } else {
+                giaEl.textContent = 'Vui lòng chọn đủ màu và phiên bản';
+                btnThem.disabled = true;
+                btnMua.disabled = true;
+            }
+        }
+        function capNhatGioHangBadge() {
+            fetch('/khach-hang/gio-hang/so-luong')
+                .then(res => res.json())
+                .then(data => {
+                    const badge = document.getElementById('badgeGioHang');
+                    if (badge) {
+                        console.log("cập nhật badge giỏ hàng 123112412");
+                        if (data > 0) {
+                            console.log("cập nhật badge giỏ hàng");
+                            badge.textContent = data;
+                            badge.style.display = 'inline-block';
+                        } else {
+                            console.log("ẩn badge giỏ hàng");
+                            badge.style.display = 'none';
+                        }
+                    }else {
+                        console.log("Không tìm thấy badge giỏ hàng");
+                    }
+                });
+        }
+
+        function themVaoGio() {
+            if (selectedMauId && selectedPhienbanId) {
+                const sp = chiTietList.find(ct =>
+                    ct.idMausac.id == selectedMauId && ct.idPhienban.id == selectedPhienbanId);
+                const soLuong = document.getElementById('soLuong').value;
+
+                if (sp) {
+                    fetch(`/khach-hang/gio-hang/add/${sp.id}/${soLuong}`, {
+                        method: 'POST'
+                    })
+                        .then(response => response.text())
+                        .then(data => {
+                            alert(data);
+                            capNhatGioHangBadge(); // gọi ở đây
+                        })
+                        .catch(error => alert('Lỗi: ' + error));
+                }
+            }
+        }
+
+
+    </script>
+</div>
+</body>
+</html>

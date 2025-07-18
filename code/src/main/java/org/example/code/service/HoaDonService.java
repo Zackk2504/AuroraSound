@@ -1,5 +1,7 @@
 package org.example.code.service;
 
+import jakarta.transaction.Transactional;
+import org.example.code.model.GioHangChiTiet;
 import org.example.code.model.HoaDon;
 import org.example.code.model.HoaDonChiTiet;
 import org.example.code.model.Voucher;
@@ -20,6 +22,8 @@ public class HoaDonService {
     private VoucherService voucherService;
     @Autowired
     private HoaDonChiTietService hoaDonChiTietService;
+    @Autowired
+    private GioHangChiTietService gioHangChiTietService;
 
     public Optional<HoaDon> getHoaDonById(Integer id) {
         return hoaDonRepository.getHoaDonById(id);
@@ -79,6 +83,24 @@ public class HoaDonService {
         }
 
         return tong.setScale(0, RoundingMode.HALF_UP); // Làm tròn tiền về đơn vị VNĐ
+    }
+
+    @Transactional
+    public void taoHoaDonChiTiet(HoaDon hoaDon, List<Integer> idGioHangChiTiet) {
+        for (Integer id : idGioHangChiTiet) {
+            GioHangChiTiet ghct = gioHangChiTietService.getGioHangChiTietById(id);
+            if (ghct != null) {
+                HoaDonChiTiet hdct = new HoaDonChiTiet();
+                hdct.setIdHoadon(hoaDon);
+                hdct.setIdSanphamchitiet(ghct.getIdSanphamchitiet());
+                hdct.setSoLuong(ghct.getSoLuong());
+                hdct.setDonGia(ghct.getIdSanphamchitiet().getDonGia());
+
+                hoaDonChiTietService.addAndEdit(hdct);
+
+                gioHangChiTietService.xoaGioHangChiTiet(ghct.getId()); // Xóa khỏi giỏ
+            }
+        }
     }
 
 }

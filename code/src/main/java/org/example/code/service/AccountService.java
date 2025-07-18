@@ -57,11 +57,10 @@ public class AccountService {
         session.setAttribute("email", dto.getEmail());
         session.setAttribute("pass", dto.getPass());
         session.setAttribute("username", dto.getUserName());
-        System.out.println(dto.getUserName() + " :tao ten la");
         session.setAttribute("otpExpire", System.currentTimeMillis() + 5 * 60 * 1000);
         session.setAttribute("hoTen", dto.getHoTen());
         session.setAttribute("soDT", dto.getSoDT());
-//        session.setAttribute("ngaySinh", dto.getNgaySinh());
+        session.setAttribute("ngaySinh", dto.getNgaySinh());
         session.setAttribute("gioiTinh", dto.getGioiTinh());
         // Gửi mail async
         mailService.sendOtpEmail(dto.getEmail(), otp);
@@ -78,9 +77,33 @@ public class AccountService {
         String gioiTinh = (String) session.getAttribute("gioiTinh");
         KhachHang taikhoan;
         if (otp != null && otp.equals(maXacNhan)) {
-            if (email == null || pass == null || username == null || hoTen == null || soDT == null || ngaySinh == null || gioiTinh == null) {
-                throw new RuntimeException("Thông tin đăng ký không đầy đủ");
+            if (email == null || email.trim().isEmpty()) {
+                throw new RuntimeException("Email không được để trống");
             }
+
+            if (pass == null || pass.trim().isEmpty()) {
+                throw new RuntimeException("Mật khẩu không được để trống");
+            }
+
+            if (username == null || username.trim().isEmpty()) {
+                throw new RuntimeException("Tên đăng nhập không được để trống");
+            }
+
+            if (soDT == null || soDT.trim().isEmpty()) {
+                throw new RuntimeException("Số điện thoại không được để trống");
+            }
+
+            if (ngaySinh == null) {
+                throw new RuntimeException("Ngày sinh không được để trống");
+            }
+
+            if (gioiTinh == null || gioiTinh.trim().isEmpty()) {
+                throw new RuntimeException("Giới tính không được để trống");
+            }
+            if (hoTen == null || hoTen.trim().isEmpty()) {
+                throw new RuntimeException("Họ tên không được để trống");
+            }
+
             Optional<KhachHang> khachHang = accountRepository.findBySoDT(soDT);
             if (khachHang.isPresent() && khachHang.get().getEmail() == null) {
                taikhoan = khachHang.get();
