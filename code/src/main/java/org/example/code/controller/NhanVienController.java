@@ -59,7 +59,7 @@ public class NhanVienController {
         return "admin/nhanVien";
     }
 
-    @PostMapping("/admin/nhan-vien/edit")
+    @PostMapping("/admin/nhan-vien/save")
     public String updateNhanVien(@ModelAttribute NhanVien nhanVien) {
         Optional<NhanVien> nhanVien1 = nhanVienService.getById(nhanVien.getId());
         VaiTro vaiTro = vaiTroService.getVaiTroByName("employee");

@@ -5,9 +5,12 @@ import org.example.code.repo.GioHangChiTietRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
+import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -35,13 +38,18 @@ public class GioHangChiTietService {
 
 
     public void addGioHangChiTiet(Integer sanPhamCTId, Integer soLuong) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();
-        Optional<KhachHang> kh = khachHangService.getKhachHangByUsername(username);
-        if (!kh.isPresent()) {
-            throw new RuntimeException("Khach hang not found");
+        Integer khachHangId;
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        KhachHang khachHang;
+        if (auth.getPrincipal() instanceof DefaultOidcUser user) {
+            String email = user.getAttribute("email");
+            khachHang = khachHangService.getKhachHangByEmail(email).get();
+            khachHangId = khachHang.getId();
+        }else {
+            String tenDangNhap = auth.getName();
+            khachHang = khachHangService.getKhachHangByUsername(tenDangNhap).orElse(new KhachHang());
+            khachHangId = khachHang.getId();
         }
-        KhachHang khachHang = kh.get();
         GioHangChiTiet gioHangChiTiet;
 
         GioHang gioHang = gioHangService.getGioHangByKhachHang(khachHang.getId());
@@ -66,27 +74,49 @@ public class GioHangChiTietService {
             giohangchitiet.setSoLuong(giohangchitiet.getSoLuong() + soLuong);
             gioHangChiTietRepository.save(giohangchitiet);
         }
+        SanPhamChiTiet sanPhamChiTiet = sanPhamChiTietService.getSanPhamChiTietById(sanPhamCTId)
+                .orElseThrow(() -> new RuntimeException("San pham chi tiet not found with id: " + sanPhamCTId));
+        if (sanPhamChiTiet.getSoLuongTon() < soLuong) {
+            throw new RuntimeException("So luong san pham chi tiet khong du");
+        }
+        if (sanPhamChiTiet.getSoLuongTon() > 0) {
+            sanPhamChiTiet.setSoLuongTon(sanPhamChiTiet.getSoLuongTon() - soLuong);
+            sanPhamChiTietService.addAndEdit(sanPhamChiTiet);
+        } else {
+            throw new RuntimeException("San pham chi tiet da het hang");
+        }
     }
     public List<GioHangChiTiet> getGioHangChiTietByGioHang() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();
-        Optional<KhachHang> kh = khachHangService.getKhachHangByUsername(username);
-        if (!kh.isPresent()) {
-            throw new RuntimeException("Khach hang not found");
+        Integer khachHangId;
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        KhachHang khachHang;
+        if (auth.getPrincipal() instanceof DefaultOidcUser user) {
+            String email = user.getAttribute("email");
+            khachHang = khachHangService.getKhachHangByEmail(email).get();
+            khachHangId = khachHang.getId();
+        }else {
+            String tenDangNhap = auth.getName();
+            khachHang = khachHangService.getKhachHangByUsername(tenDangNhap).orElse(new KhachHang());
+            khachHangId = khachHang.getId();
         }
-        GioHang gioHang = gioHangService.getGioHangByKhachHang(kh.get().getId());
+        GioHang gioHang = gioHangService.getGioHangByKhachHang(khachHang.getId());
         if (gioHang == null) {
             throw new RuntimeException("Gio hang not found for khach hang");
         }
         return gioHangChiTietRepository.findByIdGiohang_Id(gioHang.getId());
     }
     public void thaydoisoluongGioHangChiTiet(Integer sanPhamCTId,int soLuong) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();
-
-        KhachHang khachHang = khachHangService.getKhachHangByUsername(username)
-                .orElseThrow(() -> new RuntimeException("Khach hang not found"));
-
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        KhachHang khachHang;
+        if (auth.getPrincipal() instanceof DefaultOidcUser user) {
+            String email = user.getAttribute("email");
+            khachHang = khachHangService.getKhachHangByEmail(email).get();
+            System.out.println("Email: " + email);
+        }else {
+            String tenDangNhap = auth.getName();
+            System.out.println("Tên đăng nhập: " + tenDangNhap);
+            khachHang = khachHangService.getKhachHangByUsername(tenDangNhap).orElse(new KhachHang());
+        }
         GioHang gioHang = gioHangService.getGioHangByKhachHang(khachHang.getId());
         if (gioHang == null) {
             throw new RuntimeException("Gio hang not found");
@@ -111,13 +141,18 @@ public class GioHangChiTietService {
     }
 
     public void xoaGioHangChiTiet(Integer id) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();
-        Optional<KhachHang> kh = khachHangService.getKhachHangByUsername(username);
-        if (!kh.isPresent()) {
-            throw new RuntimeException("Khach hang not found");
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        KhachHang khachHang;
+        if (auth.getPrincipal() instanceof DefaultOidcUser user) {
+            String email = user.getAttribute("email");
+            khachHang = khachHangService.getKhachHangByEmail(email).get();
+            System.out.println("Email: " + email);
+        }else {
+            String tenDangNhap = auth.getName();
+            System.out.println("Tên đăng nhập: " + tenDangNhap);
+            khachHang = khachHangService.getKhachHangByUsername(tenDangNhap).orElse(new KhachHang());
         }
-        GioHang gioHang = gioHangService.getGioHangByKhachHang(kh.get().getId());
+        GioHang gioHang = gioHangService.getGioHangByKhachHang(khachHang.getId());
         if (gioHang == null) {
             throw new RuntimeException("Gio hang not found for khach hang");
         }

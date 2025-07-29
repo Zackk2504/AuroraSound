@@ -28,10 +28,6 @@ public class KhachHang {
     @Column(name = "soDT", length = 20)
     private String soDT;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "ID_DiaChi")
-    private DiaChi idDiachi;
-
     @Nationalized
     @Column(name = "email", length = 100)
     private String email;

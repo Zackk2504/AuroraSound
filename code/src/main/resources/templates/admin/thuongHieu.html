@@ -7,39 +7,50 @@
 </head>
 <body>
 <div layout:fragment="content" class="container mt-4">
-    <h3 th:text="${thuongHieu.id == null ? 'Thêm mới thương hiệu' : 'Chỉnh sửa thương hiệu'}"></h3>
 
-    <form th:object="${thuongHieu}"
-          th:action="@{${thuongHieu.id == null} ? '/admin/thuonghieu/add' : '/admin/thuonghieu/update'}"
-          method="post">
-        <input type="hidden" th:field="*{id}"/>
+    <!-- Nút Thêm -->
+    <button type="button" class="btn btn-primary mb-3" onclick="openAddModal()">Thêm Thương Hiệu</button>
 
-        <div class="mb-3">
-            <label class="form-label">Mã thương hiệu</label>
-            <input type="text" class="form-control" th:field="*{maThuongHieu}" required>
+    <!-- Modal Thương Hiệu -->
+    <div class="modal fade" id="thuongHieuModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form id="thuongHieuForm" method="post">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="modalTitle">Thêm Thương Hiệu</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" name="id" id="id"/>
+
+                        <div class="mb-3">
+                            <label class="form-label">Mã Thương Hiệu</label>
+                            <input type="text" class="form-control" name="maThuongHieu" id="maThuongHieu" required/>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Tên Thương Hiệu</label>
+                            <input type="text" class="form-control" name="tenThuongHieu" id="tenThuongHieu" required/>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Trạng Thái</label>
+                            <select class="form-select" name="trangThai" id="trangThai" required>
+                                <option value="true">Hoạt động</option>
+                                <option value="false">Ngưng</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-success" id="submitBtn">Lưu</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                    </div>
+                </form>
+            </div>
         </div>
+    </div>
 
-        <div class="mb-3">
-            <label class="form-label">Tên thương hiệu</label>
-            <input type="text" class="form-control" th:field="*{tenThuongHieu}" required>
-        </div>
-
-        <div class="mb-3">
-            <label class="form-label">Trạng thái</label>
-            <select class="form-select" th:field="*{trangThai}">
-                <option value="true">Hoạt động</option>
-                <option value="false">Ngưng</option>
-            </select>
-        </div>
-
-        <div>
-            <button type="submit" class="btn btn-success" th:text="${thuongHieu.id == null ? 'Thêm mới' : 'Cập nhật'}"></button>
-            <a href="/admin/thuonghieu" class="btn btn-secondary">Reset</a>
-        </div>
-    </form>
-
-    <hr>
-
+    <!-- Bảng danh sách -->
     <h4 class="mt-4">Danh sách thương hiệu</h4>
     <table class="table table-bordered">
         <thead>
@@ -56,11 +67,55 @@
             <td th:text="${th.tenThuongHieu}"></td>
             <td th:text="${th.trangThai} ? 'Hoạt động' : 'Ngưng'"></td>
             <td>
-                <a th:href="@{'/admin/thuonghieu/edit/' + ${th.id}}" class="btn btn-warning btn-sm">Sửa</a>
+                <button class="btn btn-warning btn-sm"
+                        th:attr="data-id=${th.id},
+                                 data-ma=${th.maThuongHieu},
+                                 data-ten=${th.tenThuongHieu},
+                                 data-trangthai=${th.trangThai}"
+                        onclick="openEditModal(this)">
+                    Sửa
+                </button>
             </td>
+        </tr>
+        <tr th:if="${#lists.isEmpty(dsThuongHieu)}">
+            <td colspan="4" class="text-center">Chưa có thương hiệu nào</td>
         </tr>
         </tbody>
     </table>
+
+    <!-- Script xử lý modal -->
+    <script>
+        function openAddModal() {
+            document.getElementById("modalTitle").innerText = "Thêm Thương Hiệu";
+            document.getElementById("submitBtn").innerText = "Thêm mới";
+            document.getElementById("thuongHieuForm").action = "/admin/thuonghieu/add";
+
+            document.getElementById("id").value = "";
+            document.getElementById("maThuongHieu").value = "";
+            document.getElementById("tenThuongHieu").value = "";
+            document.getElementById("trangThai").value = "true";
+
+            new bootstrap.Modal(document.getElementById("thuongHieuModal")).show();
+        }
+
+        function openEditModal(btn) {
+            const id = btn.getAttribute("data-id");
+            const ma = btn.getAttribute("data-ma");
+            const ten = btn.getAttribute("data-ten");
+            const trangThai = btn.getAttribute("data-trangthai");
+
+            document.getElementById("modalTitle").innerText = "Chỉnh sửa Thương Hiệu";
+            document.getElementById("submitBtn").innerText = "Cập nhật";
+            document.getElementById("thuongHieuForm").action = "/admin/thuonghieu/update";
+
+            document.getElementById("id").value = id;
+            document.getElementById("maThuongHieu").value = ma;
+            document.getElementById("tenThuongHieu").value = ten;
+            document.getElementById("trangThai").value = trangThai;
+
+            new bootstrap.Modal(document.getElementById("thuongHieuModal")).show();
+        }
+    </script>
 </div>
 </body>
 </html>

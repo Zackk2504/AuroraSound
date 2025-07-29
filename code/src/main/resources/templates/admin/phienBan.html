@@ -3,36 +3,55 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{admin/index}">
 <head>
-    <title>Trang chính</title>
+    <title>Quản lý Phiên Bản</title>
 </head>
 <body>
-<div layout:fragment="content">
-    <h3>Thêm/Sửa Phiên Bản</h3>
-    <form th:action="@{/phienban/save}" method="post">
-        <input type="hidden" th:field="*{phienBan.id}"/>
-        <div class="mb-3">
-            <label>Mã phiên bản</label>
-            <input type="text" class="form-control" th:field="*{phienBan.maPhienBan}" required/>
-        </div>
-        <div class="mb-3">
-            <label>Tên phiên bản</label>
-            <input type="text" class="form-control" th:field="*{phienBan.tenPhienBan}" required/>
-        </div>
-        <div class="mb-3">
-            <label>Trạng thái</label>
-            <select class="form-select" th:field="*{phienBan.trangThai}">
-                <option value="true">Hoạt động</option>
-                <option value="false">Ngưng</option>
-            </select>
-        </div>
-        <div>
-            <button type="submit" class="btn btn-success" th:text="${phienBan.id == null ? 'Thêm mới' : 'Cập nhật'}"></button>
-            <a href="/admin/phien-ban" class="btn btn-secondary">Reset</a>
-        </div>
-    </form>
+<div layout:fragment="content" class="container mt-4">
+    <h3>Quản lý Phiên Bản</h3>
 
-    <hr>
-    <h3>Danh sách Phiên Bản</h3>
+    <!-- Nút mở modal -->
+    <button class="btn btn-primary mb-3" onclick="openAddModal()">Thêm Phiên Bản</button>
+
+    <!-- Modal -->
+    <div class="modal fade" id="phienBanModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form id="phienBanForm" method="post">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="modalTitle">Thêm Phiên Bản</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" name="id" id="id"/>
+
+                        <div class="mb-3">
+                            <label class="form-label">Mã Phiên Bản</label>
+                            <input type="text" class="form-control" name="maPhienBan" id="maPhienBan" required/>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Tên Phiên Bản</label>
+                            <input type="text" class="form-control" name="tenPhienBan" id="tenPhienBan" required/>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Trạng Thái</label>
+                            <select class="form-select" name="trangThai" id="trangThai">
+                                <option value="true">Hoạt động</option>
+                                <option value="false">Ngưng</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-success" id="submitBtn">Lưu</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Danh sách -->
     <table class="table table-bordered">
         <thead>
         <tr>
@@ -48,14 +67,52 @@
             <td th:text="${pb.id}"></td>
             <td th:text="${pb.maPhienBan}"></td>
             <td th:text="${pb.tenPhienBan}"></td>
-            <td th:text="${pb.trangThai ? 'Hoạt động' : 'Ngưng'}"></td>
+            <td th:text="${pb.trangThai} ? 'Hoạt động' : 'Ngưng'"></td>
             <td>
-                <a th:href="@{'/admin/phienban/edit/' + ${pb.id}}" class="btn btn-warning btn-sm">Sửa</a>
+                <button class="btn btn-warning btn-sm"
+                        th:attr="data-id=${pb.id},
+                                 data-ma=${pb.maPhienBan},
+                                 data-ten=${pb.tenPhienBan},
+                                 data-trangthai=${pb.trangThai}"
+                        onclick="openEditModal(this)">
+                    Sửa
+                </button>
             </td>
+        </tr>
+        <tr th:if="${#lists.isEmpty(list)}">
+            <td colspan="5" class="text-center">Chưa có dữ liệu</td>
         </tr>
         </tbody>
     </table>
 
+    <!-- JS xử lý modal -->
+    <script>
+        function openAddModal() {
+            document.getElementById("modalTitle").innerText = "Thêm Phiên Bản";
+            document.getElementById("submitBtn").innerText = "Thêm mới";
+            document.getElementById("phienBanForm").action = "/phienban/save";
+
+            document.getElementById("id").value = "";
+            document.getElementById("maPhienBan").value = "";
+            document.getElementById("tenPhienBan").value = "";
+            document.getElementById("trangThai").value = "true";
+
+            new bootstrap.Modal(document.getElementById("phienBanModal")).show();
+        }
+
+        function openEditModal(btn) {
+            document.getElementById("modalTitle").innerText = "Cập nhật Phiên Bản";
+            document.getElementById("submitBtn").innerText = "Cập nhật";
+            document.getElementById("phienBanForm").action = "/phienban/save";
+
+            document.getElementById("id").value = btn.getAttribute("data-id");
+            document.getElementById("maPhienBan").value = btn.getAttribute("data-ma");
+            document.getElementById("tenPhienBan").value = btn.getAttribute("data-ten");
+            document.getElementById("trangThai").value = btn.getAttribute("data-trangthai");
+
+            new bootstrap.Modal(document.getElementById("phienBanModal")).show();
+        }
+    </script>
 </div>
 </body>
 </html>

@@ -8,6 +8,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,6 +31,9 @@ public class BanHangTaiQuayService {
 
     @Autowired
     private KhachHangService khachHangService;
+
+    @Autowired
+    private VoucherService voucherService;
 
     public List<SanPhamChiTiet> DanhSachSanPham() {
         return sanPhamChiTietService.getAllSanPhamChiTiet();
@@ -133,7 +137,7 @@ public class BanHangTaiQuayService {
 
     }
 
-    public void ThanhToanHoaDon(Integer idhd,String tenKhach,String sdtkhach,String diaChiNguoiNhan,String tenNguoiNhan,String sdtNguoiNhan, String hinhThucThanhToan) {
+    public void ThanhToanHoaDon(Integer idhd,String tenKhach,String sdtkhach,String diaChiNguoiNhan,String tenNguoiNhan,String sdtNguoiNhan, String hinhThucThanhToan,String ghiChu ) {
         List<HoaDonChiTiet> hoaDonChiTietList = hoaDonChiTietService.getListHoaDonChiTietByIdHoaDon(idhd);
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String tenDangNhap = auth.getName();
@@ -165,19 +169,36 @@ public class BanHangTaiQuayService {
         HoaDon hoaDon = hoaDonService.getHoaDonById(idhd)
                 .orElseThrow(() -> new RuntimeException("Hoa Don not found"));
         hoaDon.setTrangThaiHoaDon(trangThaiHoaDon);
-        Double Tongtien = 0.0;
+        BigDecimal Tongtien = BigDecimal.ZERO;
         for (HoaDonChiTiet hoaDonChiTiet : hoaDonChiTietList) {
-            Tongtien += hoaDonChiTiet.getSoLuong() * hoaDonChiTiet.getDonGia();
+            BigDecimal soLuong = BigDecimal.valueOf(hoaDonChiTiet.getSoLuong());
+            BigDecimal donGia = hoaDonChiTiet.getDonGia();
+            Tongtien = Tongtien.add(donGia.multiply(soLuong));
         }
+        Voucher voucher = hoaDon.getIdVoucher();
+        if (voucher != null) {
+            if (voucher.getSoLuongConLai() <= 0) {
+                throw new RuntimeException("Voucher đã hết hạn sử dụng hoặc không còn số lượng");
+            }
+            voucher.setSoLuongConLai(voucher.getSoLuongConLai() - 1);
+            voucherService.Update(voucher);
+        }
+        BigDecimal tongTien = hoaDonService.tinhTongTien(hoaDon);
+        BigDecimal tienvoucher = voucherService.tinhTienGiam(hoaDon.getIdVoucher(), tongTien);
+        BigDecimal tienShip = hoaDon.getTienship() != null ? hoaDon.getTienship() : BigDecimal.ZERO;
+        BigDecimal tienthanhtoan = tongTien.subtract(tienvoucher).add(tienShip);
         hoaDon.setIdNhanvien(nhanVien);
         hoaDon.setTenNguoiNhan(tenNguoiNhan);
         hoaDon.setSdtNguoiNhan(sdtNguoiNhan);
         hoaDon.setDiaChiNhanHang(diaChiNguoiNhan);
-        hoaDon.setThanhTien(hoaDonService.tinhThanhTien(hoaDon));
+        hoaDon.setThanhTien(hoaDonService.tinhTongTien(hoaDon));
+        hoaDon.setGiaTriThanhToan(tienthanhtoan);
         hoaDon.setHinhThucThanhToan(hinhThucThanhToan);
         hoaDon.setLoaiHoaDon("OFFLINE");
         hoaDon.setTenNguoiMua(tenKhach);
         hoaDon.setSdtNguoiMua(sdtkhach);
+        hoaDon.setNgayTao(java.time.LocalDateTime.now());
+        hoaDon.setGhiChu(ghiChu);
         hoaDonService.addAndEdit(hoaDon);
 
     }

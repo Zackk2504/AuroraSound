@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{index}">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Danh sách sản phẩm</title>
+    <style>
+        .square-img {
+            width: 250px;   /* bạn có thể chỉnh size tùy ý */
+            height: 250px;
+            justify-content: center;
+            justify-items: center;
+            object-fit: cover;
+            border-radius: 8px; /* tuỳ chọn nếu bạn muốn bo góc */
+        }
+
+    </style>
+</head>
+<body>
+<div layout:fragment="khachhangcontent" class="max-w-7xl mx-auto p-6">
+
+    <div class="grid grid-cols-12 gap-6">
+        <!-- Bộ lọc -->
+        <aside class="col-span-3 bg-white p-4 shadow rounded">
+            <h2 class="text-lg font-bold mb-4">Bộ lọc</h2>
+            <form th:action="@{/khach-hang/san-pham/loc}" method="get" class="space-y-4">
+                <div>
+                    <label class="block font-semibold">Loại sản phẩm:</label>
+                    <select name="loai" class="w-full border rounded p-2">
+                        <option value="">Tất cả</option>
+                        <option th:each="loai : ${dsLoai}" th:value="${loai.id}" th:text="${loai.tenLoaiSanPham}"
+                                th:selected="${loai.id == loaiId}"
+                        ></option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block font-semibold">Thương hiệu:</label>
+                    <select name="thuonghieu" class="w-full border rounded p-2">
+                        <option value="">Tất cả</option>
+                        <option th:each="th : ${dsThuongHieu}" th:value="${th.id}" th:text="${th.tenThuongHieu}"
+                                th:selected="${th.id == thuongHieuId}"
+                        ></option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block font-semibold">Xuất xứ:</label>
+                    <select name="xuatxu" class="w-full border rounded p-2">
+                        <option value="">Tất cả</option>
+                        <option th:each="xx : ${dsXuatXu}" th:value="${xx.id}" th:text="${xx.noiXuatXu}"
+                                th:selected="${xx.id == xuatXuId}"
+                        ></option>
+                    </select>
+                </div>
+
+                <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700">Lọc</button>
+            </form>
+        </aside>
+
+        <!-- Danh sách sản phẩm -->
+        <section class="col-span-9">
+            <h2 class="text-xl font-bold mb-4">Sản phẩm</h2>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                <div th:each="sp : ${danhSachSanPham}" class="border rounded shadow hover:shadow-lg overflow-hidden">
+<!--                    <img th:src="@{${sp.sanPhamChiTietList[0].anh}}" alt="Ảnh sản phẩm" class="w-full h-48 object-cover"/>-->
+                    <div class="p-4">
+                        <img th:if="${mapAnhDau[sp.id] != null}"
+                             th:src="@{${mapAnhDau[sp.id].url}}"
+                             class="square-img"/>
+                        <a th:href="@{'/khach-hang/san-pham/' + ${sp.id}}" class="block p-4 hover:bg-gray-100 rounded">
+                            <h3 class="text-lg font-semibold" th:text="${sp.tenSanPham}">Tên sản phẩm</h3>
+                            <!-- <p class="text-red-600 font-bold mt-2" th:text="${#numbers.formatDecimal(sp.sanPhamChiTietList[0].giaBan, 0, 'COMMA', '.', '') + ' đ'}">Giá</p> -->
+                            <p class="text-blue-500 text-sm">Xem chi tiết</p>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+</body>
+</html>

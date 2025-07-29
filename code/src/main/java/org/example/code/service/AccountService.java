@@ -139,8 +139,7 @@ public class AccountService {
     public void LoginWithGG(Authentication authentication) {
         OAuth2User oauthUser = (OAuth2User) authentication.getPrincipal();
         String email = oauthUser.getAttribute("email");
-
-        Optional<?> existingUser = Optional.ofNullable(accountRepository.findByEmail(email));
+        Optional<KhachHang> existingUser = accountRepository.findByEmail(email);
         if (existingUser.isEmpty()) {
             // Tạo mới user trong database
             KhachHang newUser = new KhachHang();
@@ -150,13 +149,18 @@ public class AccountService {
             newUser.setHoTen(oauthUser.getAttribute("name"));
             newUser.setSoDT(oauthUser.getAttribute("phone_number")); // Nếu có
             newUser.setNgaySinh(oauthUser.getAttribute("birthdate")); // Nếu có
+            accountRepository.save(newUser);
             // tạo giỏ hàng
             GioHang gioHang = new GioHang();
             LocalDate now = LocalDate.now();
             gioHang.setIdKhachhang(newUser);
             gioHang.setNgayTao(now);
             gioHangService.add(gioHang);
-            accountRepository.save(newUser);
+
+            System.out.println("New user created: " + newUser.getEmail());
+        }else {
+            System.out.println("oi oi oi" + existingUser.get());
         }
+        System.out.println("thanh cong");
     }
 }

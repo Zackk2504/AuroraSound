@@ -3,11 +3,86 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{admin/index}">
 <head>
-    <title>Trang chính</title>
+    <title>Quản lý loại sản phẩm</title>
 </head>
 <body>
 <div layout:fragment="content">
-    LoaiSanPham
+    <div class="container mt-4">
+        <h2 class="mb-4">Thêm / Sửa loại sản phẩm</h2>
+
+        <form th:action="@{/admin/loai-san-pham/save}" method="post" th:object="${loai}">
+            <input type="hidden" th:field="*{id}" />
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label">Mã loại</label>
+                    <input type="text" class="form-control" th:field="*{maLoaiSanPham}" required>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Tên loại</label>
+                    <input type="text" class="form-control" th:field="*{tenLoaiSanPham}" required>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Trạng thái</label>
+                    <select class="form-select" th:field="*{trangThai}" required>
+                        <option value="true">Hoạt động</option>
+                        <option value="false">Ngưng</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="mt-4">
+                <button type="submit" class="btn btn-success">Lưu</button>
+            </div>
+        </form>
+
+        <hr class="my-5">
+        <h3 class="mb-3">Danh sách loại sản phẩm</h3>
+
+        <table class="table table-bordered table-hover">
+            <thead class="table-dark">
+            <tr>
+                <th>ID</th>
+                <th>Mã</th>
+                <th>Tên</th>
+                <th>Trạng thái</th>
+                <th>Hành động</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="loai : ${dsLoai}">
+                <td th:text="${loai.id}"></td>
+                <td th:text="${loai.maLoaiSanPham}"></td>
+                <td th:text="${loai.tenLoaiSanPham}"></td>
+                <td>
+                    <span class="badge bg-success" th:if="${loai.trangThai}">Hoạt động</span>
+                    <span class="badge bg-secondary" th:if="${!loai.trangThai}">Ngưng</span>
+                </td>
+                <td>
+                    <a th:href="@{/admin/loai-san-pham/edit/{id}(id=${loai.id})}" class="btn btn-primary btn-sm">Sửa</a>
+<!--                    <a th:href="@{/loai-san-pham/delete/{id}(id=${loai.id})}" class="btn btn-danger btn-sm" onclick="return confirm('Xác nhận xóa?')">Xóa</a>-->
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+        <!-- Phân trang -->
+        <nav th:if="${dsLoaiPage.totalPages > 1}" aria-label="Phân trang">
+            <ul class="pagination">
+                <li class="page-item" th:classappend="${dsLoaiPage.first} ? 'disabled'">
+                    <a class="page-link" th:href="@{/loai-san-pham(page=${dsLoaiPage.number - 1})}">Trước</a>
+                </li>
+                <li class="page-item" th:each="i : ${#numbers.sequence(0, dsLoaiPage.totalPages - 1)}"
+                    th:classappend="${dsLoaiPage.number == i} ? 'active'">
+                    <a class="page-link" th:href="@{/loai-san-pham(page=${i})}" th:text="${i + 1}"></a>
+                </li>
+                <li class="page-item" th:classappend="${dsLoaiPage.last} ? 'disabled'">
+                    <a class="page-link" th:href="@{/loai-san-pham(page=${dsLoaiPage.number + 1})}">Tiếp</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
 </div>
 </body>
 </html>

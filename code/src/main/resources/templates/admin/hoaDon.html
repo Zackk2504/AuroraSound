@@ -32,8 +32,8 @@
                 <td>
                     <button class="btn btn-sm btn-primary" data-bs-toggle="modal"
                             th:attr="data-bs-target='#modalChiTiet_' + ${hd.id}">Chi tiết</button>
-
-                    <a th:href="@{'/admin/hoa-don/pdf/' + ${hd.id}}"
+                    <a  class="btn btn-sm btn-warning" th:href="@{'/ban-hang-tai-quay/hoa-don/chi-tiet/' + ${hd.id}}"></a>
+                    <a th:href="@{'/ban-hang-tai-quay/hoa-don/pdf/' + ${hd.id}}"
                        class="btn btn-sm btn-success" target="_blank">In</a>
                 </td>
             </tr>

@@ -47,52 +47,66 @@
 
             <!-- Thông tin sản phẩm -->
             <div class="col-md-7">
-                <h3 th:text="${sp.tenSanPham}">Tên sản phẩm</h3>
+                <!-- TÊN SẢN PHẨM NỔI BẬT HƠN -->
+                <h1 th:text="${sp.tenSanPham}"
+                    class="display-5 fw-bold text-primary mb-4 border-bottom pb-2">
+                    Tên sản phẩm
+                </h1>
+
+                <!-- THÔNG TIN CƠ BẢN -->
                 <p><strong>Thương hiệu:</strong> <span th:text="${sp.idThuonghieu.tenThuongHieu}"></span></p>
                 <p><strong>Loại sản phẩm:</strong> <span th:text="${sp.idLoaisanpham.tenLoaiSanPham}"></span></p>
                 <p><strong>Xuất xứ:</strong> <span th:text="${sp.idXuatxu.noiXuatXu}"></span></p>
 
-                <!-- Màu sắc -->
-                <div class="mb-3">
-                    <h5>Chọn màu sắc:</h5>
-                    <div id="mauOptions">
-                <span th:each="ten : ${mauSacList}" class="option-btn"
-                      th:data-value="${ten.id}" th:text="${ten.tenMauSac}" onclick="chonMau(this)">
-                </span>
+                <!-- MÀU SẮC -->
+                <div class="mb-4">
+                    <h5 class="mb-2">Chọn màu sắc:</h5>
+                    <div id="mauOptions" class="d-flex flex-wrap gap-2">
+            <span th:each="ten : ${mauSacList}" class="option-btn btn btn-outline-secondary"
+                  th:data-value="${ten.id}" th:text="${ten.tenMauSac}" onclick="chonMau(this)">
+            </span>
                     </div>
                 </div>
 
-                <!-- Phiên bản -->
-                <div class="mb-3">
-                    <h5>Chọn phiên bản:</h5>
-                    <div id="phienbanOptions">
-                <span th:each="ten : ${phienBanList}" class="option-btn"
-                      th:data-value="${ten.id}" th:text="${ten.tenPhienBan}" onclick="chonPhienBan(this)">
-                </span>
+                <!-- PHIÊN BẢN -->
+                <div class="mb-4">
+                    <h5 class="mb-2">Chọn phiên bản:</h5>
+                    <div id="phienbanOptions" class="d-flex flex-wrap gap-2">
+            <span th:each="ten : ${phienBanList}" class="option-btn btn btn-outline-secondary"
+                  th:data-value="${ten.id}" th:text="${ten.tenPhienBan}" onclick="chonPhienBan(this)">
+            </span>
                     </div>
                 </div>
 
+                <!-- SỐ LƯỢNG CÒN -->
+                <div class="mb-3">
+                    <h5>Số lượng còn lại:</h5>
+                    <p id="soLuongConLai" class="fs-5 fw-semibold text-muted">Vui lòng chọn màu và phiên bản</p>
+                </div>
 
-                <!-- Giá -->
+                <!-- GIÁ -->
                 <div class="mb-3">
                     <h5>Giá:</h5>
                     <p id="giaSanPham" class="fs-4 text-danger fw-bold">Vui lòng chọn đủ màu và phiên bản</p>
                 </div>
 
+                <!-- SỐ LƯỢNG -->
                 <div class="mt-4">
                     <label for="soLuong">Số lượng:</label>
                     <input type="number" id="soLuong" name="soLuong" min="1" value="1" class="form-control w-25">
                 </div>
 
-                <!-- Nút thao tác -->
-                <div class="mt-4">
-                    <button class="btn btn-outline-danger" id="btnThemGio" disabled onclick="themVaoGio()" ><i class="bi bi-cart-plus"></i> Thêm vào giỏ</button>
+                <!-- NÚT -->
+                <div class="mt-4 d-flex gap-3">
+                    <button class="btn btn-outline-danger" id="btnThemGio" disabled onclick="themVaoGio()">
+                        <i class="bi bi-cart-plus"></i> Thêm vào giỏ
+                    </button>
                     <button class="btn btn-danger" id="btnMuaNgay" disabled>Mua ngay</button>
                 </div>
             </div>
-        </div>
 
-        <hr class="my-4">
+
+            <hr class="my-4">
 
         <!-- Mô tả -->
         <div>
@@ -126,25 +140,30 @@
             const giaEl = document.getElementById('giaSanPham');
             const btnThem = document.getElementById('btnThemGio');
             const btnMua = document.getElementById('btnMuaNgay');
+            const soLuongConLaiEl = document.getElementById('soLuongConLai'); // Thêm dòng này
 
             if (selectedMauId && selectedPhienbanId) {
                 const sp = chiTietList.find(ct =>
                     ct.idMausac.id == selectedMauId && ct.idPhienban.id == selectedPhienbanId);
                 if (sp) {
                     giaEl.textContent = sp.donGia.toLocaleString('vi-VN') + ' ₫';
+                    soLuongConLaiEl.textContent = sp.soLuongTon + " sản phẩm";
                     btnThem.disabled = false;
                     btnMua.disabled = false;
                 } else {
                     giaEl.textContent = 'Không tìm thấy phiên bản phù hợp';
+                    soLuongConLaiEl.textContent = 'Không rõ số lượng';
                     btnThem.disabled = true;
                     btnMua.disabled = true;
                 }
             } else {
                 giaEl.textContent = 'Vui lòng chọn đủ màu và phiên bản';
+                soLuongConLaiEl.textContent = 'Vui lòng chọn màu và phiên bản';
                 btnThem.disabled = true;
                 btnMua.disabled = true;
             }
         }
+
         function capNhatGioHangBadge() {
             fetch('/khach-hang/gio-hang/so-luong')
                 .then(res => res.json())

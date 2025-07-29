@@ -7,6 +7,6 @@ import org.springframework.data.repository.query.Param;
 
 public interface GioHangRepository extends JpaRepository<GioHang, Integer> {
     GioHang findByIdKhachhang_Id(Integer khachHangId);
-    @Query("SELECT COUNT(DISTINCT ct.idSanphamchitiet.id) FROM GioHangChiTiet ct WHERE ct.idGiohang.idKhachhang.tenDangNhap = :tenDangNhap")
-    Long demSoSanPhamTheoTenDangNhap( String tenDangNhap);
+    @Query("SELECT COUNT(DISTINCT ct.idSanphamchitiet.id) FROM GioHangChiTiet ct WHERE ct.idGiohang.idKhachhang.email = :email")
+    Long demSoSanPhamTheoTenDangNhap( String email);
 }

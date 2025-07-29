@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Nationalized;
 
+import java.math.BigDecimal;
+
 @Getter
 @Setter
 @Entity
@@ -37,7 +39,7 @@ public class SanPhamChiTiet {
     private Integer soLuongTon;
 
     @Column(name = "donGia")
-    private Double donGia;
+    private BigDecimal donGia;
 
     @Nationalized
     @Lob
