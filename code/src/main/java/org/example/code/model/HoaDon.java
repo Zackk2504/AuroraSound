@@ -6,6 +6,7 @@ import lombok.Setter;
 import org.hibernate.annotations.Nationalized;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -30,7 +31,7 @@ public class HoaDon {
     private Voucher idVoucher;
 
     @Column(name = "giaTriThanhToan")
-    private Double giaTriThanhToan;
+    private BigDecimal giaTriThanhToan;
 
     @Column(name = "thanhTien")
     private BigDecimal thanhTien;
@@ -69,4 +70,10 @@ public class HoaDon {
     @Nationalized
     @Column(name = "sdtNguoiMua", length = 100)
     private String sdtNguoiMua;
+
+    @Column(name = "tienship")
+    private BigDecimal tienship;
+
+    @Column(name = "ngayTao")
+    private LocalDateTime ngayTao;
 }

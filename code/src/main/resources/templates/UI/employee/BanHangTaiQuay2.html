@@ -31,7 +31,7 @@
         }
 
         .voucher-scroll {
-            max-height: 200px;
+            max-height: 400px;
             overflow-y: auto;
         }
 
@@ -54,21 +54,24 @@
 <div class="container-fluid mt-3">
     <div class="mt-3">
         <h5>Quét sản phẩm</h5>
-<!--        <div id="qr-reader" style="width: 300px;"></div>-->
-        <div id="qr-reader" hidden></div>
+        <div id="qr-reader" style="width: 300px;"></div>
+<!--        <div id="qr-reader" hidden></div>-->
     </div>
     <div class="row">
-        <!-- Danh sách sản phẩm -->
-        <div class="col-md-8">
+            <!-- Cột bên trái: Danh sách sản phẩm -->
+        <div class="container-fluid mt-3">
             <h4>Danh sách sản phẩm</h4>
             <h5>Hóa đơn chờ</h5>
             <ul class="nav nav-tabs mb-3">
                 <li class="nav-item" th:each="hd : ${listHoaDonCho}">
                     <a class="nav-link"
                        th:classappend="${hd.id == idHoaDon} ? 'active'"
-                       th:href="@{/ban-hang-tai-quay(idhd=${hd.id})}">
+                       th:href="@{/ban-hang-tai-quay(idhd=${hd.id})}"
+                       th:onclick="'luuIdHoaDon('+ ${hd.id} +')'"
+                    >
                         HD #[[${hd.id}]]
                     </a>
+                    <input type="hidden" th:if="${hd.id == idHoaDon}" th:value="${hd.id}" id="idhddangchon" />
                 </li>
                 <li class="nav-item">
                     <form th:action="@{/ban-hang-tai-quay/tao-moi}" method="post">
@@ -76,60 +79,81 @@
                     </form>
                 </li>
             </ul>
-            <input type="text" id="searchInput" class="form-control mb-3" placeholder="Tìm sản phẩm...">
-            <div class="row" id="product-list">
-                <div th:each="sp : ${ListSanPham}" class="col-md-4">
-                    <form th:action="@{/ban-hang-tai-quay/addsp}" method="post">
-                        <input type="hidden" name="idSanPham" th:value="${sp.id}" />
-                        <input type="hidden" name="soLuong" value="1" />
-                        <input type="hidden" name="idhd" th:value="${idHoaDon}" />
-                        <button type="submit" class="product-card w-100 text-start border-0">
-                            <!--                            <img th:src="@{${sp.hinhAnh}}" class="img-fluid mb-2" alt="Ảnh sản phẩm">-->
-                            <div><strong th:text="${sp.idSanpham.tenSanPham}">Tên sản phẩm</strong></div>
-                            <div class="text-muted" th:text="${sp.donGia } + '₫'">Giá</div>
-                            <div class="text-muted" th:text="${sp.soLuongTon } + ' sản phẩm còn' ">Số lượng</div>
-                        </button>
-                    </form>
-                </div>
-            </div>
-        </div>
 
-        <!-- Giỏ hàng (Hóa đơn chi tiết) -->
-        <div class="col-md-4 scrollable-panel">
-            <h4>Hóa đơn hiện tại</h4>
-            <div class="cart-summary">
-                <!-- Tổng cộng và hủy -->
-                <hr>
-                <div class="d-flex justify-content-between">
-                    <strong>Tổng cộng:</strong>
-                    <span th:text="${tongTien} + '₫'">0₫</span>
-                </div>
-                <div class="voucher-scroll mt-4">
-                    <h5>Voucher áp dụng</h5>
-                    <div th:each="vc : ${dsVoucherDangHoatDong}" class="voucher-item">
-                        <div th:if="${hoaDon.idVoucher != null and hoaDon.idVoucher.id != null and vc.id == hoaDon.idVoucher.id}">
-                            <strong th:text="${vc.tenVoucher}">Tên voucher</strong><br>
-                            <small th:text="'Giảm: ' + ${vc.giaTriVoucher} + '%'"></small><br>
-                            <button class="btn btn-sm btn-secondary mt-1" disabled>Đã áp dụng</button>
+            <!-- HÀNG CHỨA 2 CỘT TRÁI - PHẢI -->
+            <div class="row">
+                <input type="text" id="searchInput" class="form-control mb-3" placeholder="Tìm sản phẩm...">
+                <!-- CỘT TRÁI: Danh sách sản phẩm -->
+                <div class="col-md-7">
+                    <div class="row mb-3">
+                        <div class="col-md-3">
+                            <select class="form-select" id="filterMauSac">
+                                <option value="">-- Màu sắc --</option>
+                                <option th:each="m : ${dsMauSac}" th:value="${m.id}" th:text="${m.tenMauSac}"></option>
+                            </select>
                         </div>
-                        <div th:unless="${hoaDon.idVoucher != null and hoaDon.idVoucher.id != null and vc.id == hoaDon.idVoucher.id}">
-                            <form th:action="@{/ban-hang-tai-quay/them-voucher}" method="post">
-                                <input type="hidden" name="idhd" th:value="${idHoaDon}" />
-                                <input type="hidden" name="idVoucher" th:value="${vc.id}" />
-                                <strong th:text="${vc.tenVoucher}">Tên voucher</strong><br>
-                                <small th:text="'Giảm: ' + ${vc.giaTriVoucher} + '%'"></small><br>
-                                <button type="submit" class="btn btn-sm btn-outline-primary mt-1">Thêm</button>
-                            </form>
+                        <div class="col-md-3">
+                            <select class="form-select" id="filterPhienBan">
+                                <option value="">-- Phiên bản --</option>
+                                <option th:each="p : ${dsPhienBan}" th:value="${p.id}" th:text="${p.tenPhienBan}"></option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <select class="form-select" id="filterLoaiSanPham">
+                                <option value="">-- Loại sản phẩm --</option>
+                                <option th:each="p : ${dsPhienBan}" th:value="${p.id}" th:text="${p.tenPhienBan}"></option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <select class="form-select" id="filterThuongHieu">
+                                <option value="">-- Thương hiệu --</option>
+                                <option th:each="th : ${dsThuongHieu}" th:value="${th.id}" th:text="${th.tenThuongHieu}"></option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <select class="form-select" id="filterXuatXu">
+                                <option value="">-- Xuất xứ --</option>
+                                <option th:each="xx : ${dsXuatXu}" th:value="${xx.id}" th:text="${xx.noiXuatXu}"></option>
+                            </select>
                         </div>
                     </div>
-                </div>
-                <div class="mt-4">
-                    <h5>Sản phẩm trong hóa đơn</h5>
-                    <div th:each="ct : ${ListHoaDonChiTiet}" class="cart-item d-flex justify-content-between align-items-center">
-                        <div>
-                            <div>
-                                <strong th:text="${ct.idSanphamchitiet.idSanpham.tenSanPham}">Tên SP</strong>
+
+                    <!-- DANH SÁCH SẢN PHẨM DẠNG DÒNG -->
+                    <div id="product-list" class="list-group">
+                        <div style="max-height: 500px; overflow-y: auto;" class="border rounded p-2">
+                            <div th:each="sp : ${ListSanPham}" class="mb-2">
+                                <form th:action="@{/ban-hang-tai-quay/addsp}" method="post" class="d-flex justify-content-between align-items-center border-bottom pb-2">
+                                    <div>
+                                        <input type="hidden" name="idSanPham" th:value="${sp.id}" />
+                                        <input type="hidden" name="soLuong" value="1" />
+                                        <input type="hidden" name="idhd" th:value="${idHoaDon}" />
+
+                                        <strong th:text="${sp.idSanpham.tenSanPham} + ' - ' + ${sp.idPhienban.tenPhienBan} + ' - ' + ${sp.idMausac.tenMauSac}">Tên sản phẩm</strong><br>
+                                        <span th:text="${#utils.formatCurrency(sp.donGia)}">Giá</span> -
+                                        <small class="text-muted" th:text="${sp.soLuongTon} + ' sản phẩm còn'">Số lượng</small><br>
+                                        <span th:if="${sp.idSanpham != null and sp.idSanpham.idThuonghieu != null}"
+                                              th:text="'Thương hiệu: ' + ${sp.idSanpham.idThuonghieu.tenThuongHieu}">Thương hiệu</span>
+                                        <span th:if="${sp.idSanpham != null and sp.idSanpham.idXuatxu != null}"
+                                              th:text="' - Xuất xứ: ' + ${sp.idSanpham.idXuatxu.noiXuatXu}">Xuất xứ</span>
+                                    </div>
+                                    <button type="submit" class="btn btn-sm btn-primary ms-2">Thêm</button>
+                                </form>
                             </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="col-1 d-flex justify-content-center">
+                    <div style="width:1px; height: 100%; background-color: black;"></div>
+                </div>
+
+                <!-- CỘT PHẢI: Sản phẩm trong hóa đơn -->
+                <div class="col-md-4">
+                    <h5>Sản phẩm trong hóa đơn</h5>
+                    <div th:each="ct : ${ListHoaDonChiTiet}" class="cart-item d-flex justify-content-between align-items-center mb-2">
+                        <div>
+                            <div><strong th:text="${ct.idSanphamchitiet.idSanpham.tenSanPham}">Tên SP</strong></div>
                             <div class="d-flex align-items-center mt-1">
                                 <!-- Nút trừ -->
                                 <form th:action="@{/ban-hang-tai-quay/addsp}" method="post" class="me-2">
@@ -159,92 +183,194 @@
                                 </form>
                             </div>
                         </div>
-                        <div th:text="${ct.soLuong * ct.donGia} + '₫'">0₫</div>
+                        <div th:text="${#utils.formatCurrency(ct.donGia * ct.soLuong)} ">0₫</div>
                     </div>
                 </div>
+
+            </div> <!-- END ROW -->
+        </div> <!-- END CONTAINER -->
+
+
+    </div> <!-- kết thúc .row -->
+    </div> <!-- kết thúc .container-fluid -->
+
+        <!-- Giỏ hàng (Hóa đơn chi tiết) -->
+        <div class=" scrollable-panel ">
+            <h4>Thông tin thanh toán</h4>
+            <div class="cart-summary">
                 <!-- Form thanh toán: được chuyển xuống đây, thay vì trong modal -->
-                <form id="formThanhToan" th:action="@{/ban-hang-tai-quay/thanhtoan/{idhd}(idhd=${idHoaDon})}" method="post" class="mt-3">
+                <form id="formThanhToan" th:action="@{/ban-hang-tai-quay/thanhtoan/{idhd}(idhd=${idHoaDon})}" method="post" class="row">
                     <h5>Thông tin thanh toán</h5>
 
                     <!-- Tabs -->
-                    <ul class="nav nav-tabs" id="thanhToanTab" role="tablist">
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link active" id="mua-tab" data-bs-toggle="tab" data-bs-target="#mua" type="button" role="tab">
-                                Mua hàng
-                            </button>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="nhan-tab" data-bs-toggle="tab" data-bs-target="#nhan" type="button" role="tab">
-                                Nhận hàng
-                            </button>
-                        </li>
-                    </ul>
+                    <div class="col-md-8">
+                        <ul class="nav nav-tabs" id="thanhToanTab" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="mua-tab" data-bs-toggle="tab" data-bs-target="#mua" type="button" role="tab">
+                                    Mua hàng
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="nhan-tab" data-bs-toggle="tab" data-bs-target="#nhan" type="button" role="tab">
+                                    Giao hàng
+                                </button>
+                            </li>
+                        </ul>
+                        <!-- Tab content -->
+                        <div class="tab-content p-3">
+                            <!-- Mua hàng -->
+                            <div class="tab-pane active" id="mua" role="tabpanel" aria-labelledby="mua-tab">
+                                <div class="mb-3">
+                                    <div class="col-sm-6">
+                                        <label for="sdtCheck" class="form-label">SĐT khách hàng</label>
+                                        <input type="text" class="form-control" id="sdtCheck" placeholder="Nhập số điện thoại...">
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <button type="button" class="btn btn-primary" onclick="timKhachHang()">Tìm</button>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="tenNguoiMua" class="form-label">Tên người mua</label>
+                                    <input type="text" class="form-control" id="tenNguoiMua" name="tenNguoiMua">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="sdtNguoiMua" class="form-label">Số điện thoại người mua</label>
+                                    <input type="tel" class="form-control" id="sdtNguoiMua" name="sdtNguoiMua">
+                                </div>
+                                <div class="mt-4">
+                                    <label class="form-label">Hình thức thanh toán</label>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="hinhThucThanhToan" id="tienMat" value="TIEN_MAT" checked>
+                                        <label class="form-check-label" for="tienMat">Tiền mặt</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="hinhThucThanhToan" id="chuyenKhoan" value="CHUYEN_KHOAN">
+                                        <label class="form-check-label" for="chuyenKhoan">Chuyển khoản</label>
+                                    </div>
+                                </div>
+                            </div>
 
-                    <!-- Tab content -->
-                    <div class="tab-content p-3">
-                        <!-- Mua hàng -->
-                        <div class="tab-pane active" id="mua" role="tabpanel" aria-labelledby="mua-tab">
-                            <div class="mb-3">
-                                <div class="col-sm-6">
-                                    <label for="sdtCheck" class="form-label">SĐT khách hàng</label>
-                                    <input type="text" class="form-control" id="sdtCheck" placeholder="Nhập số điện thoại...">
+                            <!-- Nhận hàng -->
+                            <div class="tab-pane" id="nhan" role="tabpanel" aria-labelledby="nhan-tab">
+                                <p>* Khách lấy hàng tại quầy không cần nhập</p>
+                                <div class="mb-3">
+                                    <label for="tenNguoiNhan" class="form-label">Tên người nhận</label>
+                                    <input type="text" class="form-control" id="tenNguoiNhan" name="tenNguoiNhan">
                                 </div>
-                                <div class="col-sm-3">
-                                    <button type="button" class="btn btn-primary" onclick="timKhachHang()">Tìm</button>
+                                <div class="mb-3">
+                                    <label for="sdtNguoiNhan" class="form-label">Số điện thoại người nhận</label>
+                                    <input type="tel" class="form-control" id="sdtNguoiNhan" name="sdtNguoiNhan">
                                 </div>
-                            </div>
-                            <div class="mb-3">
-                                <label for="tenNguoiMua" class="form-label">Tên người mua</label>
-                                <input type="text" class="form-control" id="tenNguoiMua" name="tenNguoiMua">
-                            </div>
-                            <div class="mb-3">
-                                <label for="sdtNguoiMua" class="form-label">Số điện thoại người mua</label>
-                                <input type="tel" class="form-control" id="sdtNguoiMua" name="sdtNguoiMua">
-                            </div>
-                            <div class="mt-4">
-                                <label class="form-label">Hình thức thanh toán</label>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="hinhThucThanhToan" id="tienMat" value="TIEN_MAT" checked>
-                                    <label class="form-check-label" for="tienMat">Tiền mặt</label>
+                                <div class="mb-3">
+                                    <label class="form-label">Địa chỉ người nhận</label>
+                                    <select id="province" class="form-select mt-2"></select>
+                                    <select id="district" class="form-select mt-2"></select>
+                                    <select id="ward" class="form-select mt-2"></select>
+                                    <input type="text" class="form-control mb-2" id="chiTietDiaChi" placeholder="Số nhà, đường..." />
+                                    <input type="hidden" name="diaChiNguoiNhan" id="diaChiNguoiNhan" />
                                 </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="hinhThucThanhToan" id="chuyenKhoan" value="CHUYEN_KHOAN">
-                                    <label class="form-check-label" for="chuyenKhoan">Chuyển khoản</label>
+                                <div class="mb-3">
+                                    <label>Ghi chú</label>
+                                    <input name="ghiChu" type="text">
                                 </div>
-                            </div>
-                        </div>
-
-                        <!-- Nhận hàng -->
-                        <div class="tab-pane" id="nhan" role="tabpanel" aria-labelledby="nhan-tab">
-                            <p>* Khách lấy hàng tại quầy không cần nhập</p>
-                            <div class="mb-3">
-                                <label for="tenNguoiNhan" class="form-label">Tên người nhận</label>
-                                <input type="text" class="form-control" id="tenNguoiNhan" name="tenNguoiNhan">
-                            </div>
-                            <div class="mb-3">
-                                <label for="sdtNguoiNhan" class="form-label">Số điện thoại người nhận</label>
-                                <input type="tel" class="form-control" id="sdtNguoiNhan" name="sdtNguoiNhan">
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Địa chỉ người nhận</label>
-                                <select id="province" class="form-select mt-2"></select>
-                                <select id="district" class="form-select mt-2"></select>
-                                <select id="ward" class="form-select mt-2"></select>
-                                <input type="text" class="form-control mb-2" id="chiTietDiaChi" placeholder="Số nhà, đường..." />
-                                <input type="hidden" name="diaChiNguoiNhan" id="diaChiNguoiNhan" />
                             </div>
                         </div>
                     </div>
-                    <a type="button" class="btn btn-success mt-3 btn-pay" th:href="@{/ban-hang-tai-quay/delete/{idhd}(idhd=${idHoaDon})}"> Hủy hóa đơn</a>
-                    <button type="button" class="btn btn-primary w-100 "  onclick="hienXacNhanThanhToan()">Xác nhận thanh toán</button>
+
+                    <div class="col-md-4">
+                        <h5>Voucher áp dụng</h5>
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#voucherModal">
+                            Chọn mã giảm giá
+                        </button>
+                        <!-- Modal -->
+                        <div class="modal fade" id="voucherModal" tabindex="-1" aria-labelledby="voucherModalLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-lg modal-dialog-scrollable">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="voucherModalLabel">Chọn mã giảm giá</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+                                    </div>
+                                    <div class="modal-body voucher-scroll ">
+                                        <!-- Danh sách voucher -->
+                                        <div th:each="vc : ${dsVoucherDangHoatDong}" class="voucher-item mb-3 p-2 border rounded">
+                                            <div th:if="${hoaDon.idVoucher != null and hoaDon.idVoucher.id != null and vc.id == hoaDon.idVoucher.id}">
+                                                <strong th:text="${vc.tenVoucher}">Tên voucher</strong><br>
+                                                <small>
+                                                    Giảm:
+                                                    <span th:if="${vc.kieuGiam == 'phan_tram'}" th:text="${vc.giaTriVoucher + '%'}"></span>
+                                                    <span th:if="${vc.kieuGiam == 'tien_mat'}" th:text="${#utils.formatCurrency(vc.giaTriVoucher)}"></span>
+                                                    - Giảm tối đa <span th:text="${#utils.formatCurrency(vc.giaTriToiDaVoucher)}"></span>
+                                                </small><br>
+                                                <small th:text="'Điều kiện áp dụng : ' + ${#utils.formatCurrency(vc.giaTriToiThieuApDung)} + ' - ' + ${#utils.formatCurrency(vc.giaTriToiDaApDung)}"></small><br>
+                                                <small th:text = "'Số lượng còn lại: ' + ${vc.soLuongConLai}">0</small>
+                                                <button class="btn btn-sm btn-secondary mt-1" disabled>Đã áp dụng</button>
+                                            </div>
+                                            <div th:unless="${hoaDon.idVoucher != null and hoaDon.idVoucher.id != null and vc.id == hoaDon.idVoucher.id}">
+
+                                                    <input type="hidden" name="idhd" th:value="${idHoaDon}" />
+                                                    <input type="hidden" name="idVoucher" th:value="${vc.id}" />
+                                                    <strong th:text="${vc.tenVoucher}">Tên voucher</strong><br>
+                                                <small>
+                                                    Giảm:
+                                                    <span th:if="${vc.kieuGiam == 'phan_tram'}" th:text="${vc.giaTriVoucher + '%'}"></span>
+                                                    <span th:if="${vc.kieuGiam == 'tien_mat'}" th:text="${#utils.formatCurrency(vc.giaTriVoucher)}"></span>
+                                                    - Giảm tối đa <span th:text="${#utils.formatCurrency(vc.giaTriToiDaVoucher)}"></span>
+                                                </small>                  <br>
+                                                <small th:text="'Điều kiện áp dụng : ' + ${#utils.formatCurrency(vc.giaTriToiThieuApDung)} + ' - ' + ${#utils.formatCurrency(vc.giaTriToiDaApDung)}"></small><br>
+                                                    <small th:text = "'Số lượng còn lại: ' + ${vc.soLuongConLai}">0</small>
+                                                <button
+                                                        type="button"
+                                                        class="btn btn-sm btn-outline-primary mt-1"
+                                                        th:data-voucher-id="${vc.id}"
+                                                        th:data-hoa-don-id="${idHoaDon}"
+                                                        onclick="submitVoucher(this.getAttribute('data-voucher-id'), this.getAttribute('data-hoa-don-id'))">
+                                                    Thêm
+                                                </button>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between mb-2 mt-5">
+                            <strong class="me-3">Tổng cộng:</strong>
+                            <span th:text="${#utils.formatCurrency(tongTien)} ">0₫</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <strong class="me-3">Giảm giá:</strong>
+                            <span th:text="${#utils.formatCurrency(tienVoucher)} ">0₫</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <strong class="me-3"> Tiền ship:</strong>
+                            <div class="mb-3">
+                                <div id="shipping-fee" class="fw-bold">0 VND</div>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <strong class="me-3">Thành tiền:</strong>
+                            <span th:text="${#utils.formatCurrency(GiaTriThanhToan)}">0₫</span>
+                        </div>
+
+                        <button type="button" class="btn btn-primary w-100 "  onclick="hienXacNhanThanhToan()">Xác nhận thanh toán</button>
+                        <a type="button" class="btn btn-success mt-3 btn-pay" th:href="@{/ban-hang-tai-quay/delete/{idhd}(idhd=${idHoaDon})}"> Hủy hóa đơn</a>
+                    </div>
+
+
+
+
+
+
                 </form>
 
                 <!-- Danh sách sản phẩm trong hóa đơn (giữ nguyên đoạn này, nhưng di chuyển xuống dưới cùng) -->
             </div>
         </div>
 
-    </div>
-</div>
 
 <script src="https://unpkg.com/html5-qrcode"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -272,7 +398,10 @@
                         console.error("Không tìm thấy formThanhToan");
                     }
                 }
-
+            localStorage.removeItem("provinceCode");
+            localStorage.removeItem("districtCode");
+            localStorage.removeItem("wardCode");
+            localStorage.removeItem("diaChiMacDinh");
         });
     }
     document.querySelectorAll('.quantity-input').forEach(input => {
@@ -350,7 +479,7 @@
             return;
         }
 
-        fetch(`/khach-hang/tim-theo-sdt?sdt=${encodeURIComponent(sdt)}`)
+        fetch(`/nhan-vien/khach-hang/tim-theo-sdt?sdt=${encodeURIComponent(sdt)}`)
             .then(res => {
                 if (!res.ok) throw new Error("Không tìm thấy khách hàng.");
                 return res.json();
@@ -371,7 +500,12 @@
     const provinceSelect = document.getElementById("province");
     const districtSelect = document.getElementById("district");
     const wardSelect = document.getElementById("ward");
+    const idhd = document.getElementById("idhddangchon").value;
+    wardSelect.addEventListener('change', tinhPhiShip);
 
+    function luuIdHoaDon(id) {
+        localStorage.setItem("idHoaDonDangChon2", id);
+    }
     // Tải danh sách tỉnh
     fetch("https://provinces.open-api.vn/api/p/")
         .then(res => res.json())
@@ -384,10 +518,16 @@
                 provinceSelect.appendChild(opt);
                 console.log(`Tải tỉnh: ${p.name} (${p.code})`);
             });
+            const savedProvince = localStorage.getItem(`provinceCode_${idhd}`);
+            if (savedProvince) {
+                provinceSelect.value = savedProvince;
+                provinceSelect.dispatchEvent(new Event("change")); // Gọi lại để load huyện
+            }
         });
 
     // Khi chọn tỉnh thì load huyện
     provinceSelect.addEventListener("change", () => {
+        localStorage.setItem(`provinceCode_${idhd}`, provinceSelect.value);
         const provinceCode = provinceSelect.value;
         if (!provinceCode) return;
         fetch(`https://provinces.open-api.vn/api/p/${provinceCode}?depth=2`)
@@ -402,11 +542,17 @@
                     districtSelect.appendChild(opt);
                 });
                 capNhatDiaChi(); // cập nhật lại địa chỉ
+                const savedDistrict = localStorage.getItem(`districtCode_${idhd}`);
+                if (savedDistrict) {
+                    districtSelect.value = savedDistrict;
+                    districtSelect.dispatchEvent(new Event("change")); // Load xã
+                }
             });
     });
 
     // Khi chọn huyện thì load xã
     districtSelect.addEventListener("change", () => {
+        localStorage.setItem(`districtCode_${idhd}`, districtSelect.value);
         const districtCode = districtSelect.value;
         if (!districtCode) return;
         fetch(`https://provinces.open-api.vn/api/d/${districtCode}?depth=2`)
@@ -420,16 +566,32 @@
                     wardSelect.appendChild(opt);
                 });
                 capNhatDiaChi();
+                const savedWard = localStorage.getItem(`wardCode_${idhd}`);
+                if (savedWard) {
+                    wardSelect.value = savedWard;
+                    wardSelect.dispatchEvent(new Event("change")); // Cập nhật địa chỉ
+                }
             });
     });
 
-    // Khi chọn xã hoặc nhập địa chỉ cụ thể, tự động gộp địa chỉ đầy đủ
-    wardSelect.addEventListener("change", capNhatDiaChi);
+    // Khi chọn xã hoặc nhập địa chỉ cụ thể, tự động gộp địa chỉ đầy đủ;
+    wardSelect.addEventListener("change", () => {
+        localStorage.setItem(`wardCode_${idhd}`, wardSelect.value);
+        capNhatDiaChi();
+        // ...
+    });
+
     diaChiInput.addEventListener("blur", capNhatDiaChi);
+    window.addEventListener("DOMContentLoaded", function () {
+        const savedDiaChi = localStorage.getItem(`diaChiMacDinh_${idhd}`);
+        if (diaChiDaLuu) {
+            diaChiInput.value = diaChiDaLuu;
+        }
+    });
 
     function capNhatDiaChi() {
         const diaChiCuThe = document.getElementById("chiTietDiaChi").value.trim();
-
+        localStorage.setItem(`diaChiMacDinh_${idhd}`, document.getElementById("chiTietDiaChi").value);
         const tinh = provinceSelect.value
             ? provinceSelect.options[provinceSelect.selectedIndex].text
             : "";
@@ -446,7 +608,133 @@
         document.getElementById("diaChiNguoiNhan").value = full;
     }
 
+    document.querySelectorAll('#filterMauSac, #filterPhienBan, #filterThuongHieu, #filterXuatXu')
+        .forEach(select => {
+            select.addEventListener('change', loadFilteredProducts);
+        });
+
+    function formatCurrency(amount) {
+        if (!amount) return 'N/A';
+        return new Intl.NumberFormat('vi-VN', {
+            style: 'currency',
+            currency: 'VND',
+            minimumFractionDigits: 0
+        }).format(amount);
+    }
+
+    function submitVoucher(idVoucher, idHoaDon) {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '/ban-hang-tai-quay/them-voucher';
+
+        const inputVoucher = document.createElement('input');
+        inputVoucher.name = 'idVoucher';
+        inputVoucher.value = idVoucher;
+        inputVoucher.type = 'hidden';
+
+        const inputHd = document.createElement('input');
+        inputHd.name = 'idhd';
+        inputHd.value = idHoaDon;
+        inputHd.type = 'hidden';
+
+        form.appendChild(inputVoucher);
+        form.appendChild(inputHd);
+        document.body.appendChild(form);
+        form.submit();
+    }
+
+
+    function loadFilteredProducts() {
+        const mauSac = document.getElementById('filterMauSac').value;
+        const phienBan = document.getElementById('filterPhienBan').value;
+        const thuongHieu = document.getElementById('filterThuongHieu').value;
+        const xuatXu = document.getElementById('filterXuatXu').value;
+        const loaisanpham = document.getElementById('filterLoaiSanPham').value;
+
+        const query = new URLSearchParams({
+            mauSac,
+            phienBan,
+            thuongHieu,
+            xuatXu
+        });
+
+        fetch(`/ban-hang-tai-quay/loc-san-pham?${query}`)
+            .then(res => res.json())
+            .then(data => {
+                console.log("DATA:", data);
+                const listContainer = document.getElementById('product-list');
+                listContainer.innerHTML = ""; // Clear old list
+
+                if (data.length === 0) {
+                    listContainer.innerHTML = "<p class='text-muted'>Không có sản phẩm phù hợp.</p>";
+                    return;
+                }
+
+                data.forEach(sp => {
+                    const html = `
+<form action="/ban-hang-tai-quay/addsp" method="post" class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-2">
+    <div>
+        <input type="hidden" name="idSanPham" value="${sp.id || ''}">
+        <input type="hidden" name="soLuong" value="1">
+        <input type="hidden" name="idhd" value="${sp.idHoaDon || ''}">
+
+        <strong>${sp.tensanPham || 'Không rõ'} -  ${sp.tenPhienBan || 'Không rõ'} - ${sp.tenMau || 'Không rõ'} - ${sp.tenLoaiSanPham || 'Không rõ'}</strong><br>
+        <span>${formatCurrency(sp.gia)}</span> -
+        <small class="text-muted">${sp.soLuongTon} sản phẩm còn</small><br>
+        <span>Thương hiệu: ${sp.thuongHieu || 'Không rõ'} - Xuất xứ: ${sp.xuatXu || 'Không rõ'}</span>
+    </div>
+    <button type="submit" class="btn btn-sm btn-primary ms-2">Thêm</button>
+</form>
+`;
+                    listContainer.innerHTML += html;
+                });
+            });
+                }
+    function tinhPhiShip() {
+        // Kiểm tra nếu đã chọn đủ 3 cấp địa chỉ
+        if (!provinceSelect.value || !districtSelect.value || !wardSelect.value) return;
+
+        if (!idhd) {
+            console.error("Chưa có ID hóa đơn");
+            return;
+        }
+
+        const provinceCode = provinceSelect.value;
+        const districtCode = districtSelect.value;
+        const wardCode = wardSelect.value;
+        const weight = 1000; // Khối lượng mặc định (gram)
+
+        // Gọi API tính phí ship
+        fetch(`/ban-hang-tai-quay/calculate-fee/${idhd}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                province: provinceCode,
+                district: districtCode,
+                ward: wardCode,
+                weight: weight
+            })
+        })
+            .then(response => {
+                return response.text(); // <-- nhận BigDecimal dạng số thuần (plain text)
+            })
+            .then(fee => {
+                const feeNumber = Number(fee);
+                if (isNaN(feeNumber)) {
+                    throw new Error("Phí ship không hợp lệ: " + fee);
+                }
+                document.getElementById('shipping-fee').textContent = `${feeNumber.toLocaleString()} VND`;
+            })
+            .catch(error => {
+                alert("Không thể tính phí ship");
+                console.error(error);
+            });
+    }
+
 </script>
+
 </div>
 </body>
 </html>

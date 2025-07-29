@@ -16,11 +16,23 @@ public class DiaChi {
     private Integer id;
 
     @Nationalized
-    @Column(name = "soNha", length = 100)
-    private String soNha;
+    @Column(name = "diaChi", length = 100)
+    private String diaChi;
 
-    @Nationalized
-    @Column(name = "quanHuyenXaThanhPho")
-    private String quanHuyenXaThanhPho;
+    @Column(name = "province_id")
+    private Integer provinceId;
+
+    @Column(name = "district_id")
+    private Integer districtId;
+
+    @Column(name = "ward_code")
+    private Integer wardCode;
+
+    @Column(name = "macDinh")
+    private Boolean macdinh;
+
+    @JoinColumn(name = "ID_KhachHang", referencedColumnName = "id")
+    @ManyToOne(fetch = FetchType.EAGER)
+    private KhachHang khachHang;
 
 }

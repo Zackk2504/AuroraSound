@@ -5,6 +5,8 @@ import org.example.code.DTO.SanPhamDTO;
 import org.example.code.model.*;
 import org.example.code.repo.SanPhamRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -37,6 +39,14 @@ public class SanPhamService {
     @Autowired
     private XuatXuService xuatXuService;
 
+    public List<SanPham> locSanPham(Integer loaiId, Integer thuongHieuId, Integer xuatXuId) {
+        return sanPhamRepository.locSanPham(loaiId, thuongHieuId, xuatXuId);
+    }
+
+    public Page<SanPham> findByFilter(Integer loaiId, Integer thuongHieuId, Integer xuatXuId, String trangThai, Pageable pageable) {
+        return sanPhamRepository.search(
+                loaiId, thuongHieuId, xuatXuId, trangThai, pageable);
+    }
 
     public List<SanPham> getAllSanPhams() {
         return sanPhamRepository.findAll();

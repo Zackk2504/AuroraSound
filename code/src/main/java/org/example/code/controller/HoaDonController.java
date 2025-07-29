@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Controller
-@RequestMapping("/admin/hoa-don")
+@RequestMapping("/ban-hang-tai-quay/hoa-don")
 public class HoaDonController {
     @Autowired
     private HoaDonService hoaDonService;

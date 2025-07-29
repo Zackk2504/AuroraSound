@@ -6,10 +6,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.stereotype.Controller;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @Controller
 @RequestMapping("/khach-hang")
@@ -44,8 +47,14 @@ public class GioHangChiTietController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.isAuthenticated()
                 && !authentication.getPrincipal().equals("anonymousUser")) {
-            String username = authentication.getName();
-            return gioHangService.demTongSanPhamTrongGio(username);
+            String email = "";
+            if (authentication instanceof OAuth2AuthenticationToken) {
+                OAuth2AuthenticationToken oauthToken = (OAuth2AuthenticationToken) authentication;
+                Map<String, Object> attributes = oauthToken.getPrincipal().getAttributes();
+                email = (String) attributes.get("email");
+                System.out.println("Email: " + email);
+            }
+            return gioHangService.demTongSanPhamTrongGio(email);
         }
         return 0L;
     }

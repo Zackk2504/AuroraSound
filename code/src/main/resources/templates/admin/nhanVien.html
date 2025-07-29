@@ -9,51 +9,67 @@
 <div layout:fragment="content">
     <h1 class="text-center my-4">Quản lý nhân viên</h1>
     <div class="container">
-        <h2 class="mb-4">Thêm mới nhân viên</h2>
+        <button class="btn btn-primary mb-3" onclick="openAddModal()">Thêm Nhân Viên</button>
 
-        <form th:action="@{/admin/nhan-vien/create}" method="post" th:object="${nhanVien}">
-            <div class="row g-3">
-                <div class="col-md-6">
-                    <label class="form-label">Họ tên</label>
-                    <input type="text" class="form-control" th:field="*{hoTen}" required>
+        <!-- Modal Nhân Viên -->
+        <div class="modal fade" id="nhanVienModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <form id="nhanVienForm" method="post">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="modalTitle">Thêm Nhân Viên</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <input type="hidden" name="id" id="id"/>
+
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Họ tên</label>
+                                    <input type="text" class="form-control" name="hoTen" id="hoTen" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Giới tính</label>
+                                    <select class="form-select" name="gioiTinh" id="gioiTinh">
+                                        <option value="">Không muốn nói</option>
+                                        <option value="true">Nam</option>
+                                        <option value="false">Nữ</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Ngày sinh</label>
+                                    <input type="date" class="form-control" name="ngaySinh" id="ngaySinh" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Số điện thoại</label>
+                                    <input type="text" class="form-control" name="soDT" id="soDT" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Email</label>
+                                    <input type="email" class="form-control" name="email" id="email" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Địa chỉ</label>
+                                    <input type="text" class="form-control" name="diaChi" id="diaChi">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Trạng thái</label>
+                                    <select class="form-select" name="trangThai" id="trangThai">
+                                        <option value="true">Đang hoạt động</option>
+                                        <option value="false">Ngưng hoạt động</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer mt-3">
+                            <button type="submit" class="btn btn-success" id="submitBtn">Lưu</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                        </div>
+                    </form>
                 </div>
-
-                <div class="col-md-6">
-                    <label class="form-label">Giới tính</label>
-                    <select class="form-select" th:field="*{gioiTinh}">
-                        <option th:value="true">Nam</option>
-                        <option th:value="false">Nữ</option>
-                        <option th:value="null">Không muốn nói</option>
-                    </select>
-                </div>
-
-                <div class="col-md-6">
-                    <label class="form-label">Ngày sinh</label>
-                    <input type="date" class="form-control" th:field="*{ngaySinh}" required>
-                </div>
-
-                <div class="col-md-6">
-                    <label class="form-label">Số điện thoại</label>
-                    <input type="text" class="form-control" th:field="*{soDT}" required>
-                </div>
-
-                <div class="col-md-6">
-                    <label class="form-label">Email</label>
-                    <input type="email" class="form-control" th:field="*{email}" required>
-                </div>
-
-                <div class="col-md-6">
-                    <label class="form-label">Địa chỉ</label>
-                    <input type="text" class="form-control" th:field="*{diaChi}">
-                </div>
-
-
             </div>
+        </div>
 
-            <div class="mt-4">
-                <button type="submit" class="btn btn-success">Thêm mới</button>
-            </div>
-        </form>
 
         <hr class="my-5">
 
@@ -85,20 +101,21 @@
                     <span class="badge bg-secondary" th:unless="${nv.trangThai}">Ngưng</span>
                 </td>
                 <td>
-                    <a href="#" class="btn btn-primary btn-sm"
-                       th:attr="data-id=${nv.id},
-            data-hoTen=${nv.hoTen},
-            data-gioiTinh=${nv.gioiTinh},
-            data-ngaySinh=${nv.ngaySinh},
-            data-email=${nv.email},
-            data-soDT=${nv.soDT},
-            data-diaChi=${nv.diaChi},
-            data-trangThai=${nv.trangThai},
-            data-vaiTro=${nv.vaiTro.id}"
-                       data-bs-toggle="modal" data-bs-target="#editModal"
-                       onclick="fillModal(this)">
+                    <a class="btn btn-primary btn-sm"
+                       href="javascript:void(0);"
+                       th:attr="
+        data-id=${nv.id},
+        data-ho=${nv.hoTen},
+        data-gioi=${nv.gioiTinh},
+        data-ngay=${nv.ngaySinh},
+        data-email=${nv.email},
+        data-sdt=${nv.soDT},
+        data-diachi=${nv.diaChi},
+        data-trangthai=${nv.trangThai}"
+                       onclick="openEditModal(this)">
                         Sửa
                     </a>
+
                 </td>
             </tr>
             </tbody>
@@ -180,18 +197,47 @@
         </div>
     </div>
     <script>
-        function fillModal(button) {
-            const fields = ['id', 'hoTen', 'gioiTinh', 'ngaySinh', 'email', 'soDT', 'diaChi', 'trangThai', 'vaiTro'];
+        function openAddModal() {
+            document.getElementById("modalTitle").innerText = "Thêm Nhân Viên";
+            document.getElementById("submitBtn").innerText = "Thêm mới";
+            document.getElementById("nhanVienForm").action = "/admin/nhan-vien/add";
 
-            fields.forEach(field => {
-                const value = button.getAttribute(`data-${field}`);
-                const input = document.getElementById(`edit-${field}`);
-                if (input) {
-                    input.value = value ?? '';
-                }
-            });
+            // Clear form
+            ['id','hoTen','ngaySinh','soDT','email','diaChi'].forEach(id => document.getElementById(id).value = "");
+            document.getElementById("gioiTinh").value = "";
+            document.getElementById("trangThai").value = "true";
+
+            new bootstrap.Modal(document.getElementById("nhanVienModal")).show();
+        }
+
+        function openEditModal(btn) {
+            document.getElementById("modalTitle").innerText = "Chỉnh sửa Nhân Viên";
+            document.getElementById("submitBtn").innerText = "Cập nhật";
+
+            const id = btn.getAttribute("data-id");
+            const ho = btn.getAttribute("data-ho");
+            const gioi = btn.getAttribute("data-gioi");
+            const ngay = btn.getAttribute("data-ngay");
+            const email = btn.getAttribute("data-email");
+            const sdt = btn.getAttribute("data-sdt");
+            const diachi = btn.getAttribute("data-diachi");
+            const trangThai = btn.getAttribute("data-trangthai");
+
+            document.getElementById("id").value = id;
+            document.getElementById("hoTen").value = ho;
+            document.getElementById("gioiTinh").value = gioi;
+            document.getElementById("ngaySinh").value = ngay;
+            document.getElementById("email").value = email;
+            document.getElementById("soDT").value = sdt;
+            document.getElementById("diaChi").value = diachi;
+            document.getElementById("trangThai").value = trangThai;
+
+            document.getElementById("nhanVienForm").action = "/admin/nhan-vien/edit/" + id;
+
+            new bootstrap.Modal(document.getElementById("nhanVienModal")).show();
         }
     </script>
+
 
 </div>
 </body>

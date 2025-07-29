@@ -41,17 +41,18 @@ public class MauSacController {
         }
         return "admin/macSac"; // Assuming you have a Thymeleaf template named editMauSac.html
     }
-    @PostMapping("/mau-sac/edit?id={id}")
-    public String editMauSac(@ModelAttribute MauSac mauSac,@RequestParam Integer id) {
+    @PostMapping("/mau-sac/edit/{id}")
+    public String editMauSac(@ModelAttribute MauSac mauSac, @PathVariable Integer id) {
         Optional<MauSac> existingMauSac = mauSacService.getById(id);
         if (existingMauSac.isEmpty()) {
-            return "redirect:/mau-sac"; // Redirect if Mau Sac not found
+            return "redirect:/admin/mau-sac";
         }
         MauSac mauSac1 = existingMauSac.get();
         mauSac1.setMaMauSac(mauSac.getMaMauSac());
         mauSac1.setTenMauSac(mauSac.getTenMauSac());
         mauSac1.setTrangThai(mauSac.getTrangThai());
         mauSacService.save(mauSac1);
-        return "redirect:/admin/mau-sac"; // Redirect to the list page after editing
+        return "redirect:/admin/mau-sac";
     }
+
 }

@@ -13,6 +13,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -20,7 +22,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 
 @Configuration
 @EnableWebSecurity
@@ -37,44 +41,8 @@ public class SecurityConfig {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-
     @Bean
     @Order(1)
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .csrf().disable()
-                .securityMatcher("/khach-hang/**") // hoặc "/khach-hang/**", "/index", "/san-pham/**"...
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/index", "/khach-hang/login","/login", "/oauth2/**").permitAll()
-                                .requestMatchers("/khach-hang/**").hasRole("USER")
-//                        .anyRequest().authenticated()
-                )
-                .formLogin(form -> form
-                        .loginPage("/login")
-                        .loginProcessingUrl("/khach-hang/login")
-                        .defaultSuccessUrl("/index", true)
-                        .permitAll()
-                )
-                .logout(logout -> logout
-                        .logoutUrl("/khach-hang/logout") // URL để logout
-                        .logoutSuccessUrl("/index") // Sau khi logout sẽ chuyển về đây
-                        .invalidateHttpSession(true)
-                        .clearAuthentication(true)
-                        .deleteCookies("JSESSIONID")
-                )
-                .oauth2Login(oauth -> oauth
-                        .loginPage("/login")
-                                .successHandler((request, response, authentication) -> {
-                                    response.sendRedirect("/oauth2/success");
-                                }
-                        )
-                );
-
-        return http.build();
-    }
-
-    @Bean
-    @Order(2)
     public SecurityFilterChain nhanVienSecurity(HttpSecurity http) throws Exception {
         http
                 .csrf().disable()
@@ -82,7 +50,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/nhan-vien/login").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/ban-hang-tai-quay/**").hasAnyRole("ADMIN", "EMPLOYEE")
+                        .requestMatchers("/ban-hang-tai-quay/**","nhan-vien/**").hasAnyRole("ADMIN", "EMPLOYEE")
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
@@ -98,18 +66,46 @@ public class SecurityConfig {
         return http.build();
     }
     @Bean
-    @Order(3)
-    public SecurityFilterChain defaultSecurity(HttpSecurity http) throws Exception {
+    @Order(2)
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf().disable()
+//                .securityMatcher("/khach-hang/**") // hoặc "/khach-hang/**", "/index", "/san-pham/**"...
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/index", "/login", "/oauth2/**").permitAll()
-                        .anyRequest().authenticated()
-                );
+                                .requestMatchers("/verify/**","/register/**","/", "/index", "/login", "/oauth2/**","/error","/login/oauth2/**","/images/**","/shipping/**").permitAll()
+                                .requestMatchers("/khach-hang/**").hasRole("USER")
+//                        .anyRequest().authenticated()
+                )
+                .formLogin(form -> form
+                        .loginPage("/login")
+                        .loginProcessingUrl("/khach-hang/login")
+                        .defaultSuccessUrl("/index", true)
+                        .permitAll()
+                ).oauth2Login(oauth -> oauth
+                        .loginPage("/login")
+                       .userInfoEndpoint(userInfo -> userInfo
+                        .userService(customOAuth2UserService) // Bắt buộc dùng cái custom để tạo user mới
+                        .userAuthoritiesMapper(authorities -> {
+                            Set<GrantedAuthority> mapped = new HashSet<>();
+                            mapped.add(new SimpleGrantedAuthority("ROLE_USER")); // Gán tay
+                            return mapped;
+                        })
+                    )
+                        .successHandler((request, response, authentication) -> {
+                            response.sendRedirect("/oauth2/success");
+                        })
+                )
+                .logout(logout -> logout
+                        .logoutUrl("/khach-hang/logout") // URL để logout
+                        .logoutSuccessUrl("/index") // Sau khi logout sẽ chuyển về đây
+                        .invalidateHttpSession(true)
+                        .clearAuthentication(true)
+                        .deleteCookies("JSESSIONID")
+                )
+               ;
 
         return http.build();
     }
-
 
     @Bean
     public UserDetailsService userDetailsService() {
@@ -139,6 +135,7 @@ public class SecurityConfig {
             throw new UsernameNotFoundException("Không tìm thấy người dùng");
         };
     }
+
 
 }
 

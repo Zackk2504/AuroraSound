@@ -35,9 +35,10 @@ public class LoginController {
     }
 
     @GetMapping("/oauth2/success")
-    public ResponseEntity<?> handleOAuth2Success(Authentication authentication) {
+    public String handleOAuth2Success(Authentication authentication) {
         accountService.LoginWithGG(authentication);
-        return ResponseEntity.ok("Đăng nhập thành công!");
+        System.out.println("OAuth2 login successful: " + authentication.getPrincipal());
+        return "redirect:/index"; // Redirect to index page after successful login
     }
 
     @GetMapping("/logout")

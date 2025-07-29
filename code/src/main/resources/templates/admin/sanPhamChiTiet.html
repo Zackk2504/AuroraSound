@@ -23,8 +23,8 @@
                 <label class="form-label">Trạng thái</label>
                 <select class="form-select" th:field="*{trangThai}" required>
                     <option value="" disabled>-- Chọn trạng thái --</option>
-                    <option value="Hoạt động">Hoạt động</option>
-                    <option value="Ngưng">Ngưng</option>
+                    <option value="hoat_dong">Hoạt động</option>
+                    <option value="khong_hoat_dong" >Ngưng</option>
                 </select>
             </div>
 
@@ -58,17 +58,51 @@
             </div>
         </div>
         <hr>
+        <h4>Ảnh sản phẩm</h4>
+
+        <!-- 3 ô upload ảnh -->
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <img id="preview1" src="/images/default-image.jpg" class="img-thumbnail mb-2" style="max-height: 200px;">
+                        <div class="form-group">
+                            <label>Ảnh 1</label>
+                            <input type="file" name="productImages" class="form-control" accept="image/*" multiple>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <img id="preview2" src="/images/default-image.jpg" class="img-thumbnail mb-2" style="max-height: 200px;">
+                        <div class="form-group">
+                            <label>Ảnh 2</label>
+                            <input type="file" name="productImages" class="form-control" accept="image/*" multiple>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <img id="preview3" src="/images/default-image.jpg" class="img-thumbnail mb-2" style="max-height: 200px;">
+                        <div class="form-group">
+                            <label>Ảnh 3</label>
+                            <input type="file" name="productImages" class="form-control" accept="image/*" multiple>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <hr>
 
 
         <h4>Chọn màu sắc và kích cỡ</h4>
         <div class="row mb-3 p-3 bg-light rounded">
-            <div class="col-md-5">
-                <label for="chonPhienBan">Kích thước</label>
-                <select id="chonPhienBan" class="form-select" multiple size="4">
-                    <option value="" disabled selected>Chọn kích thước...</option>
-                    <option th:each="p : ${danhsachphienban}" th:value="${p.id}" th:text="${p.tenPhienBan}"></option>
-                </select>
-            </div>
             <div class="col-md-5">
                 <label for="chonMauSac">Màu sắc</label>
                 <select id="chonMauSac" class="form-select" multiple size="4">
@@ -76,9 +110,28 @@
                     <option th:each="m : ${danhsachmausac}" th:value="${m.id}" th:text="${m.tenMauSac}"></option>
                 </select>
             </div>
+            <div class="col-md-5">
+                <label for="chonPhienBan">Phiên bản</label>
+                <select id="chonPhienBan" class="form-select" multiple size="4">
+                    <option value="" disabled selected>Chọn phiên bản...</option>
+                    <option th:each="p : ${danhsachphienban}" th:value="${p.id}" th:text="${p.tenPhienBan}"></option>
+                </select>
+            </div>
             <div class="col-md-2 d-flex align-items-end">
                 <button type="button" class="btn btn-primary w-100" onclick="addChiTietFromSelect()">+</button>
             </div>
+
+            <div class="row mb-3">
+                <div class="col-md-3">
+                    <label for="defaultDonGia">Đơn giá mặc định</label>
+                    <input type="number" id="defaultDonGia" class="form-control" placeholder="VD: 100000">
+                </div>
+                <div class="col-md-3">
+                    <label for="defaultSoLuong">Số lượng tồn mặc định</label>
+                    <input type="number" id="defaultSoLuong" class="form-control" placeholder="VD: 10">
+                </div>
+            </div>
+
         </div>
 
 
@@ -113,27 +166,23 @@
                         </select>
                     </div>
                     <div class="col-md-4">
-                        <label>Ảnh sản phẩm</label>
-                        <input type="text" class="form-control" th:name="'chiTietList[' + ${iStat.index} + '].anhSP'" th:value="${ct.anhSP}">
+                        <label>Trạng thái</label>
+                        <select class="form-select" th:name="'chiTietList[' + ${iStat.index} + '].trangThai'">
+                            <option value="hoat_dong" th:selected="${ct.trangThai == 'hoat_dong'}">Hoạt động</option>
+                            <option value="khong_hoat_dong" th:selected="${ct.trangThai == 'khong_hoat_dong'}">Ngưng</option>
+                        </select>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-4">
                         <label>Số lượng tồn</label>
                         <input type="number" class="form-control" th:name="'chiTietList[' + ${iStat.index} + '].soLuongTon'" th:value="${ct.soLuongTon}">
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-md-4">
                         <label>Đơn giá</label>
                         <input type="number" class="form-control" th:name="'chiTietList[' + ${iStat.index} + '].donGia'" th:value="${ct.donGia}">
                     </div>
                     <div class="col-md-4">
                         <label>Mô tả</label>
                         <input type="text" class="form-control" th:name="'chiTietList[' + ${iStat.index} + '].moTa'" th:value="${ct.moTa}">
-                    </div>
-                    <div class="col-md-2">
-                        <label>Trạng thái</label>
-                        <select class="form-select" th:name="'chiTietList[' + ${iStat.index} + '].trangThai'" th:value="${ct.trangThai}">
-                            <option value="hoat_dong">Hoạt động</option>
-                            <option value="khong_hoat_dong">Ngưng</option>
-                        </select>
                     </div>
                 </div>
             </div>
@@ -158,27 +207,23 @@
                             </select>
                         </div>
                         <div class="col-md-4">
-                            <label>Ảnh sản phẩm</label>
-                            <input type="text" class="form-control" name="chiTietList[__index__].anhSP">
+                            <label>Trạng thái</label>
+                            <select class="form-select" name="chiTietList[__index__].trangThai">
+                                <option value="true">Hoạt động</option>
+                                <option value="false">Ngưng</option>
+                            </select>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-4">
                             <label>Số lượng tồn</label>
                             <input type="number" class="form-control" name="chiTietList[__index__].soLuongTon">
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-4">
                             <label>Đơn giá</label>
                             <input type="number" class="form-control" name="chiTietList[__index__].donGia">
                         </div>
                         <div class="col-md-4">
                             <label>Mô tả</label>
                             <input type="text" class="form-control" name="chiTietList[__index__].moTa">
-                        </div>
-                        <div class="col-md-2">
-                            <label>Trạng thái</label>
-                            <select class="form-select" name="chiTietList[__index__].trangThai">
-                                <option value="true">Hoạt động</option>
-                                <option value="false">Ngưng</option>
-                            </select>
                         </div>
                         <div class="col-md-1 d-flex align-items-end">
                             <button type="button" class="btn btn-danger btn-sm" onclick="this.closest('.chiTietRow').remove()">❌</button>
@@ -276,7 +321,108 @@
                 });
             });
         }
+        document.querySelectorAll('input[type="file"]').forEach((input, index) => {
+            input.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                const previewId = "preview" + (index + 1);
+                const preview = document.getElementById(previewId);
 
+                if (file && preview) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        preview.src = e.target.result;
+                    }
+                    reader.readAsDataURL(file);
+                }
+            });
+        });
+        // Hàm tải ảnh từ backend
+        async function loadProductImages() {
+            const productId = document.getElementById('productId')?.value;
+
+            if (!productId) {
+                console.error('Không tìm thấy ID sản phẩm');
+                return;
+            }
+
+            try {
+                const response = await fetch(`/admin/sanpham/${productId}/images`);
+                if (!response.ok) throw new Error('Lỗi network');
+
+                const imageUrls = await response.json();
+                displayLastThreeImages(imageUrls);
+            } catch (error) {
+                console.error('Lỗi khi tải ảnh:', error);
+                // Hiển thị ảnh mặc định nếu có lỗi
+                displayLastThreeImages([]);
+            }
+        }
+
+        // Hàm hiển thị ảnh
+        function displayLastThreeImages(imageUrls) {
+            const previews = [
+                document.getElementById('preview1'),
+                document.getElementById('preview2'),
+                document.getElementById('preview3')
+            ];
+
+            // Reset tất cả ảnh về mặc định trước
+            previews.forEach(preview => {
+                if (preview) preview.src = '/images/default-image.jpg';
+            });
+
+            // Hiển thị ảnh từ backend (tối đa 3 ảnh)
+            imageUrls.slice(0, 3).forEach((url, index) => {
+                if (previews[index] && url) {
+                    previews[index].src = url;
+                }
+            });
+        }
+
+        // Khởi tạo khi trang tải xong
+        document.addEventListener('DOMContentLoaded', function() {
+            // Tải ảnh khi trang load
+            loadProductImages();
+
+            // Gán sự kiện cho các input file
+            document.querySelectorAll('input[type="file"][name="productImages"]').forEach((input, index) => {
+                input.addEventListener('change', () => handleImageUpload(input, index));
+            });
+        });
+        // Hiện ảnh khi người dùng tải lên
+        document.querySelectorAll('input[type="file"]').forEach((input, index) => {
+            input.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                const previewId = "preview" + (index + 1);
+                const preview = document.getElementById(previewId);
+
+                if (file && preview) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        preview.src = e.target.result;
+                    }
+                    reader.readAsDataURL(file);
+                }
+            });
+        });
+        document.addEventListener('DOMContentLoaded', function () {
+            const donGiaInput = document.getElementById("defaultDonGia");
+            const soLuongInput = document.getElementById("defaultSoLuong");
+
+            donGiaInput?.addEventListener("input", function () {
+                const allDonGiaFields = document.querySelectorAll('input[name*=".donGia"]');
+                allDonGiaFields.forEach(input => {
+                    input.value = donGiaInput.value;
+                });
+            });
+
+            soLuongInput?.addEventListener("input", function () {
+                const allSoLuongFields = document.querySelectorAll('input[name*=".soLuongTon"]');
+                allSoLuongFields.forEach(input => {
+                    input.value = soLuongInput.value;
+                });
+            });
+        });
 
     </script>
 

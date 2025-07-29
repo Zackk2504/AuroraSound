@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/index}">
+<head>
+    <meta charset="UTF-8">
+    <title>Chi tiết hóa đơn</title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+</head>
+<body>
+<div layout:fragment="content">
+<div class="container mt-4">
+    <h4>Mã HD: <span th:text="${hoaDon.id}">HD001</span></h4>
+    <hr>
+
+    <div class="mb-3">
+        <strong>4PStore</strong><br>
+        Đ/c: FPT Polytechnic Trịnh Văn Bô<br>
+        Email: AuroraStore@gmail.com<br>
+        SĐT: 0983212210
+    </div>
+
+    <div class="mb-3">
+        <strong>Khách hàng:</strong> <span th:text="${hoaDon.tenNguoiMua}">Nguyễn Văn A</span><br>
+        <strong>SĐT:</strong> <span th:text="${hoaDon.sdtNguoiMua}">0987654321</span><br>
+        <strong>Voucher:</strong>
+        <span th:text="${hoaDon.idVoucher?.tenVoucher ?: 'Không có'}">Không có</span><br>
+        <strong th:if="${hoaDon.idVoucher != null}">Voucher:</strong>
+        <span th:if="${hoaDon.idVoucher != null}" th:text="${hoaDon.idVoucher.tenVoucher}">SALE10</span><br>
+
+        <strong th:if="${hoaDon.idVoucher != null}">Giá trị giảm:</strong>
+        <span th:if="${hoaDon.idVoucher != null}"
+              th:text="${#numbers.formatDecimal(hoaDon.idVoucher.giaTriVoucher, 0, 'COMMA')}">100.000đ</span><br>
+
+        <span th:if="${hoaDon.idVoucher == null}">Không có mã giảm giá</span>
+        <strong>Loại đơn:</strong> <span th:text="${hoaDon.loaiHoaDon}">Tại quầy</span>
+    </div>
+
+    <table class="table table-bordered text-center">
+        <thead>
+        <tr>
+            <th>Sản phẩm</th>
+            <th>Màu sắc</th>
+            <th>Phiên bản</th>
+            <th>Giá tiền</th>
+            <th>Số lượng</th>
+            <th>Thành tiền</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="ct : ${hoaDonChiTiets}">
+            <td th:text="${ct.idSanphamchitiet.idSanpham.tenSanPham}"></td>
+            <td th:text="${ct.idSanphamchitiet.idMausac.tenMauSac}"></td>
+            <td th:text="${ct.idSanphamchitiet.idPhienban.tenPhienBan}">M</td>
+            <td th:text="${#utils.formatCurrency(ct.donGia)} "></td>
+            <td th:text="${ct.soLuong}">2</td>
+            <td th:text="${#utils.formatCurrency((ct.donGia * ct.soLuong))} ">500.000đ</td>
+        </tr>
+        </tbody>
+        <tfoot>
+        <tr>
+            <td colspan="5" class="text-end"><strong>Tổng tiền hàng:</strong></td>
+            <td th:text="${#utils.formatCurrency((hoaDon.thanhTien))} ">1.420.000đ</td>
+        </tr>
+        <tr>
+            <td colspan="5" class="text-end"><strong>Giảm giá (voucher):</strong></td>
+<!--            <td th:text="${hoaDon.idVoucher.giaTriVoucher ?: 'Không có'} + 'đ'">100.000đ</td>-->
+        </tr>
+        </tfoot>
+    </table>
+
+    <div class="mt-3">
+        <strong>Ngày mua hàng:</strong> <span th:text="${#temporals.format(hoaDon.ngayTao, 'dd-MM-yyyy HH:mm')}">18-07-2025 20:58</span><br>
+        <strong>Trạng thái:</strong>
+        <span class="text-success" th:if="${hoaDon.trangThaiHoaDon == 'THANH_CONG'}">Hoàn thành</span>
+        <span class="text-warning" th:if="${hoaDon.trangThaiHoaDon == 'CHO_XAC_NHAN'}">Chờ xác nhận</span>
+        <span class="text-warning" th:if="${hoaDon.trangThaiHoaDon == 'DA_XAC_NHAN'}">Đã xác nhận</span>
+    </div>
+
+    <div class="mt-4 text-end">
+        <button class="btn btn-danger" th:if="${hoaDon.trangThaiHoaDon != 'THANH_CONG'}"
+                th:onclick="'/hoa-don/huy/' + ${hoaDon.id}">
+            Hủy đơn này
+        </button>
+        <a class="btn btn-success"
+           th:if="${hoaDon.trangThaiHoaDon != 'THANH_CONG'}"
+           th:href="@{'/nhan-vien/thay-doi-trang-thai/' + ${hoaDon.id}}">
+            Xác nhận duyệt đơn
+        </a>
+
+    </div>
+</div>
+</div>
+</body>
+</html>

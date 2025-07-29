@@ -27,4 +27,15 @@ public class SanPhamChiTietService {
     public void addAndEdit(SanPhamChiTiet sanPhamChiTiet) {
         sanPhamChiTietRepository.save(sanPhamChiTiet);
     }
+
+    public List<SanPhamChiTiet> locSanPham(Integer idThuongHieu, Integer idMauSac, Integer idPhienBan, Integer idXuatXu,Integer idLoaiSanPham ) {
+        return sanPhamChiTietRepository.locSanPham(
+                idThuongHieu,
+                idMauSac,
+                idPhienBan,
+                idXuatXu,
+                idLoaiSanPham
+        );
+    }
+
 }

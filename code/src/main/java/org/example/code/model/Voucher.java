@@ -5,7 +5,9 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Nationalized;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -26,22 +28,22 @@ public class Voucher {
     private String tenVoucher;
 
     @Column(name = "giaTriVoucher")
-    private Double giaTriVoucher;
+    private BigDecimal giaTriVoucher;
 
     @Column(name = "giaTriToiDaApDung")
-    private Double giaTriToiDaApDung;
+    private BigDecimal giaTriToiDaApDung;
 
     @Column(name = "giaTriToiThieuApDung")
-    private Double giaTriToiThieuApDung;
+    private BigDecimal giaTriToiThieuApDung;
 
     @Column(name = "soLuongVoucher")
     private Integer soLuongVoucher;
 
     @Column(name = "ngayBatDau")
-    private LocalDate ngayBatDau;
+    private LocalDateTime ngayBatDau;
 
     @Column(name = "ngayKetThuc")
-    private LocalDate ngayKetThuc;
+    private LocalDateTime ngayKetThuc;
 
     @Column(name = "trangThai")
     private String trangThai;
@@ -49,5 +51,11 @@ public class Voucher {
     @Nationalized
     @Column(name = "kieuGiam", length = 50)
     private String kieuGiam;
+
+    @Column(name = "giaTriToiDaVoucher")
+    private BigDecimal giaTriToiDaVoucher;
+
+    @Column(name = "soLuongConLai")
+    private Integer soLuongConLai;
 
 }

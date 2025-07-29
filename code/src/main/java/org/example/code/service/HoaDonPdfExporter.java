@@ -59,7 +59,7 @@ public class HoaDonPdfExporter {
             table.addCell(new Phrase(ct.getDonGia().toString(), fontVN));
 
             BigDecimal soLuong = BigDecimal.valueOf(ct.getSoLuong());
-            BigDecimal donGia = BigDecimal.valueOf(ct.getDonGia());
+            BigDecimal donGia = (ct.getDonGia());
             BigDecimal thanhTien = soLuong.multiply(donGia);
 
             table.addCell(new Phrase(thanhTien.toString(), fontVN));
