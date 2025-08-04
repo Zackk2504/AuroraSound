@@ -32,7 +32,7 @@ public class GhnService {
                 "to_ward_code", String.valueOf(toWardCode),
                 "height", 15,
                 "length", 15,
-                "weight", 500,
+                "weight", 2000  ,
                 "width", 15,
                 "from_district_id", 197187 // từ district id của shop
         );

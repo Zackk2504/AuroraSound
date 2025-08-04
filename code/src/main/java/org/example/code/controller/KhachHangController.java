@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Controller
 
@@ -50,6 +51,11 @@ public class KhachHangController {
     private HoaDonChiTietService hoaDonChiTietService;
     @Autowired
     private VoucherService voucherService;
+    @Autowired
+    private  SanPhamChiTietService sanPhamChiTietService;
+    @Autowired
+    private MailService mailService;
+
 
 
     @GetMapping("/nhan-vien/khach-hang/tim-theo-sdt")
@@ -95,6 +101,49 @@ public class KhachHangController {
         model.addAttribute("VoucherList",voucherService.getvoucherBytrangThaiHoatDong());
         return "User/ThanhToan";
     }
+    @GetMapping("/khach-hang/mua-ngay")
+    public String muaNgay(
+            @RequestParam("idSanPhamChiTiet") Integer idSanPhamChiTiet,
+            @RequestParam("soLuong") Integer soLuong,
+            Model model
+    ) {
+        Optional<SanPhamChiTiet> sanPhamChiTietOptional = sanPhamChiTietService.getSanPhamChiTietById(idSanPhamChiTiet);
+        if (!sanPhamChiTietOptional.isPresent()){
+            model.addAttribute("error", "Sản phẩm không tồn tại.");
+            return "redirect:/khach-hang/san-pham";
+        }
+        SanPhamChiTiet spct = sanPhamChiTietOptional.get();
+
+        GioHangChiTiet item = new GioHangChiTiet();
+        item.setIdSanphamchitiet(spct);
+        item.setSoLuong(soLuong);
+        gioHangChiTietService.addAndEdit(item);
+        BigDecimal tongTien = BigDecimal.valueOf(soLuong).multiply(spct.getDonGia());
+
+        // Lấy thông tin khách hàng
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        KhachHang khachHang;
+        if (auth.getPrincipal() instanceof DefaultOidcUser user) {
+            String email = user.getAttribute("email");
+            khachHang = khachHangService.getKhachHangByEmail(email).orElse(null);
+        } else {
+            String tenDangNhap = auth.getName();
+            khachHang = khachHangService.getKhachHangByUsername(tenDangNhap).orElse(null);
+        }
+
+        Optional<DiaChi> diaChiMacDinh = diaChiService.findByMacdinhTrue();
+
+        model.addAttribute("gioHangDaChon", List.of(item));
+        System.out.println("tongTien: " + List.of(item).get(0).getIdSanphamchitiet().getDonGia());
+        model.addAttribute("tongTien", tongTien);
+        model.addAttribute("khachHang", khachHang);
+        model.addAttribute("diaChiMacDinh", diaChiMacDinh.orElse(new DiaChi()));
+        model.addAttribute("listDiaChi", diaChiService.layDanhSachDiaChiTheoKhachHang(khachHang.getId()));
+        model.addAttribute("VoucherList", voucherService.getvoucherBytrangThaiHoatDong());
+
+        return "User/ThanhToan";
+    }
+
 
     @PostMapping("/khach-hang/xac-nhan-thanh-toan")
     public String thanhToan(
@@ -153,8 +202,8 @@ public class KhachHangController {
         // Tạo hóa đơn
         HoaDon hoaDon = new HoaDon();
         hoaDon.setIdKhachhang(khachHang);
-        hoaDon.setGiaTriThanhToan(tongTien);
-        hoaDon.setThanhTien(tongThanhToan);
+        hoaDon.setGiaTriThanhToan(tongThanhToan);
+        hoaDon.setThanhTien(tongTien);
         hoaDon.setHinhThucThanhToan(hinhThucThanhToan);
         hoaDon.setTrangThaiHoaDon("CHO_XAC_NHAN");
         hoaDon.setDiaChiNhanHang(diaChiNhanHang);
@@ -166,8 +215,11 @@ public class KhachHangController {
         hoaDon.setNgayTao(java.time.LocalDateTime.now());
         hoaDon.setTenNguoiMua(khachHang.getHoTen());
         hoaDon.setSdtNguoiMua(khachHang.getSoDT());
+        hoaDon.setMaHoaDon(hoaDonService.taoMaHoaDon());
 
         hoaDonService.addAndEdit(hoaDon);
+        // Gửi email thông báo
+        mailService.sendThankYouEmail(khachHang.getHoTen(), khachHang.getEmail(), hoaDon.getMaHoaDon());
 
         // Tạo hóa đơn chi tiết
         for (GioHangChiTiet gh : gioHangDaChon) {
@@ -184,7 +236,7 @@ public class KhachHangController {
         // Xóa sản phẩm khỏi giỏ hàng sau khi đặt hàng
 
 
-        return "redirect:/khach-hang/hoa-don-thanh-cong";
+        return "redirect:/khach-hang/hoa-don-thanh-cong/" + hoaDon.getId();
     }
 
 
@@ -259,8 +311,16 @@ public class KhachHangController {
             Model model
     ) {
         List<SanPham> danhSachSanPham = sanPhamService.locSanPham(loai, thuonghieu, xuatxu);
-
+        List<AnhSanPham> danhSachAnh = anhSanPhamService.getAllList();
+        Map<Integer, AnhSanPham> mapAnhDau = new HashMap<>();
+        for (AnhSanPham anh : danhSachAnh) {
+            Integer idSanPham = anh.getIdSanpham().getId();
+            if (!mapAnhDau.containsKey(idSanPham)) {
+                mapAnhDau.put(idSanPham, anh); // chỉ lưu ảnh đầu tiên
+            }
+        }
         model.addAttribute("danhSachSanPham", danhSachSanPham);
+        model.addAttribute("mapAnhDau", mapAnhDau);
         model.addAttribute("dsLoai", loaiSanPhamService.getAllLoaiSanPhams());
         model.addAttribute("dsThuongHieu", thuongHieuService.getAllThuongHieus());
         model.addAttribute("dsXuatXu", xuatXuService.getAll());
@@ -269,6 +329,74 @@ public class KhachHangController {
         model.addAttribute("xuatXuId", xuatxu);
 
         return "User/DanhSachSanPham"; // đường dẫn đến file HTML bạn đã viết
+    }
+
+    @GetMapping("/khach-hang/Tra-cuu-don-hang")
+    public String traCuuDonHang(Model model,@RequestParam(value = "maHoaDon", required = false) String maHoaDon) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        KhachHang khachHang;
+        if (auth.getPrincipal() instanceof DefaultOidcUser user) {
+            String email = user.getAttribute("email");
+            khachHang = khachHangService.getKhachHangByEmail(email).get();
+            System.out.println("Email: " + email);
+        }else {
+            String tenDangNhap = auth.getName();
+            System.out.println("Tên đăng nhập: " + tenDangNhap);
+            khachHang = khachHangService.getKhachHangByUsername(tenDangNhap).orElse(new KhachHang());
+        }
+//        List<HoaDon> danhSachHoaDon = hoaDonService.getHoaDonsByKhachHang(khachHang.getId());
+//        model.addAttribute("danhSachHoaDon", danhSachHoaDon);
+        return "User/TraCuuDonHang";
+    }
+
+    @GetMapping("/khach-hang/hoa-don-thanh-cong/{id}")
+    public String hoaDonThanhCong(Model model, @PathVariable("id") Integer id) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        KhachHang khachHang;
+        if (auth.getPrincipal() instanceof DefaultOidcUser user) {
+            String email = user.getAttribute("email");
+            khachHang = khachHangService.getKhachHangByEmail(email).get();
+            System.out.println("Email: " + email);
+        }else {
+            String tenDangNhap = auth.getName();
+            System.out.println("Tên đăng nhập: " + tenDangNhap);
+            khachHang = khachHangService.getKhachHangByUsername(tenDangNhap).orElse(new KhachHang());
+        }
+        Optional<HoaDon> hoaDonOptional = hoaDonService.getHoaDonById(id);
+        model.addAttribute("maHoaDon", hoaDonOptional.get().getMaHoaDon());
+
+        return "User/DatHangThanhCong";
+    }
+
+    @GetMapping("/khach-hang/sanpham/{id}/images")
+    @ResponseBody
+    public List<String> getProductImages(@PathVariable Integer id) {
+        return anhSanPhamService.getAllListByIDSP(id)
+                .stream()
+                .map(AnhSanPham::getUrl)
+                .limit(3) // Chỉ lấy tối đa 3 ảnh
+                .collect(Collectors.toList());
+    }
+
+    @GetMapping("/khach-hang/tra-cuu-don-hang")
+    public String traCuuDonHang(
+            @RequestParam(value = "maHoaDon", required = false) String maHoaDon,
+            Model model) {
+
+        HoaDon hoaDon = hoaDonService.getHoaDonByMa(maHoaDon)
+                .orElse(null);
+        if (hoaDon == null) {
+            model.addAttribute("error", "Không tìm thấy hóa đơn với mã: " + maHoaDon);
+            return "User/TraCuuDonHang";
+        }
+        System.out.println(hoaDon.getId() + " id hoa don");
+        BigDecimal tienvoucher = voucherService.tinhTienGiam(hoaDon.getIdVoucher(), hoaDon.getThanhTien());
+        List<HoaDonChiTiet> chiTiets = hoaDonChiTietService.getListHoaDonChiTietByIdHoaDon(hoaDon.getId());
+        System.out.println(chiTiets.size() + " so luong chi tiet hoa don");
+        model.addAttribute("hoaDon", hoaDon);
+        model.addAttribute("hoaDonChiTiets", chiTiets);
+        model.addAttribute("tienVoucher", tienvoucher);
+        return "User/TraCuuDonHang";
     }
 
 }

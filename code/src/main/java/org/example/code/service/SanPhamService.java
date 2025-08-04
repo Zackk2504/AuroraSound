@@ -1,5 +1,6 @@
 package org.example.code.service;
 
+import org.example.code.DTO.SanPhamBienTheDTO;
 import org.example.code.DTO.SanPhamChiTietDTO;
 import org.example.code.DTO.SanPhamDTO;
 import org.example.code.model.*;
@@ -134,5 +135,13 @@ public class SanPhamService {
         return ResponseEntity.ok(sp);
     }
 
-
+    public List<SanPhamBienTheDTO> countBienTheTheoSanPham() {
+        List<SanPhamBienTheDTO> result = new ArrayList<>();
+        List<SanPham> optionalSanPham = sanPhamRepository.findAll();
+        for (SanPham sanPham : optionalSanPham) {
+            Long soLuongBienThe = sanPhamChiTietService.countBienTheBySanPhamId(sanPham.getId());
+            result.add(new SanPhamBienTheDTO(sanPham.getId(), soLuongBienThe));
+        }
+        return result;
+    }
 }

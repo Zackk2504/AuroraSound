@@ -8,6 +8,32 @@
 <body>
 <div layout:fragment="content">
     <div class="container mt-4">
+        <form th:action="@{/ban-hang-tai-quay/hoa-don}" method="get" class="row mb-3">
+            <div class="col-md-3">
+                <input type="text" name="sdt" class="form-control" placeholder="Tìm theo SĐT người nhận" th:value="${sdt}">
+            </div>
+            <div class="col-md-3">
+                <select name="trangThai" class="form-select">
+                    <option value="">-- Trạng thái hóa đơn --</option>
+                    <option th:each="tt : ${dsTrangThai}" th:value="${tt}" th:text="${tt}" th:selected="${tt == trangThai}"></option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <select name="loai" class="form-select">
+                    <option value="">-- Loại hóa đơn --</option>
+                    <option th:each="l : ${dsLoai}" th:value="${l}" th:text="${l}" th:selected="${l == loai}"></option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <select name="hinhThuc" class="form-select">
+                    <option value="">-- Hình thức thanh toán --</option>
+                    <option th:each="ht : ${dsHinhThuc}" th:value="${ht}" th:text="${ht}" th:selected="${ht == hinhThuc}"></option>
+                </select>
+            </div>
+            <div class="col-md-12 mt-2 text-end">
+                <button type="submit" class="btn btn-primary">Lọc</button>
+            </div>
+        </form>
         <h3>Danh sách Hóa Đơn</h3>
         <table class="table table-bordered table-hover">
             <thead>
@@ -18,21 +44,31 @@
                 <th>Thanh tiền</th>
                 <th>Hình thức</th>
                 <th>Trạng thái</th>
+                <th>Thời gian</th>
                 <th>Thao tác</th>
             </tr>
             </thead>
             <tbody>
-            <tr th:each="hd, iStat : ${listHoaDon}">
+            <tr th:each="hd, iStat : ${pageHoaDon.content}">
                 <td th:text="${iStat.index + 1}">1</td>
                 <td th:text="${hd.tenNguoiMua}">Nguyễn Văn A</td>
                 <td th:text="${hd.sdtNguoiMua}">0123456789</td>
-                <td th:text="${hd.thanhTien} + ' ₫'">100.000 ₫</td>
-                <td th:text="${hd.hinhThucThanhToan}">Tiền mặt</td>
-                <td th:text="${hd.trangThaiHoaDon}">Đã thanh toán</td>
+                <td th:text="${#utils.formatCurrency(hd.thanhTien)} ">100.000 ₫</td>
+                <td th:switch="${hd.hinhThucThanhToan}">
+                    <span th:case="'TIEN_MAT'">Tiền mặt</span>
+                    <span th:case="'CHUYEN_KHOAN'">Chuyển khoản</span>
+                    <span th:case="*">Không rõ</span> <!-- Trường hợp mặc định -->
+                <td th:switch="${hd.trangThaiHoaDon}">
+                    <span th:case="'THANH_CONG'"> Thành công </span>
+                    <span th:case="'CHO_XAC_NHAN'">Chờ xác nhận</span>
+                    <span th:case="'DA_HUY'">Đã hủy</span>
+                    <span th:case="'DA_XAC_NHAN'"> Đã xác nhận </span>
+                    <span th:case="'DA_GIAO_HANG'">Đã giao hàng</span>
+                    <span th:case="*">Không rõ</span> <!-- Trường hợp mặc định -->
+                </td>
+                <td th:text="${#temporals.format(hd.ngayTao, 'dd-MM-yyyy HH:mm')}">18-07-2025 20:58</td>
                 <td>
-                    <button class="btn btn-sm btn-primary" data-bs-toggle="modal"
-                            th:attr="data-bs-target='#modalChiTiet_' + ${hd.id}">Chi tiết</button>
-                    <a  class="btn btn-sm btn-warning" th:href="@{'/ban-hang-tai-quay/hoa-don/chi-tiet/' + ${hd.id}}"></a>
+                    <a  class="btn btn-sm btn-warning" th:href="@{'/ban-hang-tai-quay/hoa-don/chi-tiet/' + ${hd.id}}">Chi tiết</a>
                     <a th:href="@{'/ban-hang-tai-quay/hoa-don/pdf/' + ${hd.id}}"
                        class="btn btn-sm btn-success" target="_blank">In</a>
                 </td>
@@ -80,6 +116,23 @@
                 </div>
             </div>
         </div>
+
+        <nav>
+            <ul class="pagination justify-content-center">
+                <li class="page-item" th:classappend="${pageHoaDon.first} ? 'disabled'">
+                    <a class="page-link" th:href="@{/ban-hang-tai-quay/hoa-don(page=${pageHoaDon.number - 1}, sdt=${sdt}, trangThai=${trangThai}, loai=${loai}, hinhThuc=${hinhThuc})}">Trước</a>
+                </li>
+                <li class="page-item" th:each="i : ${#numbers.sequence(0, pageHoaDon.totalPages - 1)}"
+                    th:classappend="${i == pageHoaDon.number} ? 'active'">
+                    <a class="page-link" th:href="@{/ban-hang-tai-quay/hoa-don(page=${i}, sdt=${sdt}, trangThai=${trangThai}, loai=${loai}, hinhThuc=${hinhThuc})}"
+                       th:text="${i + 1}">1</a>
+                </li>
+                <li class="page-item" th:classappend="${pageHoaDon.last} ? 'disabled'">
+                    <a class="page-link" th:href="@{/ban-hang-tai-quay/hoa-don(page=${pageHoaDon.number + 1}, sdt=${sdt}, trangThai=${trangThai}, loai=${loai}, hinhThuc=${hinhThuc})}">Sau</a>
+                </li>
+            </ul>
+        </nav>
+
 
     </div>
 

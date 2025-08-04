@@ -11,7 +11,7 @@
     <h3>Thêm biến thể cho sản phẩm: <span th:text="${sanPhamdto.tenSanPham}">Tên sản phẩm</span></h3>
 
     <form th:object="${sanPhamdto}" th:action="@{/admin/sanphamct/add}" method="post" enctype="multipart/form-data">
-        <input type="hidden" th:field="*{id}" />
+        <input type="hidden" th:field="*{id}" id="productId"/>
 
         <div class="row g-3">
             <div class="col-md-6">

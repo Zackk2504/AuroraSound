@@ -22,21 +22,25 @@ public class GlobalControllerAdvice {
     @ModelAttribute("slGioHang")
     public Long getSoLuongGioHang() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        KhachHang khachHang;
-        if (auth != null){
+        KhachHang khachHang = null;
+
+
             if (auth.getPrincipal() instanceof DefaultOidcUser user) {
                 String email = user.getAttribute("email");
-                khachHang = khachHangService.getKhachHangByEmail(email).get();
-                return gioHangService.demTongSanPhamTrongGio(khachHang.getEmail());
-
+                khachHang = khachHangService.getKhachHangByEmail(email).orElse(null);
             } else {
                 String tenDangNhap = auth.getName();
-                khachHang = khachHangService.getKhachHangByUsername(tenDangNhap).orElse(new KhachHang());
+                khachHang = khachHangService.getKhachHangByUsername(tenDangNhap).orElse(null);
+            }
+
+            if (khachHang != null) {
                 return gioHangService.demTongSanPhamTrongGio(khachHang.getEmail());
             }
-        }
+
+
         return 0L;
     }
+
 
 }
 

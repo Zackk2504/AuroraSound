@@ -1,16 +1,18 @@
 package org.example.code.service;
 
 import jakarta.transaction.Transactional;
-import org.example.code.model.GioHangChiTiet;
-import org.example.code.model.HoaDon;
-import org.example.code.model.HoaDonChiTiet;
-import org.example.code.model.Voucher;
+import org.example.code.model.*;
 import org.example.code.repo.HoaDonRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.security.SecureRandom;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +28,10 @@ public class HoaDonService {
     private HoaDonChiTietService hoaDonChiTietService;
     @Autowired
     private GioHangChiTietService gioHangChiTietService;
+    @Autowired
+    private NhanVienService nhanVienService;
+    @Autowired
+    private SanPhamChiTietService sanPhamChiTietService;
 
     public Optional<HoaDon> getHoaDonById(Integer id) {
         return hoaDonRepository.getHoaDonById(id);
@@ -123,4 +129,114 @@ public class HoaDonService {
         hoaDon.setTienship(phiShip);
         hoaDonRepository.save(hoaDon);
     }
+
+    private static final String KY_TU = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    private static final int DO_DAI_MA = 6;
+    private static final SecureRandom random = new SecureRandom();
+
+    public String taoMaHoaDon() {
+        StringBuilder ma = new StringBuilder(DO_DAI_MA);
+        for (int i = 0; i < DO_DAI_MA; i++) {
+            int index = random.nextInt(KY_TU.length());
+            ma.append(KY_TU.charAt(index));
+        }
+        // Đảm bảo mã hóa đơn là duy nhất
+        Optional<HoaDon> existingHoaDon = hoaDonRepository.findByMaHoaDon(ma.toString());
+        if (existingHoaDon.isPresent()) {
+            return taoMaHoaDon(); // Gọi đệ quy nếu mã đã tồn tại
+        }
+        return ma.toString();
+    }
+
+    public void xacNhanDonHang(Integer idHoaDon,String ghiChu, String diaChiMoi, String tienTraSau) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String tenDangNhap = auth.getName(); // Lấy tên đăng nhập của người dùng hiện tại
+        NhanVien nhanVien = nhanVienService.getNhanVienByTenDangNhap(tenDangNhap);
+        HoaDon hoaDon = hoaDonRepository.findById(idHoaDon)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy hóa đơn với ID: " + idHoaDon));
+        if (hoaDon.getTrangThaiHoaDon().equals("CHO_XAC_NHAN")) {
+            if (ghiChu != null && !ghiChu.isBlank()) {
+                hoaDon.setGhiChu(ghiChu);
+            }
+            if (diaChiMoi != null && !diaChiMoi.isBlank()) {
+                hoaDon.setDiaChiNhanHang(diaChiMoi);
+            }
+            if (tienTraSau != null && !tienTraSau.isBlank()) {
+                BigDecimal tienTraSauBD = new BigDecimal(tienTraSau);
+                if (hoaDon.getHinhThucThanhToan().equals("TIEN_MAT")){
+                    hoaDon.setGiaTriThanhToan(hoaDon.getGiaTriThanhToan().add(tienTraSauBD));
+                }else {
+                    hoaDon.setTienTraSau(tienTraSauBD);
+                }
+            }
+            hoaDon.setTrangThaiHoaDon("DA_XAC_NHAN");
+            hoaDon.setIdNhanvien(nhanVien); // Cập nhật nhân viên xử lý hóa đơn
+            hoaDonRepository.save(hoaDon);
+            List<HoaDonChiTiet> hoaDonChiTiet = hoaDonChiTietService.getListHoaDonChiTietByIdHoaDon(idHoaDon);
+            if (hoaDonChiTiet.isEmpty()) {
+                throw new RuntimeException("Hóa đơn không có chi tiết sản phẩm.");
+            }
+            for (HoaDonChiTiet chiTiet : hoaDonChiTiet) {
+                SanPhamChiTiet sanPham = chiTiet.getIdSanphamchitiet();
+                if (sanPham.getSoLuongTon() < chiTiet.getSoLuong()) {
+                    throw new RuntimeException("Số lượng sản phẩm không đủ để xác nhận đơn hàng.");
+                }
+                sanPham.setSoLuongTon(sanPham.getSoLuongTon() - chiTiet.getSoLuong());
+                sanPhamChiTietService.addAndEdit(sanPham);
+                sanPhamChiTietService.checksoluong(sanPham.getId());
+            }
+        } else {
+            throw new RuntimeException("Trạng thái hóa đơn không hợp lệ để xác nhận.");
+        }
+    }
+    public Page<HoaDon> findWithFilters(String sdt, String trangThai, String loai, String hinhThuc, Pageable pageable) {
+        return hoaDonRepository.findWithFilters(
+                sdt == null || sdt.isBlank() ? null : sdt,
+                trangThai == null || trangThai.isBlank() ? null : trangThai,
+                loai == null || loai.isBlank() ? null : loai,
+                hinhThuc == null || hinhThuc.isBlank() ? null : hinhThuc,
+                pageable
+        );
+    }
+
+    public Optional<HoaDon> getHoaDonByMa(String maHoaDon) {
+        return hoaDonRepository.findByMaHoaDon(maHoaDon);
+    }
+    @Transactional
+    public void huyDonHang(Integer idHoaDon) {
+        Optional<HoaDon> hoaDon = hoaDonRepository.findById(idHoaDon);
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String tenDangNhap = auth.getName(); // Lấy tên đăng nhập của người dùng hiện tại
+        NhanVien nhanVien = nhanVienService.getNhanVienByTenDangNhap(tenDangNhap);
+        if (nhanVien == null) {
+            throw new RuntimeException("Không tìm thấy nhân viên với tên đăng nhập: " + tenDangNhap);
+        }
+        if (!hoaDon.isPresent()) {
+          throw new RuntimeException("Không tìm thấy hóa đơn với ID: " + idHoaDon);
+        }
+        HoaDon hd = hoaDon.get();
+        if (hd.getIdVoucher() != null) {
+            Voucher voucher = hd.getIdVoucher();
+            voucher.setSoLuongConLai(voucher.getSoLuongConLai() + 1); // Trả lại voucher
+            voucherService.updateVoucher(voucher.getId(), voucher);
+        }
+        if (hd.getTrangThaiHoaDon().equalsIgnoreCase("CHO_XAC_NHAN")) {
+            hd.setTrangThaiHoaDon("DA_HUY");
+//            hd.setIdNhanvien(nhanVien); // Cập nhật nhân viên xử lý hóa đơn
+            hoaDonRepository.save(hd);
+        } else if (hd.getTrangThaiHoaDon().equalsIgnoreCase("DA_XAC_NHAN")) {
+            hd.setTrangThaiHoaDon("DA_HUY");
+            List<HoaDonChiTiet> hoaDonChiTiet = hoaDonChiTietService.getListHoaDonChiTietByIdHoaDon(idHoaDon);
+            for (HoaDonChiTiet chiTiet : hoaDonChiTiet) {
+                SanPhamChiTiet sanPham = chiTiet.getIdSanphamchitiet();
+                sanPham.setSoLuongTon(sanPham.getSoLuongTon() + chiTiet.getSoLuong());
+                sanPhamChiTietService.addAndEdit(sanPham);
+            }
+            hoaDonRepository.save(hd);
+        }
+        else {
+            throw new RuntimeException("Trạng thái hóa đơn không hợp lệ để hủy.");
+        }
+    }
+
 }

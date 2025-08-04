@@ -1,21 +1,27 @@
 package org.example.code.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
+import org.example.code.model.DiaChi;
+import org.example.code.model.HoaDon;
 import org.example.code.model.NhanVien;
 import org.example.code.model.VaiTro;
+import org.example.code.service.DiaChiService;
+import org.example.code.service.HoaDonService;
 import org.example.code.service.NhanVienService;
 import org.example.code.service.VaiTroService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 @Controller
@@ -25,6 +31,10 @@ public class NhanVienController {
 
     @Autowired
     private VaiTroService vaiTroService;
+    @Autowired
+    private HoaDonService hoaDonService;
+    @Autowired
+    private DiaChiService diaChiService;
 
     @GetMapping("/nhan-vien/login")
     public String login() {
@@ -77,4 +87,75 @@ public class NhanVienController {
         }
         return "admin/nhanVien";
     }
+    @GetMapping("/nhan-vien/thay-doi-trang-thai/{id}")
+    public String thayDoiTrangThaiHoaDon(@PathVariable Integer id) {
+        Optional<HoaDon> hoaDon = hoaDonService.getHoaDonById(id);
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String tenDangNhap = auth.getName(); // Lấy tên đăng nhập của người dùng hiện tại
+        NhanVien nhanVien = nhanVienService.getNhanVienByTenDangNhap(tenDangNhap);
+        if (nhanVien == null) {
+            throw new RuntimeException("Không tìm thấy nhân viên với tên đăng nhập: " + tenDangNhap);
+        }
+        if (hoaDon.isPresent()) {
+            HoaDon hd = hoaDon.get();
+            String trangThai = hd.getTrangThaiHoaDon();
+
+            switch (trangThai) {
+                case "DA_XAC_NHAN":
+                    hd.setTrangThaiHoaDon("DA_GIAO_HANG");
+                    break;
+                case "DA_GIAO_HANG":
+                    hd.setTrangThaiHoaDon("THANH_CONG");
+                    break;
+                case "THANH_CONG":
+                    hd.setTrangThaiHoaDon("THAT_BAI");
+                    break;
+                // Nếu cần, có thể thêm case nữa cho vòng lặp trạng thái
+                default:
+                    break; // Không thay đổi nếu không khớp trạng thái
+            }
+            hd.setIdNhanvien(nhanVien); // Cập nhật nhân viên xử lý hóa đơn
+            hoaDonService.addAndEdit(hd);
+        }
+        return "redirect:/ban-hang-tai-quay/hoa-don/chi-tiet/" + id; // Redirect về trang chi tiết hóa đơn
+    }
+
+    @GetMapping("/nhan-vien/xac-nhan-don-hang/{id}")
+    public String getHoaDonPage(Model model,@PathVariable Integer id,
+                                @RequestParam(required = false) String ghiChu,
+                                @RequestParam(required = false) String diaChimoi,
+                                @RequestParam(required = false) String tienTraSau) {
+        Optional<HoaDon> hoaDon = hoaDonService.getHoaDonById(id);
+        if (hoaDon.isEmpty()) {
+            throw new RuntimeException("Không tìm thấy hóa đơn với ID: " + id);
+        }
+        System.out.println("Ghi chú: " + ghiChu);
+        System.out.println("Dia chỉ mới: " + diaChimoi);
+        System.out.println("Tien trả sau: " + tienTraSau);
+        hoaDonService.xacNhanDonHang(hoaDon.get().getId(), ghiChu, diaChimoi, tienTraSau);
+
+        return "redirect:/ban-hang-tai-quay/hoa-don/chi-tiet/" + id; // Trang hiển thị danh sách hóa đơn
+    }
+    @GetMapping("/nhan-vien/huy-don-hang/{id}")
+    public String huyDonHang(@PathVariable Integer id) {
+
+        hoaDonService.huyDonHang(id);
+        return "redirect:/ban-hang-tai-quay/hoa-don/chi-tiet/" + id; // Redirect về trang chi tiết hóa đơn
+    }
+    @GetMapping("/nhan-vien/list-dia-chi-khach")
+    @ResponseBody
+    public ResponseEntity<List<DiaChi>> getListDiaChiKhach(@RequestParam Integer idhd) {
+        HoaDon hoaDon = hoaDonService.getHoaDonById(idhd)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy hóa đơn với ID: " + idhd));
+        if (hoaDon.getIdKhachhang() != null) {
+            List<DiaChi> diaChiList = diaChiService.layDanhSachDiaChiTheoKhachHang(hoaDon.getIdKhachhang().getId());
+            System.out.println("List Dia Chi: " + diaChiList);
+            return ResponseEntity.ok(diaChiList); // Trả về JSON
+        }
+        System.out.println("hello" + idhd);
+        return ResponseEntity.ok(Collections.emptyList());
+    }
+
+
+
 }

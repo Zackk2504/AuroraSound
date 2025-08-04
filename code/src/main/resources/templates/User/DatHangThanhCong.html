@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{index}">
+<head>
+    <meta charset="UTF-8">
+    <title>Thanh cong</title>
+</head>
+<body class="bg-light">
+<div layout:fragment="khachhangcontent" class="p-6 max-w-4xl mx-auto bg-white shadow rounded">
+
+    <div class="container text-center mt-5">
+        <div class="card shadow-sm p-4">
+            <h2 class="text-success">🎉 Đặt hàng thành công!</h2>
+            <p class="mt-3 fs-5">Xin cảm ơn <strong th:text="${tenNguoiDung}">Nguyễn Văn A</strong> đã mua hàng tại cửa hàng của chúng tôi.</p>
+
+            <p class="fs-5">
+                Dưới đây là <strong>mã hóa đơn</strong> của bạn:
+            </p>
+
+            <h3 class="text-primary" th:text="${maHoaDon}">ABC123</h3>
+
+            <p class="mt-3">
+                Bạn có thể tra cứu đơn hàng của mình tại mục <strong>Tra cứu đơn hàng</strong> bằng mã trên.<br>
+                Chúng tôi sẽ liên hệ khi đơn hàng được xác nhận và gửi đi.
+            </p>
+
+            <a href="/" class="btn btn-success mt-4">Quay lại trang chủ</a>
+        </div>
+    </div>
+
+
+</div>
+</body>
+</html>

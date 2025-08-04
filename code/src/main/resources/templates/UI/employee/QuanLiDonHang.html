@@ -10,7 +10,7 @@
 <body>
 <div layout:fragment="content">
 <div class="container mt-4">
-    <h4>Mã HD: <span th:text="${hoaDon.id}">HD001</span></h4>
+    <h4>Mã HD: <span id="idhd" th:text="${hoaDon.id}">HD001</span></h4>
     <hr>
 
     <div class="mb-3">
@@ -30,12 +30,86 @@
 
         <strong th:if="${hoaDon.idVoucher != null}">Giá trị giảm:</strong>
         <span th:if="${hoaDon.idVoucher != null}"
-              th:text="${#numbers.formatDecimal(hoaDon.idVoucher.giaTriVoucher, 0, 'COMMA')}">100.000đ</span><br>
+              th:text="${#utils.formatCurrency(hoaDon.idVoucher.giaTriVoucher)}">100.000đ</span><br>
 
         <span th:if="${hoaDon.idVoucher == null}">Không có mã giảm giá</span>
+        <br>
         <strong>Loại đơn:</strong> <span th:text="${hoaDon.loaiHoaDon}">Tại quầy</span>
+        <br>
+        <strong> Hình thức thanh toán: </strong> <span th:text="${hoaDon.hinhThucThanhToan}">Tại quầy</span>
+        <br>
+        <div class="d-flex align-items-center">
+            <strong>Địa chỉ giao hàng:</strong>
+            <span id="diaChiGiaoHangText" th:text="${hoaDon.diaChiNhanHang}" class="ms-2 me-2 flex-grow-1">FPT Polytechnic Trịnh Văn Bô</span>
+            <input type="hidden" id="diaChiGiaoHanginput" th:value="${diachimoi}"/>
+            <button class="btn btn-primary" onclick="openDiaChiModal()">Đổi địa chỉ</button>
+        </div>
     </div>
 
+    <input type="hidden" name="provinceId" id="inputProvinceId"/>
+    <input type="hidden" name="districtId" id="inputDistrictId"/>
+    <input type="hidden" name="wardCode" id="inputWardCode"/>
+
+<!--    Modal chọn địa chỉ của khách -->
+    <div class="modal fade" id="diaChiModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Chọn địa chỉ giao hàng</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+                </div>
+<!--                <div class="modal-body">-->
+<!--                    <select id="diaChiSelect" class="form-select">-->
+<!--                        &lt;!&ndash; Giả sử mỗi địa chỉ có wardCode và districtId &ndash;&gt;-->
+<!--                        <option value="1-10101">123 Nguyễn Trãi, Q.1</option>-->
+<!--                        <option value="2-20202">456 Trường Chinh, Q.12</option>-->
+<!--                        &lt;!&ndash; value: districtId-wardCode &ndash;&gt;-->
+<!--                    </select>-->
+<!--                </div>-->
+                <div class="modal-footer">
+                    <button class="btn btn-outline-primary w-100" onclick="moModalThemDiaChiMoi()">+ Thêm địa chỉ giao hàng</button>
+                    <button class="btn btn-success" onclick="chonDiaChi()">Chọn</button>
+                </div>
+            </div>
+        </div>
+    </div>
+<!--    Modal thêm địa chỉ-->
+    <div class="modal fade" id="themDiaChiModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Thêm địa chỉ giao hàng mới</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+                </div>
+                <div class="modal-body">
+                    <div>
+                        <label class="block font-semibold mb-1">Tỉnh / Thành phố:</label>
+                        <select id="selectProvince" class="w-full border rounded p-2"></select>
+                    </div>
+
+                    <div>
+                        <label class="block font-semibold mb-1">Quận / Huyện:</label>
+                        <select id="selectDistrict" class="w-full border rounded p-2"></select>
+                    </div>
+
+                    <div>
+                        <label class="block font-semibold mb-1">Phường / Xã:</label>
+                        <select id="selectWard" class="w-full border rounded p-2"></select>
+                    </div>
+
+                    <div>
+                        <label class="block font-semibold mb-1">Số nhà:</label>
+                        <input type="text" name="diaChi" id="inputDiaChi" class="w-full border rounded p-2" required/>
+                    </div>
+<!--                    <input type="text" name="diaChifull" id="inputDiaChiDayDu"/>-->
+
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-success" onclick="closeModal()">Lưu</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <table class="table table-bordered text-center">
         <thead>
         <tr>
@@ -64,32 +138,288 @@
         </tr>
         <tr>
             <td colspan="5" class="text-end"><strong>Giảm giá (voucher):</strong></td>
-<!--            <td th:text="${hoaDon.idVoucher.giaTriVoucher ?: 'Không có'} + 'đ'">100.000đ</td>-->
+            <td th:if="${hoaDon.idVoucher != null}" th:text="${#utils.formatCurrency(tienVoucher)}"></td>
+            <td th:unless="${hoaDon.idVoucher != null}">Không có</td>                </tr>
+        <tr>
+            <td colspan="5" class="text-end"><strong> Tiền ship </strong></td>
+            <td id="tienshipcu" th:text="${#utils.formatCurrency(hoaDon.tienship ?: 0)}">100.000đ</td>
+        </tr>
+        <tr>
+            <td colspan="5" class="text-end"><strong> Giá trị thanh toán </strong></td>
+            <td th:text="${#utils.formatCurrency((hoaDon.giaTriThanhToan))}">100.000đ</td>
+        </tr>
+        <tr th:if="${hoaDon.tienTraSau != null && hoaDon.tienTraSau > 0}">
+            <td colspan="5" class="text-end"><strong> Tiền trả sau </strong></td>
+            <td th:text="${#utils.formatCurrency((hoaDon.tienTraSau))}">100.000đ</td>
         </tr>
         </tfoot>
     </table>
+    <div style="text-align: right;">
+        <p>Phí ship sau khi đổi: <span id="phiShip">0đ</span></p>
+        <p>Tổng tiền trả sau: <span id="tienTraSau">0đ</span></p>
+        <input type="hidden" id="tienTraSauInput" value="0">
+    </div>
+    <span class="text-muted">*Ghi chú.</span>
+    <input type="text" id="ghiChuInput" placeholder="Ghi chú" th:value="${hoaDon.ghiChu}" class="form-control mb-3"/>
 
     <div class="mt-3">
         <strong>Ngày mua hàng:</strong> <span th:text="${#temporals.format(hoaDon.ngayTao, 'dd-MM-yyyy HH:mm')}">18-07-2025 20:58</span><br>
         <strong>Trạng thái:</strong>
         <span class="text-success" th:if="${hoaDon.trangThaiHoaDon == 'THANH_CONG'}">Hoàn thành</span>
         <span class="text-warning" th:if="${hoaDon.trangThaiHoaDon == 'CHO_XAC_NHAN'}">Chờ xác nhận</span>
+        <span class="text-warning" th:if="${hoaDon.trangThaiHoaDon == 'DA_GIAO_HANG'}"> Đã giao hàng cho bên vận chuyển </span>
         <span class="text-warning" th:if="${hoaDon.trangThaiHoaDon == 'DA_XAC_NHAN'}">Đã xác nhận</span>
+        <span class="text-warning" th:if="${hoaDon.trangThaiHoaDon == 'DA_HUY'}"> Đã hủy </span>
     </div>
 
     <div class="mt-4 text-end">
-        <button class="btn btn-danger" th:if="${hoaDon.trangThaiHoaDon != 'THANH_CONG'}"
-                th:onclick="'/hoa-don/huy/' + ${hoaDon.id}">
-            Hủy đơn này
-        </button>
-        <a class="btn btn-success"
-           th:if="${hoaDon.trangThaiHoaDon != 'THANH_CONG'}"
-           th:href="@{'/nhan-vien/thay-doi-trang-thai/' + ${hoaDon.id}}">
-            Xác nhận duyệt đơn
-        </a>
+        <div class="mt-4 text-end">
+
+            <!-- Nút hủy đơn: chỉ hiển thị nếu chưa hoàn thành -->
+            <a class="btn btn-danger"
+               th:if="${hoaDon.trangThaiHoaDon != 'THANH_CONG' && hoaDon.trangThaiHoaDon != 'DA_HUY' && hoaDon.trangThaiHoaDon != 'DA_GIAO_HANG'}"
+               th:href="@{'/nhan-vien/huy-don-hang/' + ${hoaDon.id}}">
+                Hủy đơn này
+            </a>
+
+
+            <!-- Nút xác nhận duyệt đơn: chỉ hiển thị nếu đang chờ xác nhận -->
+            <a class="btn btn-success"
+               th:if="${hoaDon.trangThaiHoaDon == 'CHO_XAC_NHAN'}"
+               onclick="xacNhanDonHang()">
+                Xác nhận duyệt đơn
+            </a>
+
+            <!-- Nút chuyển trạng thái: từ ĐÃ XÁC NHẬN -> ĐÃ GIAO HÀNG -->
+            <a class="btn btn-primary"
+               th:if="${hoaDon.trangThaiHoaDon == 'DA_XAC_NHAN'}"
+               th:href="@{'/nhan-vien/thay-doi-trang-thai/' + ${hoaDon.id}}">
+                Đã giao hàng cho bên vận chuyển
+            </a>
+
+            <!-- Nút hoàn thành: từ ĐÃ GIAO HÀNG -> THÀNH CÔNG -->
+            <a class="btn btn-success"
+               th:if="${hoaDon.trangThaiHoaDon == 'DA_GIAO_HANG'}"
+               th:href="@{'/nhan-vien/thay-doi-trang-thai/' + ${hoaDon.id}}">
+                Hoàn tất đơn hàng
+            </a>
+
+            <a class="btn btn-secondary"
+               th:if="${hoaDon.trangThaiHoaDon == 'THANH_CONG'}"
+               th:href="@{'/nhan-vien/thay-doi-trang-thai/' + ${hoaDon.id}}">
+                Giao hàng thất bại
+            </a>
+
+        </div>
+
 
     </div>
 </div>
+    <script>
+        let phiShipCu = 0;
+        let tienTraSau = 0;
+        const inputProvinceId = document.getElementById("inputProvinceId");
+        const inputDistrictId = document.getElementById("inputDistrictId");
+        const inputWardCode = document.getElementById("inputWardCode");
+        const idHoaDon = document.getElementById("idhd").textContent;
+        function openDiaChiModal() {
+            fetch(`/nhan-vien/list-dia-chi-khach?idhd=${idHoaDon}`)
+                .then(response => response.json())
+                .then(data => {
+                    const diaChiSelect = document.getElementById('diaChiSelect');
+                    diaChiSelect.innerHTML = ''; // Xoá các option cũ
+
+                    if (data.length === 0) {
+                        diaChiSelect.innerHTML = '<option disabled>Không có địa chỉ nào</option>';
+                        return;
+                    }
+
+                    data.forEach(diaChi => {
+                        const option = document.createElement('option');
+                        option.value = `${diaChi.districtId}-${diaChi.wardCode}`;
+                        option.textContent = diaChi.diaChi; // Tùy theo thuộc tính trong entity của bạn
+                        diaChiSelect.appendChild(option);
+                        console.log(data)
+                    });
+                })
+                .catch(error => {
+                    console.error("Lỗi khi load địa chỉ:", error);
+                });
+
+            // Hiển thị modal
+            const diaChiModal = new bootstrap.Modal(document.getElementById('diaChiModal'));
+            diaChiModal.show();
+        }
+
+        function chonDiaChi() {
+            bootstrap.Modal.getInstance(document.getElementById("diaChiModal")).hide();
+
+        }
+
+        function moModalThemDiaChiMoi() {
+            loadProvinces();
+            bootstrap.Modal.getInstance(document.getElementById("diaChiModal")).hide();
+            new bootstrap.Modal(document.getElementById("themDiaChiModal")).show();
+        }
+        function closeModal() {
+            capNhatDiaChiVaTinhPhi();
+            bootstrap.Modal.getInstance(document.getElementById("themDiaChiModal")).hide();
+        }
+
+        const sProvince = document.getElementById("selectProvince");
+        const sDistrict = document.getElementById("selectDistrict");
+        const sWard = document.getElementById("selectWard");
+
+
+        function loadProvinces(selectedId, selectedDistrict, selectedWard) {
+            fetch("https://dev-online-gateway.ghn.vn/shiip/public-api/master-data/province", {
+                headers: {Token: "dfc26f23-6b12-11f0-9b81-222185cb68c8"}
+            })
+                .then(res => res.json())
+                .then(data => {
+                    sProvince.innerHTML = '<option value="">Chọn tỉnh</option>';
+                    data.data.forEach(p => {
+                        sProvince.innerHTML += `<option value="${p.ProvinceID}" ${p.ProvinceID == selectedId ? 'selected' : ''}>${p.ProvinceName}</option>`;
+                    });
+                    if (selectedId) fetchDistricts(selectedId, selectedDistrict, selectedWard);
+                });
+        }
+
+        sProvince.onchange = () => fetchDistricts(sProvince.value);
+
+        function fetchDistricts(provinceId, selectedDistrict, selectedWard) {
+            fetch("https://dev-online-gateway.ghn.vn/shiip/public-api/master-data/district", {
+                method: "POST",
+                headers: {"Content-Type": "application/json", Token: "dfc26f23-6b12-11f0-9b81-222185cb68c8"},
+                body: JSON.stringify({province_id: parseInt(provinceId)})
+            })
+                .then(res => res.json())
+                .then(data => {
+                    sWard.disabled = false;
+                    sDistrict.innerHTML = '<option value="">Chọn quận</option>';
+                    data.data.forEach(d => {
+                        sDistrict.innerHTML += `<option value="${d.DistrictID}" ${d.DistrictID == selectedDistrict ? 'selected' : ''}>${d.DistrictName}</option>`;
+                    });
+                    if (selectedDistrict) fetchWards(selectedDistrict, selectedWard);
+                });
+        }
+
+        sDistrict.onchange = () => fetchWards(sDistrict.value);
+
+        function fetchWards(districtId, selectedWard) {
+            fetch("https://dev-online-gateway.ghn.vn/shiip/public-api/master-data/ward?district_id", {
+                method: "POST",
+                headers: {"Content-Type": "application/json", Token: "dfc26f23-6b12-11f0-9b81-222185cb68c8"},
+                body: JSON.stringify({district_id: parseInt(districtId)})
+            })
+                .then(res => res.json())
+                .then(data => {
+                    sWard.innerHTML = '<option value="">Chọn phường</option>';
+                    data.data.forEach(w => {
+                        sWard.innerHTML += `<option value="${w.WardCode}" ${w.WardCode == selectedWard ? 'selected' : ''}>${w.WardName}</option>`;
+                    });
+                });
+        }
+
+        sProvince.onchange = () => {
+            inputProvinceId.value = sProvince.value;
+            fetchDistricts(sProvince.value);
+        };
+
+        sDistrict.onchange = () => {
+            inputDistrictId.value = sDistrict.value;
+            fetchWards(sDistrict.value);
+        };
+
+        sWard.onchange = () => inputWardCode.value = sWard.value;
+
+        function capNhatDiaChiVaTinhPhi() {
+
+            const districtId = document.getElementById("inputDistrictId").value;
+            const wardCode = document.getElementById("inputWardCode").value;
+
+            // Optional: bạn cũng có thể lấy thêm tên tỉnh/huyện/xã để hiển thị địa chỉ
+            const provinceText = document.querySelector("#selectProvince option:checked")?.textContent || "";
+            const districtText = document.querySelector("#selectDistrict option:checked")?.textContent || "";
+            const wardText = document.querySelector("#selectWard option:checked")?.textContent || "";
+            const chitiettext = document.getElementById("inputDiaChi").value;
+
+
+            // Gán địa chỉ hiển thị
+            const diaChiText = `${chitiettext} ,${wardText}, ${districtText}, ${provinceText}`;
+            document.getElementById("diaChiGiaoHanginput").value = diaChiText;
+            document.getElementById("diaChiGiaoHangText").textContent = diaChiText;
+
+            // Gọi API tính phí ship
+            fetch('/shipping/calculate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `districtId=${districtId}&wardCode=${wardCode}`
+            })
+                .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Lỗi HTTP: ${response.status}`); // Bắt lỗi 400/500
+                }
+                return response.json(); // Parse JSON
+            })
+                .then(data => {
+                    // Kiểm tra tồn tại data.data trước khi truy cập
+                    if (data && data.data && data.data.total !== undefined) {
+                        console.log("Total:", data.data.total);
+                        const tienship = data.data.total;
+
+// Lấy giá trị cũ, bỏ dấu chấm, chữ, sau đó ép sang số
+                        const tienshipcuText = document.getElementById("tienshipcu").textContent || "0";
+                        const tienshipcu = parseInt(tienshipcuText.replace(/\D/g, '')) || 0;
+
+                        const tienChenhlech = tienship - tienshipcu;
+
+                        document.getElementById("phiShip").textContent = tienship.toLocaleString('vi-VN') + " đ";
+                        document.getElementById("tienTraSau").textContent = tienChenhlech.toLocaleString('vi-VN') + " đ";
+                        document.getElementById("tienTraSauInput").value = tienChenhlech;
+
+                    } else {
+                        console.error("Cấu trúc API không hợp lệ:", data);
+                    }
+                })
+                .catch(error => {
+                    console.error("Lỗi tính phí ship:", error);
+                    document.getElementById("phiShip").textContent = "Lỗi tính phí";
+                });
+        }
+
+        function xacNhanDonHang() {
+            const idHoaDon = document.getElementById("idhd").textContent; // hoặc lấy từ biến th: [[${hoaDon.id}]]
+            const ghiChu = document.getElementById("ghiChuInput").value;
+            const diaChiMoi = document.getElementById("diaChiGiaoHanginput").value;
+            const tienTraSau = document.getElementById("tienTraSauInput").value;
+
+            const url = `/nhan-vien/xac-nhan-don-hang/${idHoaDon}?` +
+                new URLSearchParams({
+                    ghiChu: ghiChu,
+                    diaChimoi: diaChiMoi,
+                    tienTraSau: tienTraSau
+                });
+
+            fetch(url)
+                .then(res => {
+                    if (!res.ok) throw new Error("Lỗi xác nhận đơn hàng");
+                    return res.text();
+                })
+                .then(data => {
+                    alert("✅ Xác nhận đơn hàng thành công!");
+                    location.reload(); // hoặc chuyển sang trang khác
+                })
+                .catch(err => {
+                    alert("❌ Có lỗi xảy ra: " + err.message);
+                });
+        }
+
+
+
+    </script>
+
+
 </div>
 </body>
 </html>

@@ -171,42 +171,15 @@ public class BanHangTaiQuayController {
     public String chiTietHoaDon(@PathVariable Integer id, Model model) {
         Optional<HoaDon> hoaDon = hoaDonService.getHoaDonById(id);
         List<HoaDonChiTiet> chiTiets = hoaDonChiTietService.getListHoaDonChiTietByIdHoaDon(hoaDon.get().getId());
-
+        BigDecimal tienvoucher = voucherService.tinhTienGiam(hoaDon.get().getIdVoucher(), hoaDon.get().getThanhTien());
         model.addAttribute("hoaDon", hoaDon.get());
         model.addAttribute("hoaDonChiTiets", chiTiets);
+        model.addAttribute("tienVoucher", tienvoucher);
 
         return "UI/employee/QuanLiDonHang";
     }
 
-    @GetMapping("/nhan-vien/thay-doi-trang-thai/{id}")
-    public String thayDoiTrangThaiHoaDon(@PathVariable Integer id) {
-        Optional<HoaDon> hoaDon = hoaDonService.getHoaDonById(id);
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String tenDangNhap = auth.getName(); // Lấy tên đăng nhập của người dùng hiện tại
-        NhanVien nhanVien = nhanVienService.getNhanVienByTenDangNhap(tenDangNhap);
-        if (nhanVien == null) {
-            throw new RuntimeException("Không tìm thấy nhân viên với tên đăng nhập: " + tenDangNhap);
-        }
-        if (hoaDon.isPresent()) {
-            HoaDon hd = hoaDon.get();
-            String trangThai = hd.getTrangThaiHoaDon();
 
-            switch (trangThai) {
-                case "CHO_XAC_NHAN":
-                    hd.setTrangThaiHoaDon("DA_XAC_NHAN");
-                    break;
-                case "DA_XAC_NHAN":
-                    hd.setTrangThaiHoaDon("THANH_CONG");
-                    break;
-                // Nếu cần, có thể thêm case nữa cho vòng lặp trạng thái
-                default:
-                    break; // Không thay đổi nếu không khớp trạng thái
-            }
-            hd.setIdNhanvien(nhanVien); // Cập nhật nhân viên xử lý hóa đơn
-            hoaDonService.addAndEdit(hd);
-        }
-        return "redirect:/ban-hang-tai-quay/hoa-don/chi-tiet/" + id; // Redirect về trang chi tiết hóa đơn
-    }
 
 
 }

@@ -1,10 +1,13 @@
 package org.example.code.service;
 
+import org.example.code.DTO.SanPhamBienTheDTO;
+import org.example.code.model.SanPham;
 import org.example.code.model.SanPhamChiTiet;
 import org.example.code.repo.SanPhamChiTietRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -12,6 +15,7 @@ import java.util.Optional;
 public class SanPhamChiTietService {
     @Autowired
     private SanPhamChiTietRepository sanPhamChiTietRepository;
+
 
     public Optional<SanPhamChiTiet> getSanPhamChiTietById(Integer id) {
         return sanPhamChiTietRepository.findById(id);
@@ -28,6 +32,8 @@ public class SanPhamChiTietService {
         sanPhamChiTietRepository.save(sanPhamChiTiet);
     }
 
+
+
     public List<SanPhamChiTiet> locSanPham(Integer idThuongHieu, Integer idMauSac, Integer idPhienBan, Integer idXuatXu,Integer idLoaiSanPham ) {
         return sanPhamChiTietRepository.locSanPham(
                 idThuongHieu,
@@ -36,6 +42,17 @@ public class SanPhamChiTietService {
                 idXuatXu,
                 idLoaiSanPham
         );
+    }
+
+    public void checksoluong(Integer id){
+        SanPhamChiTiet sanPhamChiTiet = sanPhamChiTietRepository.findById(id).orElseThrow();
+        if (sanPhamChiTiet.getSoLuongTon() == 0) {
+            sanPhamChiTiet.setTrangThai("khong_hoat_dong");
+        }
+    }
+
+    public Long countBienTheBySanPhamId(Integer idSanPham) {
+        return sanPhamChiTietRepository.countBienTheBySanPhamId(idSanPham);
     }
 
 }

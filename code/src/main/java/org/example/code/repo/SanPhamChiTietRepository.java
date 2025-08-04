@@ -25,5 +25,8 @@ public interface SanPhamChiTietRepository extends JpaRepository<SanPhamChiTiet, 
             @Param("idXuatXu") Integer idXuatXu,
             @Param("idLoaiSanPham") Integer idLoaiSanPham
     );
+    Integer countByIdSanpham_Id(Integer idSanPham);
 
+    @Query("SELECT COUNT(s) FROM SanPhamChiTiet s WHERE s.idSanpham.id = :idSanPham")
+    Long countBienTheBySanPhamId(@Param("idSanPham") Integer idSanPham);
 }

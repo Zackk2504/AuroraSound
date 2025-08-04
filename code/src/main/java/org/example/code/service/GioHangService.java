@@ -17,9 +17,9 @@ public class GioHangService {
     public GioHang getGioHangByKhachHang(Integer khachHangId) {
         return gioHangRepository.findByIdKhachhang_Id(khachHangId);
     }
-    public long demTongSanPhamTrongGio(String username) {
+    public long demTongSanPhamTrongGio(String email) {
         return gioHangRepository
-                .demSoSanPhamTheoTenDangNhap(username)
+                .demSoSanPhamTheoTenDangNhap(email)
                 ;
     }
 }

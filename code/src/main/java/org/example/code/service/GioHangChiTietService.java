@@ -36,6 +36,9 @@ public class GioHangChiTietService {
                 .orElseThrow(() -> new RuntimeException("Gio hang chi tiet not found with id: " + id));
     }
 
+    public void addAndEdit(GioHangChiTiet gioHangChiTiet) {
+        gioHangChiTietRepository.save(gioHangChiTiet);
+    }
 
     public void addGioHangChiTiet(Integer sanPhamCTId, Integer soLuong) {
         Integer khachHangId;
