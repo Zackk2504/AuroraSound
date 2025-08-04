@@ -141,24 +141,28 @@ public class BanHangTaiQuayService {
         List<HoaDonChiTiet> hoaDonChiTietList = hoaDonChiTietService.getListHoaDonChiTietByIdHoaDon(idhd);
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String tenDangNhap = auth.getName();
-        String trangThaiHoaDon = "THANH_CONG";
+        String trangThaiHoaDon = "DA_XAC_NHAN";
+        BigDecimal tienShip = BigDecimal.ZERO;
 
         if (tenDangNhap == null || tenDangNhap.isEmpty()) {
             throw new RuntimeException("Ten dang nhap khong hop le");
         }
 
         if (tenNguoiNhan == null || tenNguoiNhan.trim().isEmpty()) {
-            trangThaiHoaDon = "DA_THANH_TOAN";
             tenNguoiNhan = tenKhach;
         }
         if (diaChiNguoiNhan == null || diaChiNguoiNhan.trim().isEmpty()) {
-            trangThaiHoaDon = "DA_THANH_TOAN";
-            diaChiNguoiNhan = "Cua hang"; // hoặc diaChi nếu muốn dùng địa chỉ khách
+            diaChiNguoiNhan = "CUA_HANG"; // hoặc diaChi nếu muốn dùng địa chỉ khách
         }
         if (sdtNguoiNhan == null || sdtNguoiNhan.trim().isEmpty()) {
-            trangThaiHoaDon = "DA_THANH_TOAN";
             sdtNguoiNhan = sdtkhach;
         }
+        if ("CUA_HANG".equals(diaChiNguoiNhan)
+                && (sdtNguoiNhan.equals(sdtkhach) || sdtNguoiNhan.isEmpty())
+                && (tenNguoiNhan.equals(tenKhach) || tenNguoiNhan.isEmpty())) {
+            trangThaiHoaDon = "THANH_CONG";
+        }
+
 
         NhanVien nhanVien = nhanVienService.getNhanVienByTenDangNhap(tenDangNhap);
 
@@ -185,10 +189,11 @@ public class BanHangTaiQuayService {
         }
         BigDecimal tongTien = hoaDonService.tinhTongTien(hoaDon);
         BigDecimal tienvoucher = voucherService.tinhTienGiam(hoaDon.getIdVoucher(), tongTien);
-        BigDecimal tienShip = hoaDon.getTienship() != null ? hoaDon.getTienship() : BigDecimal.ZERO;
+        tienShip = hoaDon.getTienship() != null ? hoaDon.getTienship() : BigDecimal.ZERO;
         BigDecimal tienthanhtoan = tongTien.subtract(tienvoucher).add(tienShip);
         hoaDon.setIdNhanvien(nhanVien);
         hoaDon.setTenNguoiNhan(tenNguoiNhan);
+        hoaDon.setMaHoaDon(hoaDonService.taoMaHoaDon());
         hoaDon.setSdtNguoiNhan(sdtNguoiNhan);
         hoaDon.setDiaChiNhanHang(diaChiNguoiNhan);
         hoaDon.setThanhTien(hoaDonService.tinhTongTien(hoaDon));

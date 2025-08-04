@@ -111,7 +111,7 @@
             <div class="col-md-3">
                 <label class="form-label">Trạng thái</label>
                 <select class="form-select" name="trangThai">
-                    <option value="">-- Tất cả --</option>
+                    <option value="" >-- Tất cả --</option>
                     <option value="hoat_dong" th:selected="${param.trangThai == 'hoat_dong'}">Hoạt động</option>
                     <option value="khong_hoat_dong" th:selected="${param.trangThai == 'khong_hoat_dong'}">Ngưng</option>
                 </select>
@@ -132,7 +132,7 @@
                 <th>Loại</th>
                 <th>Thương hiệu</th>
                 <th>Xuất xứ</th>
-                <th>Tổng số lượng</th>
+                <th>Số lượng biến thể</th>
                 <th>Trạng thái</th>
                 <th>Hành động</th>
             </tr>
@@ -144,7 +144,11 @@
                 <td th:text="${sp.idLoaisanpham.tenLoaiSanPham}"></td>
                 <td th:text="${sp.idThuonghieu.tenThuongHieu}"></td>
                 <td th:text="${sp.idXuatxu.noiXuatXu}"></td>
-
+                <td>
+                <span th:each="bt : ${listBienThe}"
+                      th:if="${sp.id} == ${bt.idSanPham}"
+                      th:text="${bt.soLuongBienThe}">0</span>
+                </td>
                 <td>
                     <th:block th:if="${sp.trangThai == 'hoat_dong'}">
                         <span class="badge bg-success">Hoạt động</span>

@@ -208,7 +208,10 @@
                                     <div><strong th:text="'Số lượng ' +  ${v.soLuongConLai}">số lượng </strong></div>
                                 </div>
                                 <button class="btn btn-sm btn-success" type="button"
-                                        th:attr="onclick=|apDungVoucher('${v.id}')|">
+                                        th:onclick="'apDungVoucher(\'' + ${v.id} + '\');'"
+                                        th:attr="data-kieugiam=${v.kieuGiam},
+                                        data-gtvoucher=${v.giaTriVoucher},
+                                        data-toida=${v.giaTriToiDaVoucher}">
                                     Áp dụng
                                 </button>
                             </li>
@@ -258,7 +261,7 @@
 
                 <!-- Hidden fields -->
                 <input type="hidden" id="tongTienGoc" th:value="${tongTien}">
-                <input type="text" name="maVoucherDaChon" id="idVoucher" value="">
+                <input type="hidden" name="maVoucherDaChon" id="idVoucher" value="">
             </div>
 
             <button type="submit" class="btn-checkout" onclick="handleSubmit(this)">Đặt hàng</button>
@@ -359,9 +362,7 @@
         });
 
             function apDungVoucher(maVoucher) {
-                document.getElementById('idVoucher').value = maVoucher;
-
-                // Bỏ trạng thái của tất cả các nút
+                // Reset tất cả các nút voucher
                 document.querySelectorAll('[onclick^="apDungVoucher"]').forEach(btn => {
                     btn.innerText = 'Áp dụng';
                     btn.disabled = false;
@@ -369,41 +370,53 @@
                     btn.classList.add('btn-success');
                 });
 
-                const voucherItem = [...document.querySelectorAll('[onclick^="apDungVoucher"]')]
-                    .find(btn => btn.getAttribute("onclick").includes(maVoucher))
-                    .closest('.list-group-item');
+                // Tìm voucher được chọn
+                const selectedBtn = [...document.querySelectorAll('[onclick^="apDungVoucher"]')]
+                    .find(btn => btn.getAttribute("onclick").includes(maVoucher));
 
-                const btn = voucherItem.querySelector('button');
-                btn.innerText = '✅ Đã áp dụng';
-                btn.disabled = true;
-                btn.classList.remove('btn-success');
-                btn.classList.add('btn-secondary');
-
-                const giamText = voucherItem.querySelector('span').innerText;
-                const tongTienGoc = parseFloat(document.getElementById('tongTienGoc').value);
-                let tienGiam = 0;
-
-                if (giamText.includes('%')) {
-                    const match = giamText.match(/Giảm (\d+)%.*?(\d+)/);
-                    if (match) {
-                        const phanTram = parseInt(match[1]);
-                        const toiDa = parseInt(match[2]);
-                        tienGiam = Math.min(tongTienGoc * phanTram / 100, toiDa);
-                    }
-                } else {
-                    const match = giamText.match(/Giảm ([\d,.]+)/);
-                    if (match) {
-                        tienGiam = parseInt(match[1].replace(/[,.]/g, ''));
-                    }
+                if (!selectedBtn) {
+                    console.error("Không tìm thấy voucher");
+                    return;
                 }
 
+                // Đánh dấu voucher được chọn
+                selectedBtn.innerText = '✅ Đã áp dụng';
+                selectedBtn.disabled = true;
+                selectedBtn.classList.remove('btn-success');
+                selectedBtn.classList.add('btn-secondary');
+
+                // Lấy thông tin giảm giá
+                const kieuGiam = selectedBtn.dataset.kieugiam;
+                const giaTriVoucher = selectedBtn.dataset.gtvoucher;
+                const toiDa = parseFloat(selectedBtn.dataset.toida) || 0;
+                const tongTienGoc = parseFloat(document.getElementById('tongTienGoc').value) || 0;
+                let tienGiam = 0;
+
+                console.log("Thông tin voucher:", {
+                    kieuGiam,
+                    giaTriVoucher,
+                    toiDa,
+                    tongTienGoc
+                });
+
+                // Tính toán tiền giảm
+                if (kieuGiam === 'phan_tram') {
+                    tienGiam = Math.min(tongTienGoc * giaTriVoucher / 100, toiDa);
+                    console.log(`Giảm ${giaTriVoucher}% - Tối đa ${toiDa.toLocaleString('vi-VN')}₫, tính ra: ${tienGiam.toLocaleString('vi-VN')}₫`);
+                } else if (kieuGiam === 'tien_mat') {
+                    tienGiam = Math.min(tongTienGoc, giaTriVoucher);
+                    console.log(`Giảm tiền mặt: ${tienGiam.toLocaleString('vi-VN')}₫`);
+                }
+
+                // Cập nhật giao diện
                 document.getElementById('tienGiam').dataset.giam = tienGiam;
-                document.getElementById("idVoucher").value = idVoucher.value;
+                document.getElementById('tienGiam').textContent = tienGiam.toLocaleString('vi-VN') + ' ₫';
+                document.getElementById('idVoucher').value = maVoucher;
                 capNhatTongThanhToan();
 
+                // Đóng modal
                 const modal = bootstrap.Modal.getInstance(document.getElementById('voucherModal'));
-                modal.hide();
-
+                modal?.hide();
             }
 
             function capNhatTongThanhToan() {

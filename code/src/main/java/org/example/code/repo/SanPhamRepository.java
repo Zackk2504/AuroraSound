@@ -22,7 +22,7 @@ public interface SanPhamRepository extends JpaRepository<SanPham, Integer> {
     WHERE (:loaiId IS NULL OR sp.idLoaisanpham.id = :loaiId)
       AND (:thuongHieuId IS NULL OR sp.idThuonghieu.id = :thuongHieuId)
       AND (:xuatXuId IS NULL OR sp.idXuatxu.id = :xuatXuId)
-      AND (:trangThai IS NULL OR sp.trangThai = :trangThai)
+      AND (:trangThai IS NULL OR sp.trangThai LIKE :trangThai)
 """)
     Page<SanPham> search(
             @Param("loaiId") Integer loaiId,

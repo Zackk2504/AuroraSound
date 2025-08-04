@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{index}">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body >
+<div layout:fragment="khachhangcontent" class="p-6 max-w-4xl mx-auto bg-white shadow rounded">
+    <!-- Form tra cứu gửi GET request -->
+    <form method="get" th:action="@{/khach-hang/tra-cuu-don-hang}" class="bg-white shadow-lg rounded-xl p-8 w-full max-w-xl text-center">
+        <h1 class="text-2xl font-bold text-gray-800 mb-4">Tra cứu đơn hàng</h1>
+        <input
+                type="text"
+                name="maHoaDon"
+                placeholder="Nhập mã hóa đơn..."
+                class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+                required
+        />
+        <button
+                type="submit"
+                class="mt-4 bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition"
+        >
+            Tra cứu
+        </button>
+    </form>
+
+    <!-- Thông báo lỗi nếu không tìm thấy -->
+    <div th:if="${error}" class="mt-4 text-red-600 font-semibold">
+        <p th:text="${error}">Không tìm thấy đơn hàng</p>
+    </div>
+
+    <!-- Kết quả tra cứu nếu có -->
+    <div th:if="${hoaDon != null}" class="mt-8 w-full max-w-3xl">
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <h2 class="text-xl font-semibold mb-4 text-gray-700">Thông tin hóa đơn</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-gray-700">
+                <div><strong>Mã hoá đơn:</strong> <span th:text="${hoaDon.maHoaDon}"></span></div>
+                <div><strong>Ngày đặt:</strong> <span th:text="${#temporals.format(hoaDon.ngayTao, 'dd-MM-yyyy HH:mm')}"></span></div>
+                <div><strong>Tên khách hàng:</strong> <span th:text="${hoaDon.tenNguoiNhan}"></span></div>
+                <div><strong>Số điện thoại:</strong> <span th:text="${hoaDon.sdtNguoiNhan}"></span></div>
+                <div>
+                    <strong>Trạng thái:</strong>
+                    <span th:switch="${hoaDon.trangThaiHoaDon}">
+                    <span th:case="'THANH_CONG'" class="inline-block bg-green-100 text-green-800 font-semibold px-3 py-1 rounded">Đã thanh toán</span>
+                    <span th:case="'CHO_XAC_NHAN'" class="inline-block bg-yellow-100 text-yellow-800 font-semibold px-3 py-1 rounded">Chờ xác nhận</span>
+                    <span th:case="'DA_HUY'" class="inline-block bg-red-100 text-red-800 font-semibold px-3 py-1 rounded">Đã hủy</span>
+                    <span th:case="'DA_GIAO_HANG'" class="inline-block bg-blue-100 text-blue-800 font-semibold px-3 py-1 rounded">Đã giao</span>
+                    <span th:case="*" class="inline-block bg-gray-100 text-gray-800 font-semibold px-3 py-1 rounded">Không rõ</span>
+                    </span>
+                </div>
+            </div>
+            <table class="table table-bordered text-center">
+                <thead>
+                <tr>
+                    <th>Sản phẩm</th>
+                    <th>Màu sắc</th>
+                    <th>Phiên bản</th>
+                    <th>Giá tiền</th>
+                    <th>Số lượng</th>
+                    <th>Thành tiền</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="ct : ${hoaDonChiTiets}">
+                    <td th:text="${ct.idSanphamchitiet.idSanpham.tenSanPham}"></td>
+                    <td th:text="${ct.idSanphamchitiet.idMausac.tenMauSac}"></td>
+                    <td th:text="${ct.idSanphamchitiet.idPhienban.tenPhienBan}">M</td>
+                    <td th:text="${#utils.formatCurrency(ct.donGia)} "></td>
+                    <td th:text="${ct.soLuong}">2</td>
+                    <td th:text="${#utils.formatCurrency((ct.donGia * ct.soLuong))} ">500.000đ</td>
+                </tr>
+                </tbody>
+                <tfoot>
+                <tr>
+                    <td colspan="5" class="text-end"><strong>Tổng tiền hàng:</strong></td>
+                    <td th:text="${#utils.formatCurrency((hoaDon.thanhTien))} ">1.420.000đ</td>
+                </tr>
+                <tr>
+                    <td colspan="5" class="text-end"><strong>Giảm giá (voucher):</strong></td>
+                    <td th:if="${hoaDon.idVoucher != null}" th:text="${#utils.formatCurrency(tienVoucher)}"></td>
+                    <td th:unless="${hoaDon.idVoucher != null}">Không có</td>                </tr>
+                <tr>
+                    <td colspan="5" class="text-end"><strong> Tiền ship </strong></td>
+                    <td th:text="${#utils.formatCurrency(hoaDon.tienship ?: 0)}">100.000đ</td>
+                </tr>
+                <tr>
+                    <td colspan="5" class="text-end"><strong> Giá trị thanh toán </strong></td>
+                    <td th:text="${#utils.formatCurrency((hoaDon.giaTriThanhToan))}">100.000đ</td>
+                </tr>
+
+                </tfoot>
+            </table>
+        </div>
+    </div>
+
+
+</div>
+</div>
+</body>
+</html>

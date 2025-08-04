@@ -1,5 +1,6 @@
 package org.example.code.controller;
 
+import org.example.code.DTO.SanPhamBienTheDTO;
 import org.example.code.DTO.SanPhamChiTietDTO;
 import org.example.code.DTO.SanPhamDTO;
 import org.example.code.model.AnhSanPham;
@@ -56,6 +57,9 @@ public class SanPhamController {
                                 @RequestParam(value = "trangThai", required = false) String trangThai,
                                 Model model) {
         Pageable pageable = PageRequest.of(page, 5, Sort.by("id").descending());
+        if (trangThai != null && trangThai.trim().isEmpty()) {
+            trangThai = null;
+        }
         Page<SanPham> dsSanPham = sanPhamService.findByFilter(loaiId, thuongHieuId, xuatXuId, trangThai, pageable);
 
         model.addAttribute("dsSanPham", dsSanPham);
@@ -63,6 +67,11 @@ public class SanPhamController {
 
 //        model.addAttribute("danhsachmausac",mauSacService.getAll());
 //        model.addAttribute("danhsachphienban",phienBanService.getall());
+        List<SanPhamBienTheDTO> bientheList = sanPhamService.countBienTheTheoSanPham();
+        for (SanPhamBienTheDTO dto : bientheList) {
+            System.out.println(dto + "dto");
+        }
+        model.addAttribute("listBienThe", bientheList);
         model.addAttribute("danhsachsanpham",sanPhamService.getAllSanPhams());
         model.addAttribute("dsLoai", loaiSanPhamService.getAllLoaiSanPhams());
         model.addAttribute("dsThuongHieu", thuongHieuService.getAllThuongHieus());

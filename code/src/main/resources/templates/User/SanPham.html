@@ -29,6 +29,10 @@
             opacity: 0.5;
             pointer-events: none;
         }
+        #productCarousel img {
+            max-height: 400px;
+            object-fit: contain;
+        }
     </style>
 </head>
 
@@ -37,13 +41,21 @@
     <div class="container bg-white shadow-sm p-4 rounded mt-4">
         <div class="row">
             <!-- Ảnh sản phẩm -->
+            <input type="hidden" id="productId" th:value="${sp.id}"/>
             <div class="col-md-5">
-<!--                <img th:src="@{${spChiTiet[0].hinhAnh}}" class="img-fluid rounded mb-3" alt="Ảnh sản phẩm">-->
-<!--                <div class="d-flex gap-2">-->
-<!--                    <img th:each="ct : ${spChiTiet}" th:src="@{${ct.hinhAnh}}" class="img-thumbnail"-->
-<!--                         style="width: 60px; height: 60px;" alt="Ảnh phụ">-->
-<!--                </div>-->
+                <div id="productCarousel" class="carousel slide" data-bs-ride="carousel">
+                    <div class="carousel-inner" id="carousel-images">
+                        <!-- Ảnh sẽ được chèn vào đây bằng JavaScript -->
+                    </div>
+                    <button class="carousel-control-prev" type="button" data-bs-target="#productCarousel" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#productCarousel" data-bs-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    </button>
+                </div>
             </div>
+
 
             <!-- Thông tin sản phẩm -->
             <div class="col-md-7">
@@ -95,13 +107,13 @@
                     <label for="soLuong">Số lượng:</label>
                     <input type="number" id="soLuong" name="soLuong" min="1" value="1" class="form-control w-25">
                 </div>
-
+                <input type="hidden" id="idSanPhamChiTiet">
                 <!-- NÚT -->
                 <div class="mt-4 d-flex gap-3">
                     <button class="btn btn-outline-danger" id="btnThemGio" disabled onclick="themVaoGio()">
                         <i class="bi bi-cart-plus"></i> Thêm vào giỏ
                     </button>
-                    <button class="btn btn-danger" id="btnMuaNgay" disabled>Mua ngay</button>
+                    <button class="btn btn-danger" id="btnMuaNgay" disabled onclick="muaNgay()">Mua ngay</button>
                 </div>
             </div>
 
@@ -114,7 +126,7 @@
             <p th:text="${sp.moTa}">Mô tả sản phẩm sẽ hiển thị ở đây</p>
         </div>
     </div>
-
+    </div>
     <!-- Dữ liệu JS -->
     <script th:inline="javascript">
         const chiTietList = /*[[${spChiTiet}]]*/ [];
@@ -146,6 +158,7 @@
                 const sp = chiTietList.find(ct =>
                     ct.idMausac.id == selectedMauId && ct.idPhienban.id == selectedPhienbanId);
                 if (sp) {
+                    document.getElementById('idSanPhamChiTiet').value = sp.id;
                     giaEl.textContent = sp.donGia.toLocaleString('vi-VN') + ' ₫';
                     soLuongConLaiEl.textContent = sp.soLuongTon + " sản phẩm";
                     btnThem.disabled = false;
@@ -205,8 +218,52 @@
             }
         }
 
+        function muaNgay() {
+            const spctId = document.getElementById('idSanPhamChiTiet').value;
+            const soLuong = document.getElementById('soLuong').value;
+
+            if (!spctId) {
+                alert("Vui lòng chọn màu và phiên bản sản phẩm trước khi mua");
+                return;
+            }
+
+            // Điều hướng đến controller xử lý mua ngay
+            window.location.href = `/khach-hang/mua-ngay?idSanPhamChiTiet=${spctId}&soLuong=${soLuong}`;
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const productId = document.getElementById("productId").value;
+
+            fetch(`/khach-hang/sanpham/${productId}/images`)
+                .then(response => response.json())
+                .then(data => {
+                    const carouselInner = document.getElementById("carousel-images");
+
+                    if (Array.isArray(data) && data.length > 0) {
+                        data.forEach((url, index) => {
+                            const div = document.createElement("div");
+                            div.classList.add("carousel-item");
+                            if (index === 0) {
+                                div.classList.add("active");
+                            }
+
+                            div.innerHTML = `
+                            <img src="${url}" class="d-block w-100" alt="Ảnh sản phẩm ${index + 1}">
+                        `;
+
+                            carouselInner.appendChild(div);
+                        });
+                    } else {
+                        carouselInner.innerHTML = `<div class="text-center p-3">Không có ảnh để hiển thị</div>`;
+                    }
+                })
+                .catch(error => {
+                    console.error("Lỗi khi load ảnh sản phẩm:", error);
+                });
+        });
 
     </script>
-</div>
+
+    </div>
 </body>
 </html>

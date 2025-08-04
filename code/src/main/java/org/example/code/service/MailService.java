@@ -62,4 +62,43 @@ public class MailService {
             e.printStackTrace(); // hoặc log lỗi nếu cần
         }
     }
+
+    @Async("threadPoolTaskExecutor")
+    public void sendThankYouEmail(String tenKhachHang, String email, String maHoaDon) {
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+            helper.setTo(email);
+            helper.setSubject("🧾 Cảm ơn bạn đã đặt hàng tại AuroraSound!");
+
+            String content = "<div style='font-family: Arial, sans-serif; padding: 20px;'>"
+                    + "<h2 style='color: #2c3e50;'>Xin chào " + tenKhachHang + "!</h2>"
+                    + "<p>Cảm ơn bạn đã tin tưởng và mua sắm tại <strong style='color: #e67e22;'>AuroraSound</strong> 🎧.</p>"
+
+                    + "<p>💬 Đơn hàng của bạn đã được tiếp nhận thành công.</p>"
+                    + "<p>Mã hóa đơn của bạn là:</p>"
+                    + "<p style='font-size: 24px; font-weight: bold; color: #27ae60; background: #ecf0f1; padding: 10px; border-radius: 8px; display: inline-block;'>"
+                    + maHoaDon + "</p>"
+
+                    + "<p>Bạn có thể dùng mã này để tra cứu tình trạng đơn hàng bất cứ lúc nào tại website.</p>"
+
+                    + "<p style='margin-top: 30px;'>Nếu có bất kỳ thắc mắc nào, đừng ngần ngại liên hệ với chúng tôi.</p>"
+
+                    + "<hr style='margin: 30px 0;'>"
+                    + "<p style='font-size: 14px;'>Trân trọng,<br><strong>Đội ngũ AuroraSound</strong></p>"
+
+                    + "<div style='margin-top: 30px; text-align: center;'>"
+                    + "<img src='https://i.imgur.com/BjDGsUv.png' alt='Thank You' style='max-width: 100%; height: auto;'>"
+                    + "</div>"
+                    + "</div>";
+
+            helper.setText(content, true); // true = HTML content
+
+            mailSender.send(message);
+        } catch (Exception e) {
+            e.printStackTrace(); // hoặc log lỗi
+        }
+    }
+
 }

@@ -76,4 +76,10 @@ public class HoaDon {
 
     @Column(name = "ngayTao")
     private LocalDateTime ngayTao;
+
+    @Column(name = "maHoaDon")
+    private String maHoaDon;
+
+    @Column(name = "tienTraSau")
+    private BigDecimal tienTraSau;
 }
