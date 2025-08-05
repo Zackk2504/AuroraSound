@@ -108,7 +108,9 @@
                    th:data-price="${item.idSanphamchitiet.donGia}"
                    th:data-quantity="${item.soLuong}">
 
-            <img th:src="@{/images/sanpham/placeholder.jpg}" alt="Ảnh sản phẩm">
+            <img th:if="${mapAnhDau[item.idSanphamchitiet.idSanpham.id] != null}"
+                 th:src="@{${mapAnhDau[item.idSanphamchitiet.idSanpham.id].url}}"
+                 class="square-img"/>
 
             <div class="cart-details">
                 <div th:text="${item.idSanphamchitiet.idSanpham.tenSanPham}" class="fw-bold">Tên sản phẩm</div>
