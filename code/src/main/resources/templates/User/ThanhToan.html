@@ -164,7 +164,9 @@
                 <!-- Hidden input để gửi selectedIds về backend -->
                 <input type="hidden" name="selectedIds" th:value="${item.id}"/>
 
-                <img th:src="@{/images/sanpham/placeholder.jpg}" alt="Ảnh sản phẩm">
+                <img th:if="${mapAnhDau[item.idSanphamchitiet.idSanpham.id] != null}"
+                     th:src="@{${mapAnhDau[item.idSanphamchitiet.idSanpham.id].url}}"
+                     class="square-img"/>
                 <div class="product-details">
                     <div class="name" th:text="${item.idSanphamchitiet.idSanpham.tenSanPham}">Tên sản phẩm</div>
                     <div class="desc">

@@ -95,6 +95,16 @@ public class KhachHangController {
         } else {
             model.addAttribute("diaChiMacDinh", new DiaChi());
         }
+        List<AnhSanPham> danhSachAnh = anhSanPhamService.getAllList();
+        Map<Integer, AnhSanPham> mapAnhDau = new HashMap<>();
+        for (AnhSanPham anh : danhSachAnh) {
+            Integer idSanPham = anh.getIdSanpham().getId();
+            if (!mapAnhDau.containsKey(idSanPham)) {
+                mapAnhDau.put(idSanPham, anh); // chỉ lưu ảnh đầu tiên
+            }
+        }
+
+        model.addAttribute("mapAnhDau", mapAnhDau);
         model.addAttribute("khachHang", khachHang);
         model.addAttribute("tongTien", tongTien);
         model.addAttribute("listDiaChi", diaChiService.layDanhSachDiaChiTheoKhachHang(khachHang.getId()));

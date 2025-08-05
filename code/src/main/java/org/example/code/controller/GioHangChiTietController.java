@@ -1,5 +1,7 @@
 package org.example.code.controller;
 
+import org.example.code.model.AnhSanPham;
+import org.example.code.service.AnhSanPhamService;
 import org.example.code.service.GioHangChiTietService;
 import org.example.code.service.GioHangService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +14,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Controller
@@ -21,10 +25,21 @@ public class GioHangChiTietController {
     GioHangChiTietService gioHangChiTietService;
     @Autowired
     private GioHangService gioHangService;
+    @Autowired
+    private AnhSanPhamService anhSanPhamService;
 
     @GetMapping("/gio-hang")
     public String getGioHangChiTiet(Model model) {
         try {
+            List<AnhSanPham> danhSachAnh = anhSanPhamService.getAllList();
+            Map<Integer, AnhSanPham> mapAnhDau = new HashMap<>();
+            for (AnhSanPham anh : danhSachAnh) {
+                Integer idSanPham = anh.getIdSanpham().getId();
+                if (!mapAnhDau.containsKey(idSanPham)) {
+                    mapAnhDau.put(idSanPham, anh); // chỉ lưu ảnh đầu tiên
+                }
+            }
+            model.addAttribute("mapAnhDau", mapAnhDau);
             model.addAttribute("gioHangChiTietList", gioHangChiTietService.getGioHangChiTietByGioHang());
         } catch (Exception e) {
             model.addAttribute("errorMessage", "Lỗi khi lấy giỏ hàng chi tiết: " + e.getMessage());
