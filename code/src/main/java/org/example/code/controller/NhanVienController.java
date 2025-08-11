@@ -102,13 +102,12 @@ public class NhanVienController {
 
             switch (trangThai) {
                 case "DA_XAC_NHAN":
+                    hoaDonService.setlshoadon("đổi trạng thái",trangThai,"DA_GIAO_HANG",hd,nhanVien);
                     hd.setTrangThaiHoaDon("DA_GIAO_HANG");
                     break;
                 case "DA_GIAO_HANG":
+                    hoaDonService.setlshoadon("đổi trạng thái",trangThai,"THANH_CONG",hd,nhanVien);
                     hd.setTrangThaiHoaDon("THANH_CONG");
-                    break;
-                case "THANH_CONG":
-                    hd.setTrangThaiHoaDon("THAT_BAI");
                     break;
                 // Nếu cần, có thể thêm case nữa cho vòng lặp trạng thái
                 default:
@@ -136,12 +135,33 @@ public class NhanVienController {
 
         return "redirect:/ban-hang-tai-quay/hoa-don/chi-tiet/" + id; // Trang hiển thị danh sách hóa đơn
     }
-    @GetMapping("/nhan-vien/huy-don-hang/{id}")
-    public String huyDonHang(@PathVariable Integer id) {
 
-        hoaDonService.huyDonHang(id);
-        return "redirect:/ban-hang-tai-quay/hoa-don/chi-tiet/" + id; // Redirect về trang chi tiết hóa đơn
+    @GetMapping("/nhan-vien/huy-don-hang/{id}")
+    public String giaohangthatbai(Model model,@PathVariable Integer id,
+                                @RequestParam(required = false) String ghiChu,
+                                  @RequestParam(required = false) Boolean kieuhuy) {
+        Optional<HoaDon> hoaDon = hoaDonService.getHoaDonById(id);
+        if (hoaDon.isEmpty()) {
+            throw new RuntimeException("Không tìm thấy hóa đơn với ID: " + id);
+        }
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String tenDangNhap = auth.getName(); // Lấy tên đăng nhập của người dùng hiện tại
+        NhanVien nhanVien = nhanVienService.getNhanVienByTenDangNhap(tenDangNhap);
+        if (nhanVien == null) {
+            throw new RuntimeException("Không tìm thấy nhân viên với tên đăng nhập: " + tenDangNhap);
+        }
+
+            if (kieuhuy) {
+                hoaDonService.setlshoadon(ghiChu,hoaDon.get().getTrangThaiHoaDon(),"THAT_BAI",hoaDon.get(),nhanVien);
+                hoaDon.get().setTrangThaiHoaDon("THAT_BAI");
+                hoaDonService.addAndEdit(hoaDon.get());
+            }else {
+                hoaDonService.huyDonHang(id,ghiChu);
+            }
+
+        return "redirect:/ban-hang-tai-quay/hoa-don/chi-tiet/" + id; // Trang hiển thị danh sách hóa đơn
     }
+
     @GetMapping("/nhan-vien/list-dia-chi-khach")
     @ResponseBody
     public ResponseEntity<List<DiaChi>> getListDiaChiKhach(@RequestParam Integer idhd) {

@@ -3,6 +3,7 @@ package org.example.code.service;
 import jakarta.transaction.Transactional;
 import org.example.code.model.*;
 import org.example.code.repo.HoaDonRepository;
+import org.example.code.repo.LichSuHoaDonRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.security.SecureRandom;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +34,9 @@ public class HoaDonService {
     private NhanVienService nhanVienService;
     @Autowired
     private SanPhamChiTietService sanPhamChiTietService;
+    @Autowired
+    private LichSuHoaDonRepository lichSuHoaDonRepository;
+
 
     public Optional<HoaDon> getHoaDonById(Integer id) {
         return hoaDonRepository.getHoaDonById(id);
@@ -44,8 +49,31 @@ public class HoaDonService {
         hoaDonRepository.save(hoaDon);
     }
 
+    public List<LichSuHoaDon> getLichSuHoaDonByHoaDonId(Integer id) {
+        return lichSuHoaDonRepository.findAllByHoaDon_Id(id);
+    }
+
+    public void addAndEditlshoadon(LichSuHoaDon lichSuHoaDon){
+        lichSuHoaDonRepository.save(lichSuHoaDon);
+    }
+
     public void deleteHoaDon(Integer id) {
         hoaDonRepository.deleteById(id);
+    }
+    public void xoahd(Integer id){
+        hoaDonRepository.deleteById(id);
+        hoaDonChiTietService.deleteAllByIdHoaDon(id);
+    }
+
+    public void setlshoadon(String ghiChu,String TTcu,String ttms,HoaDon hoaDon, NhanVien idnv ) {
+        LichSuHoaDon lichSuHoaDon = new LichSuHoaDon();
+        lichSuHoaDon.setHoaDon(hoaDon);
+        lichSuHoaDon.setNhanVien(idnv);
+        lichSuHoaDon.setNgayCapNhat(LocalDateTime.now());
+        lichSuHoaDon.setTrangThaiCu(TTcu);
+        lichSuHoaDon.setTrangThaiMoi(ttms);
+        lichSuHoaDon.setGhiChu(ghiChu);
+        lichSuHoaDonRepository.save(lichSuHoaDon);
     }
 
     public List<HoaDon> getbytrangthai(String trangThaiHoaDon) {
@@ -154,6 +182,7 @@ public class HoaDonService {
         NhanVien nhanVien = nhanVienService.getNhanVienByTenDangNhap(tenDangNhap);
         HoaDon hoaDon = hoaDonRepository.findById(idHoaDon)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy hóa đơn với ID: " + idHoaDon));
+        LichSuHoaDon lichSuHoaDon = new LichSuHoaDon();
         if (hoaDon.getTrangThaiHoaDon().equals("CHO_XAC_NHAN")) {
             if (ghiChu != null && !ghiChu.isBlank()) {
                 hoaDon.setGhiChu(ghiChu);
@@ -172,6 +201,15 @@ public class HoaDonService {
             hoaDon.setTrangThaiHoaDon("DA_XAC_NHAN");
             hoaDon.setIdNhanvien(nhanVien); // Cập nhật nhân viên xử lý hóa đơn
             hoaDonRepository.save(hoaDon);
+//            Lưu lịch sử
+            lichSuHoaDon.setHoaDon(hoaDon);
+            lichSuHoaDon.setNhanVien(nhanVien);
+            lichSuHoaDon.setNgayCapNhat(LocalDateTime.now());
+            lichSuHoaDon.setGhiChu(ghiChu);
+            lichSuHoaDon.setTrangThaiCu("");
+            lichSuHoaDon.setTrangThaiMoi(hoaDon.getTrangThaiHoaDon());
+            lichSuHoaDonRepository.save(lichSuHoaDon);
+
             List<HoaDonChiTiet> hoaDonChiTiet = hoaDonChiTietService.getListHoaDonChiTietByIdHoaDon(idHoaDon);
             if (hoaDonChiTiet.isEmpty()) {
                 throw new RuntimeException("Hóa đơn không có chi tiết sản phẩm.");
@@ -203,11 +241,12 @@ public class HoaDonService {
         return hoaDonRepository.findByMaHoaDon(maHoaDon);
     }
     @Transactional
-    public void huyDonHang(Integer idHoaDon) {
+    public void huyDonHang(Integer idHoaDon,String ghiChu) {
         Optional<HoaDon> hoaDon = hoaDonRepository.findById(idHoaDon);
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String tenDangNhap = auth.getName(); // Lấy tên đăng nhập của người dùng hiện tại
         NhanVien nhanVien = nhanVienService.getNhanVienByTenDangNhap(tenDangNhap);
+        LichSuHoaDon lichSuHoaDon = new LichSuHoaDon();
         if (nhanVien == null) {
             throw new RuntimeException("Không tìm thấy nhân viên với tên đăng nhập: " + tenDangNhap);
         }
@@ -223,9 +262,14 @@ public class HoaDonService {
         if (hd.getTrangThaiHoaDon().equalsIgnoreCase("CHO_XAC_NHAN")) {
             hd.setTrangThaiHoaDon("DA_HUY");
 //            hd.setIdNhanvien(nhanVien); // Cập nhật nhân viên xử lý hóa đơn
+            lichSuHoaDon.setTrangThaiCu("CHO_XAC_NHAN");
+            lichSuHoaDon.setTrangThaiMoi("DA_HUY");
             hoaDonRepository.save(hd);
-        } else if (hd.getTrangThaiHoaDon().equalsIgnoreCase("DA_XAC_NHAN")) {
-            hd.setTrangThaiHoaDon("DA_HUY");
+        } else {
+//            Trường hợp hủy này khi khách ko nhận thì trả lại số lượng
+            lichSuHoaDon.setTrangThaiCu(hoaDon.get().getTrangThaiHoaDon());
+            hd.setTrangThaiHoaDon("THAT_BAI");
+            lichSuHoaDon.setTrangThaiMoi("THAT_BAI");
             List<HoaDonChiTiet> hoaDonChiTiet = hoaDonChiTietService.getListHoaDonChiTietByIdHoaDon(idHoaDon);
             for (HoaDonChiTiet chiTiet : hoaDonChiTiet) {
                 SanPhamChiTiet sanPham = chiTiet.getIdSanphamchitiet();
@@ -234,9 +278,11 @@ public class HoaDonService {
             }
             hoaDonRepository.save(hd);
         }
-        else {
-            throw new RuntimeException("Trạng thái hóa đơn không hợp lệ để hủy.");
-        }
+        lichSuHoaDon.setHoaDon(hoaDon.get());
+        lichSuHoaDon.setNhanVien(nhanVien);
+        lichSuHoaDon.setGhiChu(ghiChu);
+        lichSuHoaDon.setNgayCapNhat(LocalDateTime.now());
+        lichSuHoaDonRepository.save(lichSuHoaDon);
     }
 
 }

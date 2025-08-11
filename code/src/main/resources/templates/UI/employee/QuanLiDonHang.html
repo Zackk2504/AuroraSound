@@ -42,7 +42,7 @@
             <strong>Địa chỉ giao hàng:</strong>
             <span id="diaChiGiaoHangText" th:text="${hoaDon.diaChiNhanHang}" class="ms-2 me-2 flex-grow-1">FPT Polytechnic Trịnh Văn Bô</span>
             <input type="hidden" id="diaChiGiaoHanginput" th:value="${diachimoi}"/>
-            <button class="btn btn-primary" onclick="openDiaChiModal()">Đổi địa chỉ</button>
+            <button th:if="${hoaDon.trangThaiHoaDon == 'CHO_XAC_NHAN'}" class="btn btn-primary" onclick="openDiaChiModal()">Đổi địa chỉ</button>
         </div>
     </div>
 
@@ -159,8 +159,8 @@
         <p>Tổng tiền trả sau: <span id="tienTraSau">0đ</span></p>
         <input type="hidden" id="tienTraSauInput" value="0">
     </div>
-    <span class="text-muted">*Ghi chú.</span>
-    <input type="text" id="ghiChuInput" placeholder="Ghi chú" th:value="${hoaDon.ghiChu}" class="form-control mb-3"/>
+<!--    <span class="text-muted">*Ghi chú.</span>-->
+<!--    <input type="text" id="ghiChuInput" placeholder="Ghi chú" th:value="${hoaDon.ghiChu}" class="form-control mb-3"/>-->
 
     <div class="mt-3">
         <strong>Ngày mua hàng:</strong> <span th:text="${#temporals.format(hoaDon.ngayTao, 'dd-MM-yyyy HH:mm')}">18-07-2025 20:58</span><br>
@@ -170,51 +170,61 @@
         <span class="text-warning" th:if="${hoaDon.trangThaiHoaDon == 'DA_GIAO_HANG'}"> Đã giao hàng cho bên vận chuyển </span>
         <span class="text-warning" th:if="${hoaDon.trangThaiHoaDon == 'DA_XAC_NHAN'}">Đã xác nhận</span>
         <span class="text-warning" th:if="${hoaDon.trangThaiHoaDon == 'DA_HUY'}"> Đã hủy </span>
+        <span class="text-warning" th:if="${hoaDon.trangThaiHoaDon == 'THAT_BAI'}"> Thất bại </span>
+
     </div>
 
     <div class="mt-4 text-end">
         <div class="mt-4 text-end">
 
-            <!-- Nút hủy đơn: chỉ hiển thị nếu chưa hoàn thành -->
+            <!-- Nút hủy đơn -->
             <a class="btn btn-danger"
-               th:if="${hoaDon.trangThaiHoaDon != 'THANH_CONG' && hoaDon.trangThaiHoaDon != 'DA_HUY' && hoaDon.trangThaiHoaDon != 'DA_GIAO_HANG'}"
-               th:href="@{'/nhan-vien/huy-don-hang/' + ${hoaDon.id}}">
+               th:if="${hoaDon.trangThaiHoaDon != 'THANH_CONG' && hoaDon.trangThaiHoaDon != 'DA_HUY' && hoaDon.trangThaiHoaDon != 'DA_GIAO_HANG' && hoaDon.trangThaiHoaDon != 'THAT_BAI'}"
+               th:href="@{'/nhan-vien/huy-don-hang/' + ${hoaDon.id}}"
+               onclick="huyDonHang(event, this.href)">
                 Hủy đơn này
             </a>
 
 
-            <!-- Nút xác nhận duyệt đơn: chỉ hiển thị nếu đang chờ xác nhận -->
+            <a class="btn btn-primary"
+               th:if="${hoaDon.trangThaiHoaDon == 'DA_XAC_NHAN'}"
+               th:href="@{'/nhan-vien/thay-doi-trang-thai/' + ${hoaDon.id}}"
+               onclick="confirmAction(event, 'Xác nhận đã giao hàng cho bên vận chuyển?', this.href)">
+                Đã giao hàng cho bên vận chuyển
+            </a>
+
+
+            <!-- Nút xác nhận duyệt đơn -->
             <a class="btn btn-success"
                th:if="${hoaDon.trangThaiHoaDon == 'CHO_XAC_NHAN'}"
                onclick="xacNhanDonHang()">
                 Xác nhận duyệt đơn
             </a>
 
-            <!-- Nút chuyển trạng thái: từ ĐÃ XÁC NHẬN -> ĐÃ GIAO HÀNG -->
-            <a class="btn btn-primary"
-               th:if="${hoaDon.trangThaiHoaDon == 'DA_XAC_NHAN'}"
-               th:href="@{'/nhan-vien/thay-doi-trang-thai/' + ${hoaDon.id}}">
-                Đã giao hàng cho bên vận chuyển
-            </a>
-
-            <!-- Nút hoàn thành: từ ĐÃ GIAO HÀNG -> THÀNH CÔNG -->
+            <!-- Nút hoàn thành -->
             <a class="btn btn-success"
                th:if="${hoaDon.trangThaiHoaDon == 'DA_GIAO_HANG'}"
-               th:href="@{'/nhan-vien/thay-doi-trang-thai/' + ${hoaDon.id}}">
+               th:href="@{'/nhan-vien/thay-doi-trang-thai/' + ${hoaDon.id}}"
+               onclick="confirmAction(event, 'Xác nhận hoàn thành đơn hàng?', this.href)">
                 Hoàn tất đơn hàng
             </a>
 
+            <!-- Nút giao hàng thất bại -->
             <a class="btn btn-secondary"
-               th:if="${hoaDon.trangThaiHoaDon == 'THANH_CONG'}"
-               th:href="@{'/nhan-vien/thay-doi-trang-thai/' + ${hoaDon.id}}">
-                Giao hàng thất bại
+               th:if="${hoaDon.trangThaiHoaDon == 'DA_GIAO_HANG'}"
+               href="javascript:void(0)"
+               onclick="giaoHangThatBai()">
+                Giao hàng thất bại
             </a>
+
+
 
         </div>
 
 
     </div>
 </div>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         let phiShipCu = 0;
         let tienTraSau = 0;
@@ -389,31 +399,154 @@
         }
 
         function xacNhanDonHang() {
-            const idHoaDon = document.getElementById("idhd").textContent; // hoặc lấy từ biến th: [[${hoaDon.id}]]
-            const ghiChu = document.getElementById("ghiChuInput").value;
+            const idHoaDon = document.getElementById("idhd").textContent;
             const diaChiMoi = document.getElementById("diaChiGiaoHanginput").value;
             const tienTraSau = document.getElementById("tienTraSauInput").value;
 
-            const url = `/nhan-vien/xac-nhan-don-hang/${idHoaDon}?` +
-                new URLSearchParams({
-                    ghiChu: ghiChu,
-                    diaChimoi: diaChiMoi,
-                    tienTraSau: tienTraSau
-                });
+            Swal.fire({
+                title: 'Xác nhận đơn hàng',
+                text: 'Nhập ghi chú nếu có',
+                input: 'text',
+                inputPlaceholder: 'Ghi chú...',
+                showCancelButton: true,
+                confirmButtonText: 'Xác nhận',
+                cancelButtonText: 'Hủy'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const ghiChu = result.value || '';
 
-            fetch(url)
-                .then(res => {
-                    if (!res.ok) throw new Error("Lỗi xác nhận đơn hàng");
-                    return res.text();
-                })
-                .then(data => {
-                    alert("✅ Xác nhận đơn hàng thành công!");
-                    location.reload(); // hoặc chuyển sang trang khác
-                })
-                .catch(err => {
-                    alert("❌ Có lỗi xảy ra: " + err.message);
-                });
+                    const url = `/nhan-vien/xac-nhan-don-hang/${idHoaDon}?` +
+                        new URLSearchParams({
+                            ghiChu: ghiChu,
+                            diaChimoi: diaChiMoi,
+                            tienTraSau: tienTraSau
+                        });
+
+                    fetch(url)
+                        .then(res => {
+                            if (!res.ok) throw new Error("Lỗi xác nhận đơn hàng");
+                            return res.text();
+                        })
+                        .then(() => {
+                            Swal.fire('Thành công', 'Đơn hàng đã được xác nhận!', 'success')
+                                .then(() => location.reload());
+                        })
+                        .catch(err => {
+                            Swal.fire('Lỗi', err.message, 'error');
+                        });
+                }
+            });
         }
+
+        function confirmAction(event, message, callbackUrl) {
+            event.preventDefault(); // chặn hành động mặc định trước
+
+            Swal.fire({
+                title: 'Xác nhận',
+                text: message,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Đồng ý',
+                cancelButtonText: 'Hủy',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Chuyển hướng sau khi xác nhận
+                    window.location.href = callbackUrl;
+                }
+            });
+        }
+
+        function huyDonHang(event, callbackUrl) {
+            event.preventDefault(); // Chặn link mặc định
+
+            Swal.fire({
+                title: 'Hủy đơn hàng',
+                text: 'Bạn có chắc chắn muốn hủy đơn hàng này không?',
+                icon: 'warning',
+                input: 'text',
+                inputPlaceholder: 'Nhập ghi chú (không bắt buộc)',
+                showCancelButton: true,
+                confirmButtonText: 'Xác nhận hủy',
+                cancelButtonText: 'Không',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const ghiChu = result.value || '';
+
+                    // Luôn kèm kieuhuy=false
+                    const urlWithParams = `${callbackUrl}?kieuhuy=false&ghiChu=${encodeURIComponent(ghiChu)}`;
+
+                    fetch(urlWithParams)
+                        .then(res => {
+                            if (!res.ok) throw new Error("Lỗi khi hủy đơn hàng");
+                            return res.text();
+                        })
+                        .then(() => {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Đã hủy đơn hàng',
+                                timer: 1500,
+                                showConfirmButton: false
+                            }).then(() => {
+                                location.reload();
+                            });
+                        })
+                        .catch(err => {
+                            Swal.fire('Lỗi', err.message, 'error');
+                        });
+                }
+            });
+        }
+
+
+        function giaoHangThatBai() {
+            const idHoaDon = document.getElementById("idhd").textContent;
+            Swal.fire({
+                title: 'Xác nhận giao hàng thất bại',
+                html: `
+            <div style="text-align:left; font-size:14px;">
+                <label style="display:block; margin-bottom:8px;">
+                    <input type="radio" name="kieuhuy" value="false" checked> Khách không nhận
+                </label>
+                <label style="display:block; margin-bottom:12px;">
+                    <input type="radio" name="kieuhuy" value="true"> Mất hàng
+                </label>
+                <textarea id="ghiChuInput"
+                    placeholder="Nhập ghi chú "
+                    style="
+                        width:100%;
+                        min-height:80px;
+                        padding:10px;
+                        font-size:14px;
+                        border:1px solid #ccc;
+                        border-radius:8px;
+                        outline:none;
+                        resize: vertical;
+                        box-sizing: border-box;
+                        font-family: Arial, sans-serif;
+                    "
+                ></textarea>
+            </div>
+        `,
+                showCancelButton: true,
+                confirmButtonText: 'Xác nhận',
+                cancelButtonText: 'Hủy',
+                focusConfirm: false,
+                preConfirm: () => {
+                    const kieuhuy = document.querySelector('input[name="kieuhuy"]:checked').value;
+                    const ghiChu = document.getElementById('ghiChuInput').value;
+                    return { kieuhuy, ghiChu };
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const { kieuhuy, ghiChu } = result.value;
+                    const url = `/nhan-vien/huy-don-hang/${idHoaDon}?kieuhuy=${kieuhuy}&ghiChu=${encodeURIComponent(ghiChu)}`;
+                    window.location.href = url;
+                }
+            });
+        }
+
 
 
 

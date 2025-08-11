@@ -504,8 +504,7 @@
     });
     document.getElementById("searchInput").addEventListener("keyup", function () {
         let keyword = this.value.toLowerCase();
-        let products = document.querySelectorAll("#product-list .col-md-4");
-
+        let products = document.querySelectorAll("#product-list .mb-2");
         products.forEach(function (product) {
             let name = product.querySelector("strong").innerText.toLowerCase();
             if (name.includes(keyword)) {

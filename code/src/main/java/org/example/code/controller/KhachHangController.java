@@ -2,6 +2,7 @@ package org.example.code.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.HttpServletRequest;
 import org.example.code.DTO.KhachHangDTO;
 import org.example.code.model.*;
 import org.example.code.service.*;
@@ -55,6 +56,8 @@ public class KhachHangController {
     private  SanPhamChiTietService sanPhamChiTietService;
     @Autowired
     private MailService mailService;
+    @Autowired
+    private ThanhToanService thanhToanService;
 
 
 
@@ -142,7 +145,16 @@ public class KhachHangController {
         }
 
         Optional<DiaChi> diaChiMacDinh = diaChiService.findByMacdinhTrue();
+        List<AnhSanPham> danhSachAnh = anhSanPhamService.getAllList();
+        Map<Integer, AnhSanPham> mapAnhDau = new HashMap<>();
+        for (AnhSanPham anh : danhSachAnh) {
+            Integer idSanPham = anh.getIdSanpham().getId();
+            if (!mapAnhDau.containsKey(idSanPham)) {
+                mapAnhDau.put(idSanPham, anh); // chỉ lưu ảnh đầu tiên
+            }
+        }
 
+        model.addAttribute("mapAnhDau", mapAnhDau);
         model.addAttribute("gioHangDaChon", List.of(item));
         System.out.println("tongTien: " + List.of(item).get(0).getIdSanphamchitiet().getDonGia());
         model.addAttribute("tongTien", tongTien);
@@ -177,76 +189,79 @@ public class KhachHangController {
             System.out.println("Tên đăng nhập: " + tenDangNhap);
             khachHang = khachHangService.getKhachHangByUsername(tenDangNhap).orElse(new KhachHang());
         }
-
         List<GioHangChiTiet> gioHangDaChon = gioHangChiTietService.findByIds(selectedIds);
+            // Tính tổng tiền và phí ship
+            ObjectMapper mapper = new ObjectMapper();
 
-        // Tính tổng tiền và phí ship
-        ObjectMapper mapper = new ObjectMapper();
+            ResponseEntity<String> tienShipResponse = shippingService.calculateShippingFee(districtId, wardCode);
+            String jsonBody = tienShipResponse.getBody();  // đây là chuỗi JSON
 
-        ResponseEntity<String> tienShipResponse = shippingService.calculateShippingFee(districtId, wardCode);
-        String jsonBody = tienShipResponse.getBody();  // đây là chuỗi JSON
+            BigDecimal phiShip = BigDecimal.ZERO;
+            BigDecimal tienVoucher = BigDecimal.ZERO;
+            Voucher voucher = null;
 
-        BigDecimal phiShip = BigDecimal.ZERO;
-        BigDecimal tienVoucher = BigDecimal.ZERO;
-        Voucher voucher = null;
+            try {
+                JsonNode root = mapper.readTree(jsonBody);
+                String phiShipStr = root.path("data").path("total").asText(); // hoặc "service_fee" nếu API bạn trả vậy
+                phiShip = new BigDecimal(phiShipStr);
+            } catch (Exception e) {
+                phiShip = BigDecimal.ZERO;
+            }
 
-        try {
-            JsonNode root = mapper.readTree(jsonBody);
-            String phiShipStr = root.path("data").path("total").asText(); // hoặc "service_fee" nếu API bạn trả vậy
-            phiShip = new BigDecimal(phiShipStr);
-        } catch (Exception e) {
-            phiShip = BigDecimal.ZERO;
-        }
+            BigDecimal tongTien = gioHangDaChon.stream()
+                    .map(sp -> sp.getIdSanphamchitiet().getDonGia().multiply(BigDecimal.valueOf(sp.getSoLuong())))
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+            System.out.println(tongTien + " tong tien");
+            if (idvoucher != null && idvoucher > 0) {
+                voucher = voucherService.getVoucherById((idvoucher)).orElseThrow();
+                tienVoucher = voucherService.tinhTienGiam(voucher, tongTien);
+                voucherService.apdungvoucher(idvoucher);
+            }
+            BigDecimal tongThanhToan = tongTien.add(phiShip).subtract(tienVoucher);
 
-        BigDecimal tongTien = gioHangDaChon.stream()
-                .map(sp -> sp.getIdSanphamchitiet().getDonGia().multiply(BigDecimal.valueOf(sp.getSoLuong())))
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-        System.out.println(tongTien + " tong tien");
-        if (idvoucher != null && idvoucher > 0) {
-            voucher = voucherService.getVoucherById((idvoucher)).orElseThrow();
-            tienVoucher = voucherService.tinhTienGiam(voucher, tongTien);
-            voucherService.apdungvoucher(idvoucher);
-        }
-        BigDecimal tongThanhToan = tongTien.add(phiShip).subtract(tienVoucher);
+            // Tạo hóa đơn
+            HoaDon hoaDon = new HoaDon();
+            hoaDon.setIdKhachhang(khachHang);
+            hoaDon.setGiaTriThanhToan(tongThanhToan);
+            hoaDon.setThanhTien(tongTien);
+            hoaDon.setHinhThucThanhToan(hinhThucThanhToan);
+            hoaDon.setTrangThaiHoaDon("CHO_XAC_NHAN");
+            hoaDon.setDiaChiNhanHang(diaChiNhanHang);
+            hoaDon.setTenNguoiNhan(tenNguoiNhan);
+            hoaDon.setSdtNguoiNhan(sdtNguoiNhan);
+            hoaDon.setLoaiHoaDon("Online");
+            hoaDon.setIdVoucher(voucher);
+            hoaDon.setTienship(phiShip);
+            hoaDon.setNgayTao(java.time.LocalDateTime.now());
+            hoaDon.setTenNguoiMua(khachHang.getHoTen());
+            hoaDon.setSdtNguoiMua(khachHang.getSoDT());
+            hoaDon.setMaHoaDon(hoaDonService.taoMaHoaDon());
 
-        // Tạo hóa đơn
-        HoaDon hoaDon = new HoaDon();
-        hoaDon.setIdKhachhang(khachHang);
-        hoaDon.setGiaTriThanhToan(tongThanhToan);
-        hoaDon.setThanhTien(tongTien);
-        hoaDon.setHinhThucThanhToan(hinhThucThanhToan);
-        hoaDon.setTrangThaiHoaDon("CHO_XAC_NHAN");
-        hoaDon.setDiaChiNhanHang(diaChiNhanHang);
-        hoaDon.setTenNguoiNhan(tenNguoiNhan);
-        hoaDon.setSdtNguoiNhan(sdtNguoiNhan);
-        hoaDon.setLoaiHoaDon("Online");
-        hoaDon.setIdVoucher(voucher);
-        hoaDon.setTienship(phiShip);
-        hoaDon.setNgayTao(java.time.LocalDateTime.now());
-        hoaDon.setTenNguoiMua(khachHang.getHoTen());
-        hoaDon.setSdtNguoiMua(khachHang.getSoDT());
-        hoaDon.setMaHoaDon(hoaDonService.taoMaHoaDon());
+            hoaDonService.addAndEdit(hoaDon);
+            // Gửi email thông báo
 
-        hoaDonService.addAndEdit(hoaDon);
-        // Gửi email thông báo
-        mailService.sendThankYouEmail(khachHang.getHoTen(), khachHang.getEmail(), hoaDon.getMaHoaDon());
 
-        // Tạo hóa đơn chi tiết
-        for (GioHangChiTiet gh : gioHangDaChon) {
-            HoaDonChiTiet hdct = new HoaDonChiTiet();
-            hdct.setIdHoadon(hoaDon);
-            hdct.setIdSanphamchitiet(gh.getIdSanphamchitiet());
-            hdct.setSoLuong(gh.getSoLuong());
-            hdct.setDonGia(gh.getIdSanphamchitiet().getDonGia());
+        if (hinhThucThanhToan.equals("CHUYEN_KHOAN")) {
+            System.out.println("hello");
+            return thanhToanService.thanhToanChuyenKhoan(hoaDon,khachHang,gioHangDaChon);
+        }else {
+            System.out.println("locc");
+            for (GioHangChiTiet gh : gioHangDaChon) {
+                HoaDonChiTiet hdct = new HoaDonChiTiet();
+                hdct.setIdHoadon(hoaDon);
+                hdct.setIdSanphamchitiet(gh.getIdSanphamchitiet());
+                hdct.setSoLuong(gh.getSoLuong());
+                hdct.setDonGia(gh.getIdSanphamchitiet().getDonGia());
 
-            hoaDonChiTietService.addAndEdit(hdct);
-            gioHangChiTietService.xoaGioHangChiTiet(gh.getId()); // Xóa sản phẩm khỏi giỏ hàng
+                hoaDonChiTietService.addAndEdit(hdct);
+                gioHangChiTietService.xoaGioHangChiTiet(gh.getId()); // Xóa sản phẩm khỏi giỏ hàng
+            }
+            mailService.sendThankYouEmail(khachHang.getHoTen(), khachHang.getEmail(), hoaDon.getMaHoaDon());
+            return "redirect:/khach-hang/hoa-don-thanh-cong/" + hoaDon.getId();
         }
 
         // Xóa sản phẩm khỏi giỏ hàng sau khi đặt hàng
 
-
-        return "redirect:/khach-hang/hoa-don-thanh-cong/" + hoaDon.getId();
     }
 
 
@@ -408,5 +423,14 @@ public class KhachHangController {
         model.addAttribute("tienVoucher", tienvoucher);
         return "User/TraCuuDonHang";
     }
+    @RequestMapping(value = "/api/success/{id}")
+    public String Success(@PathVariable Integer id, @RequestParam Map<String, String> params, Model model) {
+        return "redirect:/khach-hang/hoa-don-thanh-cong/" + id;
+    }
 
+    @RequestMapping(value = "/api/cancel/{id}")
+    public String Cancel(@PathVariable Integer id, Model model) {
+        hoaDonService.xoahd(id);
+        return "test/cancel";
+    }
 }

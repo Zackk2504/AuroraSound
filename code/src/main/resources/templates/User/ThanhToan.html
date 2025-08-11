@@ -145,6 +145,8 @@
                         </div>
 
                         <div class="modal-footer">
+                            <button class="btn btn-outline-primary w-100" type="button" onclick="moModalThemDiaChiMoi()">+ Thêm địa chỉ giao hàng</button>
+
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
                         </div>
 
@@ -154,8 +156,50 @@
         </div>
 
     </div>
+<!--Modal thêm địa chỉ-->
+        <div class="modal fade" id="themDiaChiModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Thêm địa chỉ giao hàng mới</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div>
+                            <label class="block font-semibold mb-1">Tỉnh / Thành phố:</label>
+                            <select id="selectProvince" class="w-full border rounded p-2"></select>
+                        </div>
 
+                        <div>
+                            <label class="block font-semibold mb-1">Quận / Huyện:</label>
+                            <select id="selectDistrict" class="w-full border rounded p-2"></select>
+                        </div>
 
+                        <div>
+                            <label class="block font-semibold mb-1">Phường / Xã:</label>
+                            <select id="selectWard" class="w-full border rounded p-2"></select>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <input type="checkbox" name="macdinh" id="inputMacDinh" class="w-4 h-4"/>
+                            <label class="font-semibold">Đặt làm mặc định</label>
+                        </div>
+                        <div>
+                            <label class="block font-semibold mb-1">Số nhà:</label>
+                            <input type="text" name="diaChi" id="inputDiaChi" class="w-full border rounded p-2" required/>
+                        </div>
+                        <!--                    <input type="text" name="diaChifull" id="inputDiaChiDayDu"/>-->
+
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-success" type="button" onclick="closeModal()">Lưu</button>
+                    </div>
+                </div>
+            </div>
+            <input type="hidden" name="provinceId" id="inputProvinceId"/>
+            <input type="hidden" name="districtId" id="inputDistrictId"/>
+            <input type="hidden" name="wardCode" id="inputWardCode"/>
+            <input type="hidden" name="diaChifull" id="inputDiaChiDayDu"/>
+        </div>
 
         <!-- Sản phẩm -->
         <div class="checkout-section">
@@ -275,7 +319,10 @@
 
         <script>
             let phiShip = 0;
-
+            const inputProvinceId = document.getElementById("inputProvinceId");
+            const inputDistrictId = document.getElementById("inputDistrictId");
+            const inputWardCode = document.getElementById("inputWardCode");
+            // const idHoaDon = document.getElementById("idhd").textContent;
 
             function chonDiaChiFromData(row) {
                 const diaChi = row.dataset.diachi;
@@ -433,7 +480,132 @@
 
             }
 
+            function moModalThemDiaChiMoi() {
+                loadProvinces();
+                bootstrap.Modal.getInstance(document.getElementById("diaChiModal")).hide();
+                new bootstrap.Modal(document.getElementById("themDiaChiModal")).show();
+            }
+            function closeModal() {
+                const tinh = document.querySelector("#selectProvince option:checked").textContent;
+                const huyen = document.querySelector("#selectDistrict option:checked").textContent;
+                const xa = document.querySelector("#selectWard option:checked").textContent;
+                const soNha = document.getElementById("inputDiaChi").value;
 
+                const diaChiDayDu = `${soNha}, ${xa}, ${huyen}, ${tinh}`;
+                document.getElementById("inputDiaChiDayDu").value = diaChiDayDu;
+
+                const data = {
+                    provinceId: document.getElementById("inputProvinceId").value,
+                    districtId: document.getElementById("inputDistrictId").value,
+                    wardCode: document.getElementById("inputWardCode").value,
+                    diaChifull: diaChiDayDu,
+                    "diaChiMoi.diaChi": diaChiDayDu,
+                    "diaChiMoi.provinceId": document.getElementById("inputProvinceId").value,
+                    "diaChiMoi.districtId": document.getElementById("inputDistrictId").value,
+                    "diaChiMoi.wardCode": document.getElementById("inputWardCode").value,
+                    "diaChiMoi.macdinh": document.getElementById("inputMacDinh").checked
+                };
+
+                fetch("/khach-hang/diachi/save2", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded"
+                    },
+                    body: new URLSearchParams(data)
+                })
+                    .then(response => {
+                        if (!response.ok) throw new Error("Có lỗi khi lưu địa chỉ");
+                        return response.text(); // hoặc .json() nếu trả JSON
+                    })
+                    .then(result => {
+                        // ✅ Gửi thành công
+                        console.log("Đã lưu địa chỉ:", result);
+                        location.reload();
+                        tinhPhiShip(); // gọi lại sau khi lưu xong
+                        // đóng modal nếu cần
+                        // $('#modalDiaChi').modal('hide'); // nếu dùng Bootstrap
+                    })
+                    .catch(error => {
+                        console.error("Lỗi khi gửi địa chỉ:", error);
+                    });
+            }
+
+            const sProvince = document.getElementById("selectProvince");
+            const sDistrict = document.getElementById("selectDistrict");
+            const sWard = document.getElementById("selectWard");
+
+
+            function loadProvinces(selectedId, selectedDistrict, selectedWard) {
+                fetch("https://dev-online-gateway.ghn.vn/shiip/public-api/master-data/province", {
+                    headers: {Token: "dfc26f23-6b12-11f0-9b81-222185cb68c8"}
+                })
+                    .then(res => res.json())
+                    .then(data => {
+                        sProvince.innerHTML = '<option value="">Chọn tỉnh</option>';
+                        data.data.forEach(p => {
+                            sProvince.innerHTML += `<option value="${p.ProvinceID}" ${p.ProvinceID == selectedId ? 'selected' : ''}>${p.ProvinceName}</option>`;
+                        });
+                        if (selectedId) fetchDistricts(selectedId, selectedDistrict, selectedWard);
+                    });
+            }
+
+            sProvince.onchange = () => fetchDistricts(sProvince.value);
+
+            function fetchDistricts(provinceId, selectedDistrict, selectedWard) {
+                fetch("https://dev-online-gateway.ghn.vn/shiip/public-api/master-data/district", {
+                    method: "POST",
+                    headers: {"Content-Type": "application/json", Token: "dfc26f23-6b12-11f0-9b81-222185cb68c8"},
+                    body: JSON.stringify({province_id: parseInt(provinceId)})
+                })
+                    .then(res => res.json())
+                    .then(data => {
+                        sWard.disabled = false;
+                        sDistrict.innerHTML = '<option value="">Chọn quận</option>';
+                        data.data.forEach(d => {
+                            sDistrict.innerHTML += `<option value="${d.DistrictID}" ${d.DistrictID == selectedDistrict ? 'selected' : ''}>${d.DistrictName}</option>`;
+                        });
+                        if (selectedDistrict) fetchWards(selectedDistrict, selectedWard);
+                    });
+            }
+
+            sDistrict.onchange = () => fetchWards(sDistrict.value);
+
+            function fetchWards(districtId, selectedWard) {
+                fetch("https://dev-online-gateway.ghn.vn/shiip/public-api/master-data/ward?district_id", {
+                    method: "POST",
+                    headers: {"Content-Type": "application/json", Token: "dfc26f23-6b12-11f0-9b81-222185cb68c8"},
+                    body: JSON.stringify({district_id: parseInt(districtId)})
+                })
+                    .then(res => res.json())
+                    .then(data => {
+                        sWard.innerHTML = '<option value="">Chọn phường</option>';
+                        data.data.forEach(w => {
+                            sWard.innerHTML += `<option value="${w.WardCode}" ${w.WardCode == selectedWard ? 'selected' : ''}>${w.WardName}</option>`;
+                        });
+                    });
+            }
+
+            sProvince.onchange = () => {
+                inputProvinceId.value = sProvince.value;
+                fetchDistricts(sProvince.value);
+            };
+
+            sDistrict.onchange = () => {
+                inputDistrictId.value = sDistrict.value;
+                fetchWards(sDistrict.value);
+            };
+
+            sWard.onchange = () => inputWardCode.value = sWard.value;
+
+            function buildFullAddress() {
+                const soNha = document.getElementById("inputDiaChi").value;
+                const province = document.querySelector("#selectProvince option:checked")?.text || "";
+                const district = document.querySelector("#selectDistrict option:checked")?.text || "";
+                const ward = document.querySelector("#selectWard option:checked")?.text || "";
+
+                const fullAddress = `${soNha}, ${ward}, ${district}, ${province}`;
+                document.getElementById("inputDiaChiDayDu").value = fullAddress;
+            }
         </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 

@@ -72,7 +72,7 @@ public class SecurityConfig {
                 .csrf().disable()
 //                .securityMatcher("/khach-hang/**") // hoặc "/khach-hang/**", "/index", "/san-pham/**"...
                 .authorizeHttpRequests(auth -> auth
-                                .requestMatchers("/verify/**","/register/**","/", "/index", "/login", "/oauth2/**","/error","/login/oauth2/**","/images/**","/shipping/**").permitAll()
+                                .requestMatchers("/api/**","/verify/**","/register/**","/", "/index", "/login", "/oauth2/**","/error","/login/oauth2/**","/images/**","/shipping/**").permitAll()
                                 .requestMatchers("/khach-hang/**").hasRole("USER")
 //                        .anyRequest().authenticated()
                 )
