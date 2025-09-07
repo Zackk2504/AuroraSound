@@ -6,6 +6,7 @@ import lombok.Setter;
 import org.hibernate.annotations.Nationalized;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -24,18 +25,18 @@ public class LichSuHoaDon {
     private String trangThaiMoi;
 
     @Column(name = "ngayCapNhat")
-    private Instant ngayCapNhat;
+    private LocalDateTime ngayCapNhat;
 
-    @Nationalized
-    @Column(name = "nguoiCapNhat", length = 100)
-    private String nguoiCapNhat;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "nguoiCapNhat")
+    private NhanVien nhanVien;
 
     @Nationalized
     @Column(name = "ghiChu")
     private String ghiChu;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "IDHoaDon")
-    private HoaDon iDHoaDon;
+    private HoaDon hoaDon;
 
 }

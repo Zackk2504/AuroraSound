@@ -2,36 +2,108 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Đăng nhập khách hàng</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
+    <style>
+        body {
+            background: linear-gradient(135deg, #FFDEE9 0%, #B5FFFC 100%);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .login-card {
+            width: 420px;
+            border-radius: 20px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+            background-color: white;
+            padding: 40px 30px;
+            text-align: center;
+        }
+        .login-card img.logo {
+            width: 80px;
+            margin-bottom: 15px;
+        }
+        .login-card h3 {
+            font-weight: bold;
+            margin-bottom: 25px;
+            color: #333;
+        }
+        .form-control {
+            border-radius: 10px;
+        }
+        .btn-primary {
+            border-radius: 10px;
+            font-weight: 500;
+        }
+        .google-btn {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            background-color: white;
+            font-size: 16px;
+            font-weight: 500;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.2s ease;
+        }
+        .google-btn:hover {
+            background-color: #f7f7f7;
+        }
+        .extra-links {
+            margin-top: 15px;
+            font-size: 14px;
+        }
+        .extra-links a {
+            text-decoration: none;
+            color: #007bff;
+        }
+        .error-msg {
+            color: red;
+            margin-top: 10px;
+        }
+    </style>
 </head>
 <body>
-Màn hình đăng nhập của khách hàng
 
-<form th:action="@{khach-hang/login}" method="post">
-    <div>
-        <label>Username:</label>
-        <input type="text" name="username"/>
-    </div>
-    <div>
-        <label>Password:</label>
-        <input type="password" name="password"/>
-    </div>
-    <div>
-        <button type="submit">Login</button>
-        <a href="/oauth2/authorization/google" style="text-decoration: none;">
-            <button type="button" style="padding: 10px 20px; background-color: white; border: 1px solid #ccc; border-radius: 5px; font-size: 16px; display: flex; align-items: center; gap: 10px;">
-                <img src="https://developers.google.com/identity/images/g-logo.png" alt="Google logo" style="width: 20px; height: 20px;">
-                Đăng nhập với Google
-            </button>
-        </a>
-        <div th:if="${param.error}">
-        <p style="color: red;">Sai tên đăng nhập hoặc mật khẩu. Vui lòng thử lại.</p>
+<div class="login-card">
+    <!-- logo công ty -->
+    <img src="https://cdn-icons-png.flaticon.com/512/295/295128.png" alt="logo" class="logo">
+    <h3>Đăng nhập khách hàng</h3>
+
+    <form th:action="@{/khach-hang/login}" method="post">
+        <div class="mb-3 text-start">
+            <label class="form-label">Tên đăng nhập</label>
+            <input type="text" name="username" class="form-control" placeholder="Nhập username">
+        </div>
+        <div class="mb-3 text-start">
+            <label class="form-label">Mật khẩu</label>
+            <input type="password" name="password" class="form-control" placeholder="Nhập mật khẩu">
+        </div>
+        <button type="submit" class="btn btn-primary w-100 mb-3">Đăng nhập</button>
+    </form>
+
+    <a href="/oauth2/authorization/google" style="text-decoration: none;">
+        <div class="google-btn">
+            <img src="https://developers.google.com/identity/images/g-logo.png" alt="Google logo" style="width: 20px; height: 20px;">
+            Đăng nhập với Google
+        </div>
+    </a>
+
+    <div th:if="${param.error}" class="error-msg">
+        Sai tên đăng nhập hoặc mật khẩu. Vui lòng thử lại.
     </div>
 
-</form>
+    <div class="extra-links">
+        <a href="#">Quên mật khẩu?</a> | <a href="/register">Đăng ký tài khoản</a>
+    </div>
+</div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

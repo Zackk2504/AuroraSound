@@ -8,7 +8,7 @@
     <title>Title</title>
 </head>
 <body >
-<div layout:fragment="khachhangcontent" class="p-6 max-w-4xl mx-auto bg-white shadow rounded">
+<div layout:fragment="khachhangcontent" class="flex items-center justify-center p-6 max-w-4xl mx-auto bg-white shadow rounded">
     <!-- Form tra cứu gửi GET request -->
     <form method="get" th:action="@{/khach-hang/tra-cuu-don-hang}" class="bg-white shadow-lg rounded-xl p-8 w-full max-w-xl text-center">
         <h1 class="text-2xl font-bold text-gray-800 mb-4">Tra cứu đơn hàng</h1>
@@ -26,7 +26,7 @@
             Tra cứu
         </button>
     </form>
-
+<br>
     <!-- Thông báo lỗi nếu không tìm thấy -->
     <div th:if="${error}" class="mt-4 text-red-600 font-semibold">
         <p th:text="${error}">Không tìm thấy đơn hàng</p>
@@ -48,6 +48,7 @@
                     <span th:case="'CHO_XAC_NHAN'" class="inline-block bg-yellow-100 text-yellow-800 font-semibold px-3 py-1 rounded">Chờ xác nhận</span>
                     <span th:case="'DA_HUY'" class="inline-block bg-red-100 text-red-800 font-semibold px-3 py-1 rounded">Đã hủy</span>
                     <span th:case="'DA_GIAO_HANG'" class="inline-block bg-blue-100 text-blue-800 font-semibold px-3 py-1 rounded">Đã giao</span>
+                    <span th:case="'THAT_BAI'" class="inline-block bg-blue-100 text-blue-800 font-semibold px-3 py-1 rounded"> Thất bại </span>
                     <span th:case="*" class="inline-block bg-gray-100 text-gray-800 font-semibold px-3 py-1 rounded">Không rõ</span>
                     </span>
                 </div>

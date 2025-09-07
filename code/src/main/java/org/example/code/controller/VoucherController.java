@@ -8,6 +8,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.stereotype.Controller;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -65,6 +66,12 @@ public class VoucherController {
         } else {
             return ResponseEntity.badRequest().body("Voucher không hợp lệ hoặc không áp dụng được");
         }
+    }
+    @PostMapping("/stop/{id}")
+    public String stopVoucher(@PathVariable Integer id) {
+        voucherService.stopvoucher(id);
+        System.out.println("hello" + id);
+        return "redirect:/admin/vouchers";
     }
 }
 

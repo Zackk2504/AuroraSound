@@ -49,10 +49,10 @@
 <div id="sidebar">
     <h4 class="p-3">Quản trị</h4>
     <a th:href="@{/ban-hang-tai-quay}">Bán hàng tại quầy </a>
-    <a th:href="@{/admin/nhan-vien}">Nhân viên</a>
-    <a th:href="@{/admin/khach-hang}">Khách hàng</a>
-    <a th:href="@{/admin/san-pham}">Sản phẩm</a>
     <a th:href="@{/ban-hang-tai-quay/hoa-don}">Hóa đơn</a>
+    <a th:href="@{/admin/nhan-vien}">Nhân viên</a>
+    <a th:href="@{/admin/lich-su-hoa-don}">Lịch sử hóa đơn</a>
+    <a th:href="@{/admin/san-pham}">Sản phẩm</a>
     <a th:href="@{/admin/thong-ke}">Thống kê</a>
     <a th:href="@{/admin/vouchers}">Voucher</a>
     <a th:href="@{/nhan-vien/logout}">Đăng xuất</a>
@@ -98,17 +98,17 @@
 
     document.querySelectorAll('#sidebar a[href]').forEach(link => {
         const href = link.getAttribute('href');
-        if (currentPath.startsWith(href)) {
+        if (currentPath === href) { // so khớp tuyệt đối
             link.classList.add('active');
 
-            // Nếu là submenu trong chi tiết sản phẩm, mở menu cha
             if (link.closest('#chiTietCollapse')) {
-                const collapseEl = new bootstrap.Collapse(document.getElementById('chiTietCollapse'), {
+                new bootstrap.Collapse(document.getElementById('chiTietCollapse'), {
                     toggle: true
                 });
             }
         }
     });
+
 </script>
 </body>
 </html>

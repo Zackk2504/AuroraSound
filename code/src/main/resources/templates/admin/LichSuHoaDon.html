@@ -3,7 +3,7 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{admin/index}">
 <head>
-    <title>Trang chính</title>
+    <title>Trang Lịch sử hóa đơn </title>
 </head>
 <body>
 <div layout:fragment="content">
@@ -69,53 +69,13 @@
                 </td>
                 <td th:text="${#temporals.format(hd.ngayTao, 'dd-MM-yyyy HH:mm')}">18-07-2025 20:58</td>
                 <td>
-                    <a  class="btn btn-sm btn-warning" th:href="@{'/ban-hang-tai-quay/hoa-don/chi-tiet/' + ${hd.id}}">Chi tiết</a>
-                    <a th:href="@{'/ban-hang-tai-quay/hoa-don/pdf/' + ${hd.id}}"
-                       class="btn btn-sm btn-success" target="_blank">In</a>
+                    <a  class="btn btn-sm btn-warning" th:href="@{'/admin/lich-su-hoa-don/lich-su/' + ${hd.id}}">Lịch sử</a>
                 </td>
             </tr>
             </tbody>
         </table>
 
-        <!-- Modal Chi tiết Hóa Đơn -->
-        <div th:each="hd : ${listHoaDon}">
-            <div class="modal fade" th:id="'modalChiTiet_' + ${hd.id}" tabindex="-1">
-                <div class="modal-dialog modal-lg">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title">Chi tiết hóa đơn #[[${hd.id}]]</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                        </div>
-                        <div class="modal-body">
-                            <div class="row mb-3">
-                                <div class="col-md-6">
-                                    <label>Tên người nhận</label>
-                                    <input type="text" class="form-control" th:value="${hd.tenNguoiNhan}" readonly>
-                                </div>
-                                <div class="col-md-6">
-                                    <label>SĐT người nhận</label>
-                                    <input type="text" class="form-control" th:value="${hd.sdtNguoiNhan}" readonly>
-                                </div>
-                            </div>
-                            <div class="mb-3">
-                                <label>Địa chỉ nhận hàng</label>
-                                <input type="text" class="form-control" th:value="${hd.diaChiNhanHang}" readonly>
-                            </div>
-                            <div class="mb-3">
-                                <label>Ghi chú</label>
-                                <textarea class="form-control" rows="2" readonly th:text="${hd.ghiChu}"></textarea>
-                            </div>
-                            <div class="mb-3">
-                                <label>Trạng thái hóa đơn</label>
-                                <input type="text" class="form-control" th:value="${hd.trangThaiHoaDon}" readonly>
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
+
         </div>
 
         <nav>

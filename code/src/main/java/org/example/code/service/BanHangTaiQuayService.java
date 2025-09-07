@@ -35,6 +35,7 @@ public class BanHangTaiQuayService {
     @Autowired
     private VoucherService voucherService;
 
+
     public List<SanPhamChiTiet> DanhSachSanPham() {
         return sanPhamChiTietService.getAllSanPhamChiTiet();
     }
@@ -59,6 +60,7 @@ public class BanHangTaiQuayService {
             hoaDonService.addAndEdit(hoaDon);
             hoaDonChiTietService.addAndEdit(hoaDonChiTiet);
             sanPhamChiTietService.addAndEdit(sanPhamChiTiet);
+            sanPhamChiTietService.checksoluong(sanPhamChiTiet.getId());
             return hoaDon.getId();
         }else {
             Optional<HoaDon> hoaDonOptional = hoaDonService.getHoaDonById(idHoaDon);
@@ -101,6 +103,7 @@ public class BanHangTaiQuayService {
                         sanPhamChiTietService.addAndEdit(sanPhamChiTiet);
                     }
                     }
+                    sanPhamChiTietService.checksoluong(sanPhamChiTiet.getId());
                 } else {
                     if (sanPhamChiTiet.getSoLuongTon() < 1) {
                         throw new RuntimeException("So luong san pham khong du");
@@ -113,6 +116,7 @@ public class BanHangTaiQuayService {
                     sanPhamChiTiet.setSoLuongTon(sanPhamChiTiet.getSoLuongTon() - 1);
                     hoaDonChiTietService.addAndEdit(newHoaDonChiTiet);
                     sanPhamChiTietService.addAndEdit(sanPhamChiTiet);
+                    sanPhamChiTietService.checksoluong(sanPhamChiTiet.getId());
                 }
 
                 return hoaDon.getId();
@@ -143,7 +147,10 @@ public class BanHangTaiQuayService {
         String tenDangNhap = auth.getName();
         String trangThaiHoaDon = "DA_XAC_NHAN";
         BigDecimal tienShip = BigDecimal.ZERO;
+        HoaDon hoaDon = hoaDonService.getHoaDonById(idhd)
+                .orElseThrow(() -> new RuntimeException("Hoa Don not found"));
 
+        NhanVien nhanVien = nhanVienService.getNhanVienByTenDangNhap(tenDangNhap);
         if (tenDangNhap == null || tenDangNhap.isEmpty()) {
             throw new RuntimeException("Ten dang nhap khong hop le");
         }
@@ -161,18 +168,14 @@ public class BanHangTaiQuayService {
                 && (sdtNguoiNhan.equals(sdtkhach) || sdtNguoiNhan.isEmpty())
                 && (tenNguoiNhan.equals(tenKhach) || tenNguoiNhan.isEmpty())) {
             trangThaiHoaDon = "THANH_CONG";
+            hoaDonService.setlshoadon(ghiChu,"DA_XAC_NHAN","THANH_CONG",hoaDon,nhanVien);
         }
 
-
-        NhanVien nhanVien = nhanVienService.getNhanVienByTenDangNhap(tenDangNhap);
-
-
+        hoaDon.setTrangThaiHoaDon(trangThaiHoaDon);
         if (hoaDonChiTietList.isEmpty()) {
             throw new RuntimeException("Hoa Don Chi Tiet is empty");
         }
-        HoaDon hoaDon = hoaDonService.getHoaDonById(idhd)
-                .orElseThrow(() -> new RuntimeException("Hoa Don not found"));
-        hoaDon.setTrangThaiHoaDon(trangThaiHoaDon);
+
         BigDecimal Tongtien = BigDecimal.ZERO;
         for (HoaDonChiTiet hoaDonChiTiet : hoaDonChiTietList) {
             BigDecimal soLuong = BigDecimal.valueOf(hoaDonChiTiet.getSoLuong());
