@@ -196,6 +196,8 @@
             </div>
         </div>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <script>
         function openAddModal() {
             document.getElementById("modalTitle").innerText = "Thêm Nhân Viên";
@@ -236,6 +238,33 @@
 
             new bootstrap.Modal(document.getElementById("nhanVienModal")).show();
         }
+        document.getElementById("nhanVienForm").addEventListener("submit", function (event) {
+            const ngaySinh = document.getElementById("ngaySinh").value;
+            if (!ngaySinh) return; // chưa nhập ngày sinh thì HTML5 đã required rồi
+
+            const birthDate = new Date(ngaySinh);
+            const today = new Date();
+            const age = today.getFullYear() - birthDate.getFullYear();
+            const monthDiff = today.getMonth() - birthDate.getMonth();
+            const dayDiff = today.getDate() - birthDate.getDate();
+
+            let realAge = age;
+            if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
+                realAge--; // chưa qua sinh nhật năm nay
+            }
+
+            if (realAge < 18) {
+                event.preventDefault(); // ngăn form submit
+
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Tuổi không hợp lệ',
+                    text: 'Nhân viên phải từ 18 tuổi trở lên!',
+                    confirmButtonText: 'OK'
+                });
+            }
+        });
+
     </script>
 
 

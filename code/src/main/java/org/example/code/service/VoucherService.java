@@ -34,6 +34,16 @@ public class VoucherService {
         setTrangThaiTheoNgay(voucher);
         voucherRepository.save(voucher);
     }
+    public void stopvoucher(Integer id){
+        Voucher voucher = voucherRepository.findById(id).get();
+        if (voucher == null){
+            throw new RuntimeException("voucher is null");
+        }
+        LocalDateTime now = LocalDateTime.now().minusMinutes(1); // trừ đi 1 phút
+        voucher.setNgayKetThuc(now);
+        setTrangThaiTheoNgay(voucher);
+        voucherRepository.save(voucher);
+    }
 
     public List<Voucher> getvoucherBytrangThaiHoatDong() {
         return voucherRepository.findByTrangThai("DANG_DIEN_RA");
@@ -51,6 +61,7 @@ public class VoucherService {
     public Voucher updateVoucher(Integer id, Voucher voucher) {
         voucher.setId(id);
         setTrangThaiTheoNgay(voucher);
+        voucher.setSoLuongConLai((voucher.getSoLuongVoucher()));
         return voucherRepository.save(voucher);
     }
 

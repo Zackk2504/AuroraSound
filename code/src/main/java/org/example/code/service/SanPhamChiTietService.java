@@ -48,7 +48,10 @@ public class SanPhamChiTietService {
         SanPhamChiTiet sanPhamChiTiet = sanPhamChiTietRepository.findById(id).orElseThrow();
         if (sanPhamChiTiet.getSoLuongTon() == 0) {
             sanPhamChiTiet.setTrangThai("khong_hoat_dong");
+        }else {
+            sanPhamChiTiet.setTrangThai("hoat_dong");
         }
+        sanPhamChiTietRepository.save(sanPhamChiTiet);
     }
 
     public Long countBienTheBySanPhamId(Integer idSanPham) {

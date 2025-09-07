@@ -7,6 +7,7 @@ import org.example.code.model.HoaDonChiTiet;
 import org.example.code.service.HoaDonChiTietService;
 import org.example.code.service.HoaDonPdfExporter;
 import org.example.code.service.HoaDonService;
+import org.example.code.service.VoucherService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,6 +33,8 @@ public class HoaDonController {
     private HoaDonService hoaDonService;
     @Autowired
     private HoaDonChiTietService hoaDonChiTietService;
+    @Autowired
+    private VoucherService  voucherService;
 
     @GetMapping()
     public String xemChiTietHoaDon(  @RequestParam(defaultValue = "0") int page,
@@ -62,12 +66,15 @@ public class HoaDonController {
     @GetMapping("/pdf/{id}")
     public void exportPdf(@PathVariable("id") Integer id, HttpServletResponse response) throws IOException, DocumentException, com.itextpdf.text.DocumentException {
         HoaDon hoaDon = hoaDonService.getHoaDonById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Hóa đơn không tồn tại"));        List<HoaDonChiTiet> chiTietList = hoaDonChiTietService.getListHoaDonChiTietByIdHoaDon(id);
+                .orElseThrow(() -> new IllegalArgumentException("Hóa đơn không tồn tại"));
+        List<HoaDonChiTiet> chiTietList = hoaDonChiTietService.getListHoaDonChiTietByIdHoaDon(id);
 
         response.setContentType("application/pdf");
         response.setHeader("Content-Disposition", "attachment; filename=hoa-don-" + id + ".pdf");
         System.out.println("Exporting PDF for HoaDon ID: " + id);
-        HoaDonPdfExporter exporter = new HoaDonPdfExporter(hoaDon, chiTietList);
+
+        BigDecimal tienGiam = voucherService.tinhTienGiam(hoaDon.getIdVoucher(),hoaDon.getThanhTien());
+        HoaDonPdfExporter exporter = new HoaDonPdfExporter(hoaDon, chiTietList,tienGiam);
         exporter.export(response);
     }
 }

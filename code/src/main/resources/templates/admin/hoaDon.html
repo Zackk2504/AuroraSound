@@ -64,6 +64,7 @@
                     <span th:case="'DA_HUY'">Đã hủy</span>
                     <span th:case="'DA_XAC_NHAN'"> Đã xác nhận </span>
                     <span th:case="'DA_GIAO_HANG'">Đã giao hàng</span>
+                    <span th:case="'THAT_BAI'"> Thất bại </span>
                     <span th:case="*">Không rõ</span> <!-- Trường hợp mặc định -->
                 </td>
                 <td th:text="${#temporals.format(hd.ngayTao, 'dd-MM-yyyy HH:mm')}">18-07-2025 20:58</td>

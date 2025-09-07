@@ -22,7 +22,7 @@ public class GlobalControllerAdvice {
     @ModelAttribute("slGioHang")
     public Long getSoLuongGioHang() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        KhachHang khachHang = null;
+        KhachHang khachHang;
 
 
             if (auth.getPrincipal() instanceof DefaultOidcUser user) {

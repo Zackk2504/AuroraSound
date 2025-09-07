@@ -32,8 +32,6 @@ public class ThanhToanService {
     public String thanhToanChuyenKhoan(HoaDon hoaDon, KhachHang khachHang,List<GioHangChiTiet> gioHangDaChon) {
 //        hoaDonService.addAndEdit(hoaDon);
 //        String baseUrl = this.getBaseUrl(request);
-        mailService.sendThankYouEmail(khachHang.getHoTen(), khachHang.getEmail(), hoaDon.getMaHoaDon());
-
         try {
             String productName = "Thanh toán đơn hàng " + hoaDon.getMaHoaDon();
             String description = "Thanh toán hóa đơn #" + hoaDon.getMaHoaDon();

@@ -17,6 +17,7 @@ public interface SanPhamChiTietRepository extends JpaRepository<SanPhamChiTiet, 
       AND (:idPhienBan IS NULL OR s.idPhienban.id = :idPhienBan)
       AND (:idXuatXu IS NULL OR s.idSanpham.idXuatxu.id = :idXuatXu)
       AND (:idLoaiSanPham IS NULL OR s.idSanpham.idLoaisanpham.id = :idLoaiSanPham)
+      AND s.idSanpham.trangThai = 'hoat_dong'
 """)
     List<SanPhamChiTiet> locSanPham(
             @Param("idThuongHieu") Integer idThuongHieu,

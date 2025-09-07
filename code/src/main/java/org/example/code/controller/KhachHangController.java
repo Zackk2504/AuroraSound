@@ -3,6 +3,7 @@ package org.example.code.controller;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
+import javassist.NotFoundException;
 import org.example.code.DTO.KhachHangDTO;
 import org.example.code.model.*;
 import org.example.code.service.*;
@@ -424,7 +425,14 @@ public class KhachHangController {
         return "User/TraCuuDonHang";
     }
     @RequestMapping(value = "/api/success/{id}")
-    public String Success(@PathVariable Integer id, @RequestParam Map<String, String> params, Model model) {
+    public String Success(@PathVariable Integer id, @RequestParam Map<String, String> params, Model model) throws NotFoundException {
+        Optional<HoaDon> hoaDon1 = hoaDonService.getHoaDonById(id);
+        if (!hoaDon1.isPresent()) {
+            throw new NotFoundException("khong tim thay");
+        }
+        HoaDon hoaDon = hoaDon1.get();
+
+        mailService.sendThankYouEmail(hoaDon.getIdKhachhang().getHoTen(), hoaDon.getIdKhachhang().getEmail(), hoaDon.getMaHoaDon());
         return "redirect:/khach-hang/hoa-don-thanh-cong/" + id;
     }
 

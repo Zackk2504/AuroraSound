@@ -534,8 +534,13 @@
                 cancelButtonText: 'Hủy',
                 focusConfirm: false,
                 preConfirm: () => {
-                    const kieuhuy = document.querySelector('input[name="kieuhuy"]:checked').value;
-                    const ghiChu = document.getElementById('ghiChuInput').value;
+                    const radioChecked = document.querySelector('input[name="kieuhuy"]:checked');
+                    const kieuhuy = radioChecked.value;
+                    const labelText = radioChecked.nextSibling.textContent.trim(); // lấy chữ hiển thị bên cạnh radio
+                    let ghiChu = document.getElementById('ghiChuInput').value.trim();
+                    if (ghiChu === ''){
+                        ghiChu = labelText;
+                    }
                     return { kieuhuy, ghiChu };
                 }
             }).then((result) => {

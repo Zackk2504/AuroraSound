@@ -144,26 +144,37 @@
                                       <span th:case="'DA_KET_THUC'" class="bg-danger">Đã kết thúc</span>
                                     </span>
                                 </td>
-                                    <td>
-                                        <button class="btn btn-sm btn-warning text-dark me-1"
-                                                title="Chỉnh sửa"
-                                                th:data-id="${voucher.id}"
-                                                th:data-ma="${voucher.maVoucher}"
-                                                th:data-ten="${voucher.tenVoucher}"
-                                                th:data-kieugiam="${voucher.kieuGiam}"
-                                                th:data-giatri="${voucher.giaTriVoucher}"
-                                                th:data-giamtoida="${voucher.giaTriToiDaVoucher}"
-                                                th:data-toithieu="${voucher.giaTriToiThieuApDung}"
-                                                th:data-toida="${voucher.giaTriToiDaApDung}"
-                                                th:data-ngaybatdau="${#temporals.format(voucher.ngayBatDau, 'yyyy-MM-dd')}"
-                                                th:data-ngayketthuc="${#temporals.format(voucher.ngayKetThuc, 'yyyy-MM-dd')}"
-                                                th:data-soluong="${voucher.soLuongVoucher}"
-                                                th:data-trangthai="${voucher.trangThai}"
-                                                onclick="openEditVoucherModal(this)">
-                                            <i class="bi bi-pencil"></i>
-                                        </button>
+                                    <td class="text-center">
+                                        <div class="d-flex justify-content-center gap-2">
+                                            <!-- Nút sửa -->
+                                            <button class="btn btn-outline-warning btn-sm d-flex align-items-center"
+                                                    title="Chỉnh sửa"
+                                                    th:data-id="${voucher.id}"
+                                                    th:data-ma="${voucher.maVoucher}"
+                                                    th:data-ten="${voucher.tenVoucher}"
+                                                    th:data-kieugiam="${voucher.kieuGiam}"
+                                                    th:data-giatri="${voucher.giaTriVoucher}"
+                                                    th:data-giamtoida="${voucher.giaTriToiDaVoucher}"
+                                                    th:data-toithieu="${voucher.giaTriToiThieuApDung}"
+                                                    th:data-toida="${voucher.giaTriToiDaApDung}"
+                                                    th:data-ngaybatdau="${#temporals.format(voucher.ngayBatDau, 'yyyy-MM-dd')}"
+                                                    th:data-ngayketthuc="${#temporals.format(voucher.ngayKetThuc, 'yyyy-MM-dd')}"
+                                                    th:data-soluong="${voucher.soLuongVoucher}"
+                                                    th:data-trangthai="${voucher.trangThai}"
+                                                    onclick="openEditVoucherModal(this)">
+                                                <i class="bi bi-pencil-square me-1"></i> Sửa
+                                            </button>
 
+                                            <!-- Nút dừng -->
+                                            <button class="btn btn-outline-danger btn-sm d-flex align-items-center"
+                                                    title="Dừng voucher"
+                                                    th:data-id="${voucher.id}"
+                                                    onclick="stopVoucher(this)">
+                                                <i class="bi bi-stop-circle me-1"></i> Dừng
+                                            </button>
+                                        </div>
                                     </td>
+
                                 </tr>
                                 </tbody>
                             </table>
@@ -234,11 +245,11 @@
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label for="minOrderAmount" class="form-label">Giá trị đơn hàng tối thiểu</label>
-                                <input type="number" class="form-control" id="minOrderAmount" name="giaTriToiThieuApDung" min="0" placeholder="Ví dụ: 500000">
+                                <input type="number" class="form-control" id="minOrderAmount" name="giaTriToiThieuApDung" placeholder="Ví dụ: 500000">
                             </div>
                             <div class="col-md-6">
                                 <label for="MaxOrderAmount" class="form-label">Giá trị đơn hàng tối đa</label>
-                                <input type="number" class="form-control" id="MaxOrderAmount" name="giaTriToiDaApDung" min="1" placeholder="Ví dụ: 1000000">
+                                <input type="number" class="form-control" id="MaxOrderAmount" name="giaTriToiDaApDung"  placeholder="Ví dụ: 1000000">
                             </div>
                         </div>
 
@@ -281,7 +292,9 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
         crossorigin="anonymous"></script>
-<script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
     // Toggle the sidebar (copied for consistency)
     let editingVoucherId = null;
     function openAddModal() {
@@ -362,6 +375,160 @@
             return "";
         }
     }
+
+    const voucherType = document.getElementById("voucherType");
+    const giaTriGiam = document.getElementById("giaTriGiam");
+
+    // Thay đổi min/max khi chọn loại voucher
+    voucherType.addEventListener("change", function () {
+        if (this.value === "phan_tram") {
+            giaTriGiam.min = 1;
+            giaTriGiam.max = 99;
+            giaTriGiam.placeholder = "Nhập % (1 - 99)";
+        } else if (this.value === "tien_mat") {
+            giaTriGiam.min = 1000;
+            giaTriGiam.max = 9999999;
+            giaTriGiam.placeholder = "Nhập số tiền (1.000 - 9.999.999)";
+        }
+        giaTriGiam.value = ""; // reset giá trị khi đổi loại
+    });
+    const voucherValue = document.getElementById("voucherValue");
+    const maxVoucherValue = document.getElementById("MaxvoucherValue");
+    const maxUsage = document.getElementById("maxUsage");
+    const voucherForm = document.getElementById("voucherForm");
+
+    // Khi thay đổi loại voucher
+    voucherType.addEventListener("change", function () {
+        if (this.value === "phan_tram") {
+            // Nếu là % thì bật lại input maxVoucherValue để người dùng nhập
+            maxVoucherValue.readOnly = false;
+            maxVoucherValue.value = "";
+            voucherValue.min = 1;
+            voucherValue.max = 99;
+            voucherValue.placeholder = "Nhập % (1 - 99)";
+        } else if (this.value === "tien_mat") {
+            // Nếu là tiền mặt thì auto gán max = value, readonly
+            maxVoucherValue.readOnly = true;
+            maxVoucherValue.value = voucherValue.value;
+            voucherValue.min = 1000;
+            voucherValue.max = 9999999;
+            voucherValue.placeholder = "Nhập số tiền (1.000 - 9.999.999)";
+        }
+    });
+
+    // Khi thay đổi giá trị giảm -> cập nhật maxVoucherValue nếu là tiền mặt
+    voucherValue.addEventListener("input", function () {
+        if (voucherType.value === "tien_mat") {
+            maxVoucherValue.value = this.value;
+        }
+    });
+
+    // Trước khi submit form
+    voucherForm.addEventListener("submit", function (e) {
+        // Nếu số lượng voucher không nhập hoặc = 0 -> set mặc định 10000
+        if (!maxUsage.value || parseInt(maxUsage.value) === 0) {
+            maxUsage.value = 10000;
+        }
+    });
+    // Validate form trước khi submit
+    document.getElementById("voucherForm").addEventListener("submit", function(e) {
+        const minOrderEl = document.getElementById("minOrderAmount");
+        const maxOrderEl = document.getElementById("MaxOrderAmount");
+        const maxVoucherValueEl = document.getElementById("MaxvoucherValue");
+
+        const minOrder = parseFloat(minOrderEl.value) || 0;
+        const maxOrder = parseFloat(maxOrderEl.value) || 0;
+        const maxVoucherValue = parseFloat(maxVoucherValueEl.value) || 0;
+        const startDate = new Date(document.getElementById("startDate").value);
+        const endDate = new Date(document.getElementById("endDate").value);
+
+        // reset trạng thái lỗi cũ
+        [minOrderEl, maxOrderEl, maxVoucherValueEl].forEach(el => {
+            el.classList.remove("is-invalid");
+        });
+
+        let errorMsg = "";
+
+        // 1. Kiểm tra >= 1000
+        if ((minOrder > 0 && minOrder < 1000) ||
+            (maxOrder > 0 && maxOrder < 1000) ||
+            (maxVoucherValue > 0 && maxVoucherValue < 1000)) {
+
+            e.preventDefault();
+
+            if (minOrder < 1000 && minOrder > 0) {
+                minOrderEl.classList.add("is-invalid");
+            }
+            if (maxOrder < 1000 && maxOrder > 0) {
+                maxOrderEl.classList.add("is-invalid");
+            }
+            if (maxVoucherValue < 1000 && maxVoucherValue > 0) {
+                maxVoucherValueEl.classList.add("is-invalid");
+            }
+
+            Swal.fire({
+                icon: 'error',
+                title: 'Lỗi dữ liệu',
+                text: 'Các giá trị (Đơn hàng tối thiểu, tối đa, giảm tối đa) phải ≥ 1,000!',
+                confirmButtonColor: '#d33'
+            });
+            return;
+        }
+
+        // 2. Kiểm tra min < max
+        if (minOrder && maxOrder && minOrder >= maxOrder) {
+            e.preventDefault();
+            minOrderEl.classList.add("is-invalid");
+            maxOrderEl.classList.add("is-invalid");
+
+            Swal.fire({
+                icon: 'error',
+                title: 'Lỗi dữ liệu',
+                text: 'Giá trị đơn hàng tối thiểu phải nhỏ hơn giá trị đơn hàng tối đa!',
+                confirmButtonColor: '#d33'
+            });
+            return;
+        }
+
+        // 3. Kiểm tra ngày
+        if (startDate && endDate && startDate >= endDate) {
+            e.preventDefault();
+            Swal.fire({
+                icon: 'error',
+                title: 'Lỗi dữ liệu',
+                text: 'Ngày bắt đầu phải nhỏ hơn ngày kết thúc!',
+                confirmButtonColor: '#d33'
+            });
+            return;
+        }
+    });
+
+    function stopVoucher(btn) {
+        const id = btn.getAttribute("data-id");
+
+        Swal.fire({
+            title: "Bạn có chắc muốn dừng voucher?",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Có, dừng ngay",
+            cancelButtonText: "Hủy"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                fetch(`/admin/vouchers/stop/${id}`, {
+                    method: "POST"
+                })
+                    .then(res => {
+                        if (res.ok) {
+                            Swal.fire("Đã dừng!", "Voucher đã bị dừng ngay lập tức.", "success")
+                                .then(() => location.reload());
+                        } else {
+                            Swal.fire("Lỗi", "Không thể dừng voucher!", "error");
+                        }
+                    });
+            }
+        });
+    }
+
 
 
 
