@@ -53,7 +53,7 @@
                 <td th:text="${iStat.index + 1}">1</td>
                 <td th:text="${hd.tenNguoiMua}">Nguyễn Văn A</td>
                 <td th:text="${hd.sdtNguoiMua}">0123456789</td>
-                <td th:text="${#utils.formatCurrency(hd.thanhTien)} ">100.000 ₫</td>
+                <td th:text="${#utils.formatCurrency(hd.GiaTriThanhToan)} ">100.000 ₫</td>
                 <td th:switch="${hd.hinhThucThanhToan}">
                     <span th:case="'TIEN_MAT'">Tiền mặt</span>
                     <span th:case="'CHUYEN_KHOAN'">Chuyển khoản</span>

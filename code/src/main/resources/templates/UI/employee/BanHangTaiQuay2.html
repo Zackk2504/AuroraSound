@@ -808,7 +808,16 @@
             }
         });
     });
-    const thanhTien = parseFloat(document.getElementById("thanhTien").value) || 0;
+    const text = document.getElementById("giaTriThanhTOan").innerText;
+    // "1.234.567₫"
+
+    // Loại bỏ ký tự không phải số hoặc dấu chấm thập phân
+    let value = text.replace(/[^\d,]/g, "");
+    // "1234567"
+
+    // Chuyển sang float
+    let thanhTien = parseFloat(value);
+
     const tienKhachDuaInput = document.getElementById("tienKhachDua");
     const tienTraLaiInput = document.getElementById("tienTraLai");
     const btnThanhToan = document.getElementById("btnThanhToan");
@@ -831,7 +840,8 @@
     // Khi nhập tiền khách đưa
     tienKhachDuaInput.addEventListener("input", function () {
         const tienKhachDua = parseFloat(this.value) || 0;
-
+        console.log(text)
+        console.log(thanhTien)
         if (tienKhachDua >= thanhTien) {
             tienTraLaiInput.value = tienKhachDua - thanhTien;
             btnThanhToan.disabled = false;
