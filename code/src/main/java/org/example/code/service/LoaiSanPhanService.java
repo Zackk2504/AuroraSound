@@ -27,6 +27,9 @@ public class LoaiSanPhanService {
     }
 
     public List<LoaiSanPham> getAllLoaiSanPhams() {
+        return loaiSanPhanRepository.findAllByTrangThai(true);
+    }
+    public List<LoaiSanPham> getAllLoaiSanPham() {
         return loaiSanPhanRepository.findAll();
     }
     public Page<LoaiSanPham> getAllPaged(int page, int size) {

@@ -160,6 +160,20 @@
 
                 <td>
                     <a class="btn btn-primary btn-sm" th:href="@{/admin/sanphamct/add(id=${sp.id})}">Sửa</a>
+                    <a th:href="${sp.trangThai == 'hoat_dong'
+                ? '/admin/sanpham/dunghoatdong/' + sp.id
+                : '/admin/sanpham/tieptuchd/' + sp.id}"
+                       class="btn btn-sm"
+                       th:classappend="${sp.trangThai == 'hoat_dong' ? 'btn-danger' : 'btn-success'}">
+
+   <span th:text="${sp.trangThai == 'hoat_dong'
+                    ? 'Dừng hoạt động'
+                    : 'Tiếp tục hoạt động'}"></span>
+                    </a>
+
+
+
+
                 </td>
             </tr>
             </tbody>

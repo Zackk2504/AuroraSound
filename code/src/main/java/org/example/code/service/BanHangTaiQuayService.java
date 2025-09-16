@@ -48,6 +48,7 @@ public class BanHangTaiQuayService {
                 .orElseThrow(() -> new RuntimeException("SanPhamChiTiet not found"));
         if (idHoaDon == 0) {
             if (sanPhamChiTiet.getSoLuongTon() < 1) {
+                sanPhamChiTietService.checksoluong(sanPhamChiTiet.getId());
                 throw new RuntimeException("So luong san pham khong du");
             }
             HoaDon hoaDon = new HoaDon();
@@ -92,9 +93,12 @@ public class BanHangTaiQuayService {
                         }
                     }else{
                     if (newSoLuong <= 0) {
+                        sanPhamChiTiet.setSoLuongTon(sanPhamChiTiet.getSoLuongTon() - chenhLech);
+                        sanPhamChiTietService.addAndEdit(sanPhamChiTiet);
                         hoaDonChiTietService.delete(existingHoaDonChiTiet.getId());
                     } else {
                         if (sanPhamChiTiet.getSoLuongTon() < chenhLech) {
+                            sanPhamChiTietService.checksoluong(sanPhamChiTiet.getId());
                             throw new RuntimeException("So luong san pham khong du");
                         }
                         existingHoaDonChiTiet.setSoLuong(newSoLuong);
@@ -106,6 +110,7 @@ public class BanHangTaiQuayService {
                     sanPhamChiTietService.checksoluong(sanPhamChiTiet.getId());
                 } else {
                     if (sanPhamChiTiet.getSoLuongTon() < 1) {
+                        sanPhamChiTietService.checksoluong(sanPhamChiTiet.getId());
                         throw new RuntimeException("So luong san pham khong du");
                     }
                     HoaDonChiTiet newHoaDonChiTiet = new HoaDonChiTiet();

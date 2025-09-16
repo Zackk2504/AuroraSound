@@ -221,9 +221,14 @@
         function muaNgay() {
             const spctId = document.getElementById('idSanPhamChiTiet').value;
             const soLuong = document.getElementById('soLuong').value;
+            const soLuongConLai = parseInt(document.getElementById('soLuongConLai').innerText) || 0;
 
             if (!spctId) {
                 alert("Vui lòng chọn màu và phiên bản sản phẩm trước khi mua");
+                return;
+            }
+            if (soLuongConLai <=0 || soLuong > soLuongConLai){
+                alert("Không đủ sản phẩm, rất xin lỗi")
                 return;
             }
 

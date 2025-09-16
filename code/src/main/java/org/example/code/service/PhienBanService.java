@@ -14,7 +14,7 @@ public class PhienBanService {
     PhienBanRepository phienBanRepository;
 
     public List<PhienBan> getall() {
-        return phienBanRepository.findAll();
+        return phienBanRepository.findAllByTrangThai(true);
     }
 
     public Optional<PhienBan> getById(Integer id) {
