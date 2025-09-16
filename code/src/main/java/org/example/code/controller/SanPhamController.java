@@ -72,7 +72,7 @@ public class SanPhamController {
             System.out.println(dto + "dto");
         }
         model.addAttribute("listBienThe", bientheList);
-        model.addAttribute("danhsachsanpham",sanPhamService.getAllSanPhams());
+//        model.addAttribute("danhsachsanpham",sanPhamService.getAllSanPhams());
         model.addAttribute("dsLoai", loaiSanPhamService.getAllLoaiSanPhams());
         model.addAttribute("dsThuongHieu", thuongHieuService.getAllThuongHieus());
         model.addAttribute("dsXuatXu", xuatXuService.getAll());
@@ -191,5 +191,15 @@ public class SanPhamController {
                 .limit(3) // Chỉ lấy tối đa 3 ảnh
                 .collect(Collectors.toList());
     }
-    
+
+    @GetMapping("/sanpham/dunghoatdong/{id}")
+    public String dunghd(@PathVariable Integer id) {
+        sanPhamService.dungHd(id);
+        return "redirect:/admin/san-pham";
+    }
+    @GetMapping("/sanpham/tieptuchd/{id}")
+    public String tieptuchd(@PathVariable Integer id) {
+        sanPhamService.tieptuchd(id);
+        return "redirect:/admin/san-pham";
+    }
 }

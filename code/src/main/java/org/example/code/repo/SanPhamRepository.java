@@ -32,5 +32,9 @@ public interface SanPhamRepository extends JpaRepository<SanPham, Integer> {
             Pageable pageable
     );
 
+    List<SanPham> findAllByTrangThai(String trangThai);
+
+
+
 
 }

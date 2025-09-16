@@ -14,7 +14,7 @@ public class ThuongHieuService {
     private ThuongHieuRepository thuongHieuRepository;
 
     public List<ThuongHieu> getAllThuongHieus() {
-        return thuongHieuRepository.findAll();
+        return thuongHieuRepository.findAllByTrangThai(true);
     }
 
     public Optional<ThuongHieu> getThuongHieuById(Integer id) {

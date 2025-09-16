@@ -61,8 +61,8 @@ public class HoaDonService {
         hoaDonRepository.deleteById(id);
     }
     public void xoahd(Integer id){
-        hoaDonRepository.deleteById(id);
         hoaDonChiTietService.deleteAllByIdHoaDon(id);
+        hoaDonRepository.deleteById(id);
     }
 
     public void setlshoadon(String ghiChu,String TTcu,String ttms,HoaDon hoaDon, NhanVien idnv ) {

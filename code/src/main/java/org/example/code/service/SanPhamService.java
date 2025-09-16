@@ -1,5 +1,7 @@
 package org.example.code.service;
 
+import jakarta.transaction.Transactional;
+import javassist.NotFoundException;
 import org.example.code.DTO.SanPhamBienTheDTO;
 import org.example.code.DTO.SanPhamChiTietDTO;
 import org.example.code.DTO.SanPhamDTO;
@@ -11,10 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -50,7 +49,7 @@ public class SanPhamService {
     }
 
     public List<SanPham> getAllSanPhams() {
-        return sanPhamRepository.findAll();
+        return sanPhamRepository.findAllByTrangThai("hoat_dong");
     }
 
     public Optional<SanPham> getSanPhamById(Integer id) {
@@ -143,5 +142,49 @@ public class SanPhamService {
             result.add(new SanPhamBienTheDTO(sanPham.getId(), soLuongBienThe));
         }
         return result;
+    }
+    public List<SanPham> randomSanPham() {
+
+            List<SanPham> allActive = sanPhamRepository.findAllByTrangThai("hoat_dong");
+            Collections.shuffle(allActive);
+
+            // Lấy 4 sản phẩm đầu tiên sau khi xáo trộn
+            return allActive.stream()
+                    .limit(4)
+                    .collect(Collectors.toList());
+
+    }
+
+
+    @Transactional
+    public void dungHd(Integer id) {
+        SanPham sp = sanPhamRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy sản phẩm với id: " + id));
+
+        sp.setTrangThai("khong_hoat_dong");
+        sanPhamRepository.save(sp);
+
+        List<SanPhamChiTiet> sanPhamChiTietList = sanPhamChiTietService.getBySanPhamId(id);
+        for (SanPhamChiTiet old : sanPhamChiTietList) {
+            old.setTrangThai("khong_hoat_dong");
+            sanPhamChiTietService.addAndEdit(old); // update lại
+        }
+    }
+    @Transactional
+    public void tieptuchd(Integer id) {
+        SanPham sp = sanPhamRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy sản phẩm với id: " + id));
+
+        sp.setTrangThai("hoat_dong");
+        sanPhamRepository.save(sp);
+
+        List<SanPhamChiTiet> sanPhamChiTietList = sanPhamChiTietService.getBySanPhamId(id);
+        for (SanPhamChiTiet old : sanPhamChiTietList) {
+            old.setTrangThai("hoat_dong");
+            if (old.getSoLuongTon()==0){
+                old.setTrangThai("khong_hoat_dong");
+            }
+            sanPhamChiTietService.addAndEdit(old); // update lại
+        }
     }
 }

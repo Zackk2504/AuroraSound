@@ -10,7 +10,7 @@
 
     <h3>Thêm biến thể cho sản phẩm: <span th:text="${sanPhamdto.tenSanPham}">Tên sản phẩm</span></h3>
 
-    <form th:object="${sanPhamdto}" th:action="@{/admin/sanphamct/add}" method="post" enctype="multipart/form-data">
+    <form  id="spForm" th:object="${sanPhamdto}" th:action="@{/admin/sanphamct/add}" method="post" enctype="multipart/form-data">
         <input type="hidden" th:field="*{id}" id="productId"/>
 
         <div class="row g-3">
@@ -20,38 +20,31 @@
             </div>
 
             <div class="col-md-6">
-                <label class="form-label">Trạng thái</label>
-                <select class="form-select" th:field="*{trangThai}" required>
-                    <option value="" disabled>-- Chọn trạng thái --</option>
-                    <option value="hoat_dong">Hoạt động</option>
-                    <option value="khong_hoat_dong" >Ngưng</option>
-                </select>
-            </div>
-
-            <div class="col-md-6">
                 <label class="form-label">Loại sản phẩm</label>
-                <select class="form-select" th:field="*{idLoaiSanPham}" required>
+                <select class="form-select" th:field="*{idLoaiSanPham}" disabled>
                     <option value="" disabled>-- Chọn loại --</option>
                     <option th:each="loai : ${dsLoai}" th:value="${loai.id}" th:text="${loai.tenLoaiSanPham}"></option>
                 </select>
             </div>
+            <input type="hidden" th:field="*{idLoaiSanPham}">
+            <input type="hidden" th:field="*{trangThai}" th:text="${trangThai}">
 
             <div class="col-md-6">
                 <label class="form-label">Thương hiệu</label>
-                <select class="form-select" th:field="*{idThuongHieu}" required>
+                <select class="form-select" th:field="*{idThuongHieu}" disabled>
                     <option value="" disabled>-- Chọn thương hiệu --</option>
                     <option th:each="th : ${dsThuongHieu}" th:value="${th.id}" th:text="${th.tenThuongHieu}"></option>
                 </select>
             </div>
-
+            <input type="hidden" th:field="*{idThuongHieu}">
             <div class="col-md-6">
                 <label class="form-label">Xuất xứ</label>
-                <select class="form-select" th:field="*{idXuatXu}" required>
+                <select class="form-select" th:field="*{idXuatXu}" disabled>
                     <option value="" disabled>-- Chọn xuất xứ --</option>
                     <option th:each="xx : ${dsXuatXu}" th:value="${xx.id}" th:text="${xx.noiXuatXu}"></option>
                 </select>
             </div>
-
+            <input type="hidden" th:field="*{idXuatXu}">
             <div class="col-md-12">
                 <label class="form-label">Mô tả</label>
                 <textarea class="form-control" th:field="*{moTa}" rows="3"></textarea>
@@ -147,23 +140,28 @@
                 <div class="row g-2">
                     <div class="col-md-4">
                         <label>Màu sắc</label>
-                        <select class="form-select" th:name="'chiTietList[' + ${iStat.index} + '].idMausac'">
+                        <select class="form-select" disabled>
                             <option th:each="m : ${danhsachmausac}"
                                     th:value="${m.id}"
                                     th:text="${m.tenMauSac}"
                                     th:selected="${m.id} == ${ct.idMausac}">
                             </option>
                         </select>
+                        <input type="hidden" th:name="'chiTietList[' + ${iStat.index} + '].idMausac'" th:value="${ct.idMausac}">
+
                     </div>
                     <div class="col-md-4">
                         <label>Phiên bản</label>
-                        <select class="form-select" th:name="'chiTietList[' + ${iStat.index} + '].idPhienban'">
+                        <select class="form-select" disabled>
                             <option th:each="p : ${danhsachphienban}"
                                     th:value="${p.id}"
                                     th:text="${p.tenPhienBan}"
                                     th:selected="${p.id} == ${ct.idPhienban}">
                             </option>
                         </select>
+                        <input type="hidden"
+                               th:name="'chiTietList[' + ${iStat.index} + '].idPhienban'"
+                               th:value="${ct.idPhienban}">
                     </div>
                     <div class="col-md-4">
                         <label>Trạng thái</label>
@@ -238,9 +236,10 @@
 
         <div>
             <button type="submit" class="btn btn-success">Lưu toàn bộ</button>
-            <a href="/san-pham" class="btn btn-secondary">Quay lại</a>
+            <a href="/admin/san-pham" class="btn btn-secondary">Quay lại</a>
         </div>
     </form>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
         let chiTietIndex = document.querySelectorAll("#chiTietContainer .chiTietRow").length;
@@ -423,6 +422,79 @@
                 });
             });
         });
+
+        document.getElementById("spForm").addEventListener("submit", function(event) {
+            const container = document.getElementById("chiTietContainer");
+            const rows = container.querySelectorAll(".chiTietRow");
+            const seen = new Set();
+            let duplicated = false;
+
+            rows.forEach(row => {
+                // lấy value từ input hidden (vì select đã disable)
+                const mauValue = row.querySelector("input[name*='.idMausac']")?.value;
+                const pbValue = row.querySelector("input[name*='.idPhienban']")?.value;
+                if (mauValue && pbValue) {
+                    const key = `${mauValue}_${pbValue}`;
+                    if (seen.has(key)) {
+                        duplicated = true;
+                        row.style.border = "2px solid red"; // highlight row lỗi
+                    } else {
+                        seen.add(key);
+                        row.style.border = ""; // reset nếu không lỗi
+                    }
+                }
+            });
+
+            if (duplicated) {
+                event.preventDefault();
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Trùng biến thể!',
+                    text: 'Có biến thể bị trùng Màu sắc + Phiên bản. Vui lòng kiểm tra lại!',
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: '#d33'
+                });
+            }
+
+            let isValid = true;
+            let messages = [];
+
+            // reset border
+            document.querySelectorAll("#chiTietContainer input").forEach(el => {
+                el.style.border = "";
+            });
+
+            // duyệt qua từng chiTietRow
+            document.querySelectorAll("#chiTietContainer .chiTietRow").forEach(function(row, index) {
+                let soLuong = row.querySelector("[name*='soLuongTon']");
+                let donGia = row.querySelector("[name*='donGia']");
+
+                // check số lượng
+                if (soLuong && soLuong.value < 0) {
+                    isValid = false;
+                    messages.push(`Dòng ${index + 1}: Số lượng phải > 1`);
+                    soLuong.style.border = "2px solid red";
+                }
+
+                // check đơn giá
+                if (donGia && donGia.value < 1000) {
+                    isValid = false;
+                    messages.push(`Dòng ${index + 1}: Đơn giá phải > 1000`);
+                    donGia.style.border = "2px solid red";
+                }
+            });
+
+            if (!isValid) {
+                event.preventDefault();
+                Swal.fire({
+                    icon: "error",
+                    title: "Lỗi dữ liệu",
+                    html: messages.join("<br>"),
+                    confirmButtonText: "Đóng"
+                });
+            }
+        });
+
 
     </script>
 

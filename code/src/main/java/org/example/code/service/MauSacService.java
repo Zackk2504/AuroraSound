@@ -14,7 +14,7 @@ public class MauSacService {
     MauSacRepository mauSacRepository;
 
     public List<MauSac> getAll() {
-        return mauSacRepository.findAll();
+        return mauSacRepository.findAllByTrangThai(true);
     }
 
     public Optional<MauSac> getById(Integer id) {

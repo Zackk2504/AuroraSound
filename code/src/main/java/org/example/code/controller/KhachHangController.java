@@ -321,6 +321,8 @@ public class KhachHangController {
                 mapAnhDau.put(idSanPham, anh); // chỉ lưu ảnh đầu tiên
             }
         }
+
+
         model.addAttribute("danhSachSanPham", danhSach);
         model.addAttribute("mapAnhDau", mapAnhDau);
         model.addAttribute("dsLoai", loaiSanPhamService.getAllLoaiSanPhams());
@@ -436,9 +438,27 @@ public class KhachHangController {
         return "redirect:/khach-hang/hoa-don-thanh-cong/" + id;
     }
 
+
     @RequestMapping(value = "/api/cancel/{id}")
     public String Cancel(@PathVariable Integer id, Model model) {
         hoaDonService.xoahd(id);
         return "test/cancel";
     }
+    @GetMapping("/index")
+    public String indexPage(Model model) {
+        List<SanPham> random = sanPhamService.randomSanPham();
+        model.addAttribute("random", random);
+        List<AnhSanPham> danhSachAnh = anhSanPhamService.getAllList();
+        Map<Integer, AnhSanPham> mapAnhDau = new HashMap<>();
+        for (AnhSanPham anh : danhSachAnh) {
+            Integer idSanPham = anh.getIdSanpham().getId();
+            if (!mapAnhDau.containsKey(idSanPham)) {
+                mapAnhDau.put(idSanPham, anh); // chỉ lưu ảnh đầu tiên
+            }
+        }
+
+        model.addAttribute("mapAnhDau", mapAnhDau);
+        return "index"; // index.html
+    }
+
 }
