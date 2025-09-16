@@ -12,7 +12,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.text.NumberFormat;
 import java.util.List;
+import java.util.Locale;
 
 public class HoaDonPdfExporter {
 
@@ -29,7 +31,8 @@ public class HoaDonPdfExporter {
     public void export(HttpServletResponse response) throws DocumentException, IOException, com.itextpdf.text.DocumentException {
         Document document = new Document();
         PdfWriter.getInstance(document, response.getOutputStream());
-
+        Locale localeVN = new Locale("vi", "VN");
+        NumberFormat currencyVN = NumberFormat.getCurrencyInstance(localeVN);
         document.open();
 
         // Font tiếng Việt
@@ -61,9 +64,18 @@ public class HoaDonPdfExporter {
 
         // ===== THÔNG TIN HÓA ĐƠN =====
         document.add(new Paragraph("Hóa đơn #: " + hoaDon.getMaHoaDon(), fontVN));
-        document.add(new Paragraph("Người mua: " + hoaDon.getTenNguoiMua(), fontVN));
-        document.add(new Paragraph("SĐT: " + hoaDon.getSdtNguoiMua(), fontVN));
+        String tenNguoiMua = hoaDon.getTenNguoiMua();
+        if (tenNguoiMua == null || tenNguoiMua.isEmpty() || tenNguoiMua.trim().equals("")) {
+            tenNguoiMua = "Khách lẻ";
+        }
+        document.add(new Paragraph("Người mua: " + tenNguoiMua, fontVN));
+        String SDTNguoiMua =  hoaDon.getSdtNguoiMua();
+        if (SDTNguoiMua == null || SDTNguoiMua.trim().equals("")) {
+            SDTNguoiMua = "Khách lẻ";
+        }
+        document.add(new Paragraph("SĐT: " +SDTNguoiMua, fontVN));
         document.add(new Paragraph("Địa chỉ: " + hoaDon.getDiaChiNhanHang(), fontVN));
+        document.add(new Paragraph("Nhân viên xác nhận: " + hoaDon.getIdNhanvien().getHoTen(), fontVN));
         String hinhThucText;
         if ("TIEN_MAT".equalsIgnoreCase(hoaDon.getHinhThucThanhToan())) {
             hinhThucText = "Tiền mặt";
@@ -90,23 +102,38 @@ public class HoaDonPdfExporter {
         for (HoaDonChiTiet ct : chiTietList) {
             table.addCell(new Phrase(ct.getIdSanphamchitiet().getIdSanpham().getTenSanPham(), fontVN));
             table.addCell(new Phrase(ct.getSoLuong().toString(), fontVN));
-            table.addCell(new Phrase(ct.getDonGia().toString(), fontVN));
 
             BigDecimal soLuong = BigDecimal.valueOf(ct.getSoLuong());
             BigDecimal donGia = ct.getDonGia();
             BigDecimal thanhTien = soLuong.multiply(donGia);
 
-            table.addCell(new Phrase(thanhTien.toString(), fontVN));
+            // Format giá
+            String donGiaFormatted = currencyVN.format(donGia);
+            String thanhTienFormatted = currencyVN.format(thanhTien);
+
+            table.addCell(new Phrase(donGiaFormatted, fontVN));
+            table.addCell(new Phrase(thanhTienFormatted, fontVN));
         }
         document.add(table);
 
-        // ===== TỔNG TIỀN =====
-        Paragraph total2 = new Paragraph("\n Giảm giá " + tienGiam  + " đ", subTitleFont);
-        Paragraph total = new Paragraph("\nTổng thanh toán: " + hoaDon.getThanhTien() + " đ", subTitleFont);
+// ===== TỔNG TIỀN =====
+        String tienGiamFormatted = currencyVN.format(tienGiam);
+        String tongFormatted = currencyVN.format(hoaDon.getGiaTriThanhToan());
+        String traSau = currencyVN.format(
+                hoaDon.getTienTraSau() != null ? hoaDon.getTienTraSau() : BigDecimal.ZERO
+        );
+
+
+        Paragraph total2 = new Paragraph("\nGiảm giá: " + tienGiamFormatted, subTitleFont);
+        Paragraph total = new Paragraph("\nTổng thanh toán: " + tongFormatted, subTitleFont);
+        Paragraph total3 = new Paragraph("\nTiền trả sau: " + traSau, subTitleFont);
+
         total.setAlignment(Element.ALIGN_RIGHT);
         total2.setAlignment(Element.ALIGN_RIGHT);
+        total3.setAlignment(Element.ALIGN_RIGHT);
         document.add(total2);
         document.add(total);
+        document.add(total3);
 
         document.close();
     }
