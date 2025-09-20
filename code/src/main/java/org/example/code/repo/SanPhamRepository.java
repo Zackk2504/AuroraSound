@@ -19,12 +19,14 @@ public interface SanPhamRepository extends JpaRepository<SanPham, Integer> {
                              @Param("xuatXuId") Integer xuatXuId);
     @Query("""
     SELECT sp FROM SanPham sp
-    WHERE (:loaiId IS NULL OR sp.idLoaisanpham.id = :loaiId)
+    WHERE (:tensp IS NULL OR LOWER(sp.tenSanPham) LIKE LOWER('%' + :tensp + '%'))
+      AND (:loaiId IS NULL OR sp.idLoaisanpham.id = :loaiId)
       AND (:thuongHieuId IS NULL OR sp.idThuonghieu.id = :thuongHieuId)
       AND (:xuatXuId IS NULL OR sp.idXuatxu.id = :xuatXuId)
-      AND (:trangThai IS NULL OR sp.trangThai LIKE :trangThai)
+      AND (:trangThai IS NULL OR sp.trangThai = :trangThai)
 """)
     Page<SanPham> search(
+            @Param("tensp") String tensp,
             @Param("loaiId") Integer loaiId,
             @Param("thuongHieuId") Integer thuongHieuId,
             @Param("xuatXuId") Integer xuatXuId,

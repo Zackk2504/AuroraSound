@@ -40,14 +40,16 @@ public class HoaDonController {
     public String xemChiTietHoaDon(  @RequestParam(defaultValue = "0") int page,
                                      @RequestParam(defaultValue = "10") int size,
                                      @RequestParam(required = false) String sdt,
+                                     @RequestParam(name = "mahd", required = false) String mahd,
                                      @RequestParam(required = false) String trangThai,
                                      @RequestParam(required = false) String loai,
                                      @RequestParam(required = false) String hinhThuc,
                                      Model model) {
 //        List<HoaDon> list = hoaDonService.getAllHoaDon();
 //        model.addAttribute("listHoaDon", list);
+        System.out.println("xemChiTietHoaDon" + mahd);
         Pageable pageable = PageRequest.of(page, size, Sort.by("ngayTao").descending());
-        Page<HoaDon> pageHoaDon = hoaDonService.findWithFilters(sdt, trangThai, loai, hinhThuc, pageable);
+        Page<HoaDon> pageHoaDon = hoaDonService.findWithFilters(sdt, trangThai,mahd, loai, hinhThuc, pageable);
 
         model.addAttribute("dsHoaDon", pageHoaDon.getContent());
         model.addAttribute("pageHoaDon", pageHoaDon);

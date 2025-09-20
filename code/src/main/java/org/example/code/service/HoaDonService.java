@@ -227,10 +227,11 @@ public class HoaDonService {
             throw new RuntimeException("Trạng thái hóa đơn không hợp lệ để xác nhận.");
         }
     }
-    public Page<HoaDon> findWithFilters(String sdt, String trangThai, String loai, String hinhThuc, Pageable pageable) {
+    public Page<HoaDon> findWithFilters(String sdt, String trangThai,String mahd, String loai, String hinhThuc, Pageable pageable) {
         return hoaDonRepository.findWithFilters(
                 sdt == null || sdt.isBlank() ? null : sdt,
                 trangThai == null || trangThai.isBlank() ? null : trangThai,
+                mahd == null || mahd.isBlank() ? null : mahd,
                 loai == null || loai.isBlank() ? null : loai,
                 hinhThuc == null || hinhThuc.isBlank() ? null : hinhThuc,
                 pageable

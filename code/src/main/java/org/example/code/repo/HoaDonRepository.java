@@ -21,6 +21,7 @@ public interface HoaDonRepository extends JpaRepository<HoaDon, Integer> {
     SELECT h FROM HoaDon h
     WHERE (:sdt IS NULL OR LOWER(h.sdtNguoiMua) LIKE LOWER('%' + :sdt + '%'))
       AND (:trangThai IS NULL OR h.trangThaiHoaDon = :trangThai)
+      AND (:mahd IS NULL OR h.maHoaDon = :mahd)
       AND (:loai IS NULL OR h.loaiHoaDon = :loai)
       AND (:hinhThuc IS NULL OR h.hinhThucThanhToan = :hinhThuc)
       AND h.trangThaiHoaDon <> 'CHO_THANH_TOAN'
@@ -28,8 +29,10 @@ public interface HoaDonRepository extends JpaRepository<HoaDon, Integer> {
     Page<HoaDon> findWithFilters(
             @Param("sdt") String sdt,
             @Param("trangThai") String trangThai,
+            @Param("mahd") String mahd,
             @Param("loai") String loai,
             @Param("hinhThuc") String hinhThuc,
             Pageable pageable
     );
+
 }

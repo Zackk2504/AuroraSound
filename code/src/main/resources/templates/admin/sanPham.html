@@ -82,6 +82,10 @@
         <hr class="my-5">
         <form method="get" th:action="@{/admin/san-pham}" class="row g-3 mb-4">
             <div class="col-md-3">
+                <label class="form-label">Tìm theo tên</label>
+                <input type="text" name="tensp" class="form-control" placeholder="Tìm theo tên sp" th:value="${tensp}">
+            </div>
+            <div class="col-md-3">
                 <label class="form-label">Loại sản phẩm</label>
                 <select class="form-select" name="loaiId">
                     <option value="">-- Tất cả --</option>

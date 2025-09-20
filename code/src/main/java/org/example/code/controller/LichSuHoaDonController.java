@@ -30,12 +30,13 @@ public class LichSuHoaDonController {
     public String lichsuhoadon(  @RequestParam(defaultValue = "0") int page,
                                  @RequestParam(defaultValue = "10") int size,
                                  @RequestParam(required = false) String sdt,
+                                 @RequestParam(required = false) String mahd,
                                  @RequestParam(required = false) String trangThai,
                                  @RequestParam(required = false) String loai,
                                  @RequestParam(required = false) String hinhThuc,
                                  Model model){
         Pageable pageable = PageRequest.of(page, size, Sort.by("ngayTao").descending());
-        Page<HoaDon> pageHoaDon = hoaDonService.findWithFilters(sdt, trangThai, loai, hinhThuc, pageable);
+        Page<HoaDon> pageHoaDon = hoaDonService.findWithFilters(sdt, trangThai,mahd, loai, hinhThuc, pageable);
 
         model.addAttribute("dsHoaDon", pageHoaDon.getContent());
         model.addAttribute("pageHoaDon", pageHoaDon);
