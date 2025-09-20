@@ -43,9 +43,9 @@ public class SanPhamService {
         return sanPhamRepository.locSanPham(loaiId, thuongHieuId, xuatXuId);
     }
 
-    public Page<SanPham> findByFilter(Integer loaiId, Integer thuongHieuId, Integer xuatXuId, String trangThai, Pageable pageable) {
+    public Page<SanPham> findByFilter(String tensp,Integer loaiId, Integer thuongHieuId, Integer xuatXuId, String trangThai, Pageable pageable) {
         return sanPhamRepository.search(
-                loaiId, thuongHieuId, xuatXuId, trangThai, pageable);
+               tensp, loaiId, thuongHieuId, xuatXuId, trangThai, pageable);
     }
 
     public List<SanPham> getAllSanPhams() {

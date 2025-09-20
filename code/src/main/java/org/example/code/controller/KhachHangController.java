@@ -244,6 +244,8 @@ public class KhachHangController {
 
         if (hinhThucThanhToan.equals("CHUYEN_KHOAN")) {
             System.out.println("hello");
+            hoaDon.setTrangThaiHoaDon("DA_XAC_NHAN");
+            hoaDonService.addAndEdit(hoaDon);
             return thanhToanService.thanhToanChuyenKhoan(hoaDon,khachHang,gioHangDaChon);
         }else {
             System.out.println("locc");

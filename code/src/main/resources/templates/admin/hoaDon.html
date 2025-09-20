@@ -13,6 +13,9 @@
                 <input type="text" name="sdt" class="form-control" placeholder="Tìm theo SĐT người nhận" th:value="${sdt}">
             </div>
             <div class="col-md-3">
+                <input type="text" name="mahd" class="form-control" placeholder="Tìm theo mã hóa đơn" th:value="${mahd}">
+            </div>
+            <div class="col-md-3">
                 <select name="trangThai" class="form-select">
                     <option value="">-- Trạng thái hóa đơn --</option>
                     <option th:each="tt : ${dsTrangThai}" th:value="${tt}" th:text="${tt}" th:selected="${tt == trangThai}"></option>
@@ -83,7 +86,7 @@
                 <div class="modal-dialog modal-lg">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h5 class="modal-title">Chi tiết hóa đơn #[[${hd.id}]]</h5>
+                            <h5 class="modal-title">Chi tiết hóa đơn #[[${hd.maHoaDon}]]</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                         </div>
                         <div class="modal-body">

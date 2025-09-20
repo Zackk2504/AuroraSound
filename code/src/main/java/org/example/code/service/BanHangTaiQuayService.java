@@ -212,6 +212,7 @@ public class BanHangTaiQuayService {
         hoaDon.setSdtNguoiMua(sdtkhach);
         hoaDon.setNgayTao(java.time.LocalDateTime.now());
         hoaDon.setGhiChu(ghiChu);
+        hoaDonService.setlshoadon(ghiChu,"DA_XAC_NHAN","DA_XAC_NHAN",hoaDon,nhanVien);
         hoaDonService.addAndEdit(hoaDon);
 
     }

@@ -51,6 +51,7 @@ public class SanPhamController {
 
     @GetMapping("/san-pham")
     public String getSanPham(   @RequestParam(value = "page", defaultValue = "0") int page,
+                                @RequestParam(value = "tensp", required = false) String tensp,
                                 @RequestParam(value = "loaiId", required = false) Integer loaiId,
                                 @RequestParam(value = "thuongHieuId", required = false) Integer thuongHieuId,
                                 @RequestParam(value = "xuatXuId", required = false) Integer xuatXuId,
@@ -60,7 +61,7 @@ public class SanPhamController {
         if (trangThai != null && trangThai.trim().isEmpty()) {
             trangThai = null;
         }
-        Page<SanPham> dsSanPham = sanPhamService.findByFilter(loaiId, thuongHieuId, xuatXuId, trangThai, pageable);
+        Page<SanPham> dsSanPham = sanPhamService.findByFilter(tensp,loaiId, thuongHieuId, xuatXuId, trangThai, pageable);
 
         model.addAttribute("dsSanPham", dsSanPham);
         model.addAttribute("sanPham", new SanPham());
