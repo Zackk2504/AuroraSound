@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.dom4j.DocumentException;
 import org.example.code.model.HoaDon;
 import org.example.code.model.HoaDonChiTiet;
+import org.example.code.model.NhanVien;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
@@ -15,6 +16,7 @@ import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
 public class HoaDonPdfExporter {
 
@@ -75,7 +77,11 @@ public class HoaDonPdfExporter {
         }
         document.add(new Paragraph("SĐT: " +SDTNguoiMua, fontVN));
         document.add(new Paragraph("Địa chỉ: " + hoaDon.getDiaChiNhanHang(), fontVN));
-        document.add(new Paragraph("Nhân viên xác nhận: " + hoaDon.getIdNhanvien().getHoTen(), fontVN));
+        String tenNV = Optional.ofNullable(hoaDon.getIdNhanvien())
+                .map(NhanVien::getHoTen)
+                .orElse("");
+
+        document.add(new Paragraph("Nhân viên xác nhận: " + tenNV, fontVN));
         String hinhThucText;
         if ("TIEN_MAT".equalsIgnoreCase(hoaDon.getHinhThucThanhToan())) {
             hinhThucText = "Tiền mặt";
@@ -122,18 +128,25 @@ public class HoaDonPdfExporter {
         String traSau = currencyVN.format(
                 hoaDon.getTienTraSau() != null ? hoaDon.getTienTraSau() : BigDecimal.ZERO
         );
+        String tienShip = currencyVN.format(
+                hoaDon.getTienship() != null ? hoaDon.getTienship() : BigDecimal.ZERO
+        );
 
 
         Paragraph total2 = new Paragraph("\nGiảm giá: " + tienGiamFormatted, subTitleFont);
+        Paragraph total4 = new Paragraph("\nTiền ship: " + tienShip, subTitleFont);
         Paragraph total = new Paragraph("\nTổng thanh toán: " + tongFormatted, subTitleFont);
         Paragraph total3 = new Paragraph("\nTiền trả sau: " + traSau, subTitleFont);
 
         total.setAlignment(Element.ALIGN_RIGHT);
         total2.setAlignment(Element.ALIGN_RIGHT);
         total3.setAlignment(Element.ALIGN_RIGHT);
+        total4.setAlignment(Element.ALIGN_RIGHT);
         document.add(total2);
+        document.add(total4);
         document.add(total);
         document.add(total3);
+
 
         document.close();
     }

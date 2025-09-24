@@ -138,7 +138,7 @@ public class SanPhamService {
         List<SanPhamBienTheDTO> result = new ArrayList<>();
         List<SanPham> optionalSanPham = sanPhamRepository.findAll();
         for (SanPham sanPham : optionalSanPham) {
-            Long soLuongBienThe = sanPhamChiTietService.countBienTheBySanPhamId(sanPham.getId());
+            Integer soLuongBienThe = sanPhamChiTietService.countBienTheBySanPhamId(sanPham.getId());
             result.add(new SanPhamBienTheDTO(sanPham.getId(), soLuongBienThe));
         }
         return result;

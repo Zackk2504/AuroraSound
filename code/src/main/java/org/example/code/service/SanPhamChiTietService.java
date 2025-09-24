@@ -54,8 +54,8 @@ public class SanPhamChiTietService {
         sanPhamChiTietRepository.save(sanPhamChiTiet);
     }
 
-    public Long countBienTheBySanPhamId(Integer idSanPham) {
-        return sanPhamChiTietRepository.countBienTheBySanPhamId(idSanPham);
+    public Integer countBienTheBySanPhamId(Integer idSanPham) {
+        return sanPhamChiTietRepository.sumSoLuongTonBySanPhamId(idSanPham);
     }
 
 }

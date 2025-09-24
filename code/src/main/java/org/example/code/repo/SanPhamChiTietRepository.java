@@ -30,4 +30,12 @@ public interface SanPhamChiTietRepository extends JpaRepository<SanPhamChiTiet, 
 
     @Query("SELECT COUNT(s) FROM SanPhamChiTiet s WHERE s.idSanpham.id = :idSanPham")
     Long countBienTheBySanPhamId(@Param("idSanPham") Integer idSanPham);
+
+    @Query("SELECT COALESCE(SUM(s.soLuongTon), 0) " +
+            "FROM SanPhamChiTiet s " +
+            "WHERE s.idSanpham.id = :idSanPham")
+    Integer sumSoLuongTonBySanPhamId(@Param("idSanPham") Integer idSanPham);
+
+
+
 }
