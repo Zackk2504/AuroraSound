@@ -36,13 +36,18 @@
         <br>
         <strong>Loại đơn:</strong> <span th:text="${hoaDon.loaiHoaDon}">Tại quầy</span>
         <br>
-        <strong> Hình thức thanh toán: </strong> <span th:text="${hoaDon.hinhThucThanhToan}">Tại quầy</span>
+        <strong>Hình thức thanh toán: </strong>
+        <span th:switch="${hoaDon.hinhThucThanhToan}">
+            <span th:case="'TIEN_MAT'">Tiền mặt</span>
+            <span th:case="'CHUYEN_KHOAN'">Chuyển khoản</span>
+            <span th:case="*">Khác</span>
+        </span>
         <br>
         <div class="d-flex align-items-center">
             <strong>Địa chỉ giao hàng:</strong>
             <span id="diaChiGiaoHangText" th:text="${hoaDon.diaChiNhanHang}" class="ms-2 me-2 flex-grow-1">FPT Polytechnic Trịnh Văn Bô</span>
             <input type="hidden" id="diaChiGiaoHanginput" th:value="${diachimoi}"/>
-            <button th:if="${hoaDon.trangThaiHoaDon == 'CHO_XAC_NHAN'}" class="btn btn-primary" onclick="openDiaChiModal()">Đổi địa chỉ</button>
+            <button th:if="${hoaDon.trangThaiHoaDon == 'CHO_XAC_NHAN' || hoaDon.trangThaiHoaDon == 'DA_XAC_NHAN'}" class="btn btn-primary" onclick="openDiaChiModal()">Đổi địa chỉ</button>
         </div>
     </div>
 
