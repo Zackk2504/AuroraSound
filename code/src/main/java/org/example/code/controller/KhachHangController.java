@@ -78,6 +78,13 @@ public class KhachHangController {
     public String hienThiTrangThanhToan(@RequestParam("selectedIds") List<Integer> selectedIds,
                                         Model model) {
         List<GioHangChiTiet> gioHangDaChon = gioHangChiTietService.findByIds(selectedIds);
+        for (GioHangChiTiet ghi : gioHangDaChon) {
+            SanPhamChiTiet sp = ghi.getIdSanphamchitiet(); // lấy sp từ giỏ
+            if (sp.getSoLuongTon() < ghi.getSoLuong()) {
+                throw new RuntimeException("Sản phẩm " + sp.getId() + " không đủ số lượng tồn");
+            }
+            System.out.println(ghi.getSoLuong() + "hello");
+        }
         model.addAttribute("gioHangDaChon", gioHangDaChon);
         BigDecimal tongTien = gioHangDaChon.stream()
                 .map(item -> BigDecimal.valueOf(item.getSoLuong())
@@ -461,6 +468,20 @@ public class KhachHangController {
 
         model.addAttribute("mapAnhDau", mapAnhDau);
         return "index"; // index.html
+    }
+
+    @GetMapping("/khach-hang/search")
+    @ResponseBody
+    public List<Map<String, Object>> search(@RequestParam("keyword") String keyword) {
+        return sanPhamService.searchByTen(keyword)
+                .stream()
+                .map(sp -> {
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("id", sp.getId());
+                    map.put("ten", sp.getTenSanPham());
+                    return map;
+                })
+                .toList();
     }
 
 }

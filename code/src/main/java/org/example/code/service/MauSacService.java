@@ -3,6 +3,8 @@ package org.example.code.service;
 import org.example.code.model.MauSac;
 import org.example.code.repo.MauSacRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,7 +22,9 @@ public class MauSacService {
     public Optional<MauSac> getById(Integer id) {
         return mauSacRepository.findById(id);
     }
-
+    public Page<MauSac> getAllpage(Pageable pageable) {
+        return mauSacRepository.findAll(pageable);
+    }
     public MauSac save(MauSac mauSac) {
         return mauSacRepository.save(mauSac);
     }

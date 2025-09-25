@@ -223,7 +223,34 @@ public class HoaDonService {
                 sanPhamChiTietService.addAndEdit(sanPham);
                 sanPhamChiTietService.checksoluong(sanPham.getId());
             }
-        } else {
+        } else  if (hoaDon.getTrangThaiHoaDon().equals("DA_XAC_NHAN")) {
+            if (ghiChu != null && !ghiChu.isBlank()) {
+                hoaDon.setGhiChu(ghiChu);
+            }
+            if (diaChiMoi != null && !diaChiMoi.isBlank()) {
+                hoaDon.setDiaChiNhanHang(diaChiMoi);
+            }
+            if (tienTraSau != null && !tienTraSau.isBlank()) {
+                BigDecimal tienTraSauBD = new BigDecimal(tienTraSau);
+                if (hoaDon.getHinhThucThanhToan().equals("TIEN_MAT")){
+                    hoaDon.setGiaTriThanhToan(hoaDon.getGiaTriThanhToan().add(tienTraSauBD));
+                }else {
+                    hoaDon.setTienTraSau(tienTraSauBD);
+                }
+            }
+            hoaDon.setTrangThaiHoaDon("DA_GIAO_HANG");
+            hoaDonRepository.save(hoaDon);
+//            Lưu lịch sử
+            lichSuHoaDon.setHoaDon(hoaDon);
+            lichSuHoaDon.setNhanVien(nhanVien);
+            lichSuHoaDon.setNgayCapNhat(LocalDateTime.now());
+            lichSuHoaDon.setGhiChu(ghiChu);
+            lichSuHoaDon.setTrangThaiCu("");
+            lichSuHoaDon.setTrangThaiMoi(hoaDon.getTrangThaiHoaDon());
+            lichSuHoaDonRepository.save(lichSuHoaDon);
+
+        }
+        else {
             throw new RuntimeException("Trạng thái hóa đơn không hợp lệ để xác nhận.");
         }
     }

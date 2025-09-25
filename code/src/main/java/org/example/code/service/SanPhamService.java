@@ -187,4 +187,11 @@ public class SanPhamService {
             sanPhamChiTietService.addAndEdit(old); // update lại
         }
     }
+
+    public List<SanPham> searchByTen(String keyword) {
+        if (keyword == null || keyword.trim().isEmpty()) {
+            return List.of();
+        }
+        return sanPhamRepository.searchByTen(keyword.trim());
+    }
 }

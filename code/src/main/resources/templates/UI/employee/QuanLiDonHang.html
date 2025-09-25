@@ -10,7 +10,10 @@
 <body>
 <div layout:fragment="content">
 <div class="container mt-4">
-    <h4>Mã HD: <span id="idhd" th:text="${hoaDon.maHoaDon}">HD001</span></h4>
+    <h4>Mã HD: <span id="mahd" th:text="${hoaDon.maHoaDon}">HD001</span></h4>
+    <h4>ID HD:<span id="idhd" th:text="${hoaDon.id}">HD001</span></h4>
+
+
     <hr>
 
     <div class="mb-3">
@@ -193,8 +196,7 @@
 
             <a class="btn btn-primary"
                th:if="${hoaDon.trangThaiHoaDon == 'DA_XAC_NHAN'}"
-               th:href="@{'/nhan-vien/thay-doi-trang-thai/' + ${hoaDon.id}}"
-               onclick="confirmAction(event, 'Xác nhận đã giao hàng cho bên vận chuyển?', this.href)">
+               onclick="xacNhanDonHang2()">
                 Đã giao hàng cho bên vận chuyển
             </a>
 
@@ -461,7 +463,45 @@
                 }
             });
         }
+        function xacNhanDonHang2() {
+            const idHoaDon = document.getElementById("idhd").textContent;
+            const diaChiMoi = document.getElementById("diaChiGiaoHanginput").value;
+            const tienTraSau = document.getElementById("tienTraSauInput").value;
 
+            Swal.fire({
+                title: 'Xác nhận đã giao đơn hàng cho bên vận chuyển',
+                text: 'Nhập ghi chú nếu có',
+                input: 'text',
+                inputPlaceholder: 'Ghi chú...',
+                showCancelButton: true,
+                confirmButtonText: 'Xác nhận',
+                cancelButtonText: 'Hủy'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const ghiChu = result.value || '';
+
+                    const url = `/nhan-vien/xac-nhan-da-dua-hang-cho-ben-van-chuyen/${idHoaDon}?` +
+                        new URLSearchParams({
+                            ghiChu: ghiChu,
+                            diaChimoi: diaChiMoi,
+                            tienTraSau: tienTraSau
+                        });
+
+                    fetch(url)
+                        .then(res => {
+                            if (!res.ok) throw new Error("Lỗi xác nhận đơn hàng");
+                            return res.text();
+                        })
+                        .then(() => {
+                            Swal.fire('Thành công', 'Đơn hàng đã được xác nhận giao cho bên vận chuyển!', 'success')
+                                .then(() => location.reload());
+                        })
+                        .catch(err => {
+                            Swal.fire('Lỗi', err.message, 'error');
+                        });
+                }
+            });
+        }
         function huyDonHang(event, callbackUrl) {
             event.preventDefault(); // Chặn link mặc định
 

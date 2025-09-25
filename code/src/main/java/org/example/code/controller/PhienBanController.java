@@ -3,6 +3,8 @@ package org.example.code.controller;
 import org.example.code.model.PhienBan;
 import org.example.code.service.PhienBanService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -18,9 +20,17 @@ public class PhienBanController {
     PhienBanService phienBanService;
 
     @GetMapping("/phien-ban")
-    public String list(Model model) {
-        model.addAttribute("list", phienBanService.getall());
+    public String list(Model model,
+                       @RequestParam(defaultValue = "0") int page,
+                       @RequestParam(defaultValue = "5") int size) {
+
+        Page<PhienBan> phienBanPage = phienBanService.getAllpage(PageRequest.of(page, size));
+
+        model.addAttribute("list", phienBanPage.getContent());
         model.addAttribute("phienBan", new PhienBan());
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", phienBanPage.getTotalPages());
+
         return "admin/phienBan";
     }
 

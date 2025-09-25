@@ -83,7 +83,7 @@ public class MailService {
 
                     + "<p>Bạn có thể dùng mã này để tra cứu tình trạng đơn hàng bất cứ lúc nào tại website.</p>"
 
-                    + "<p style='margin-top: 30px;'>Nếu có bất kỳ thắc mắc nào, đừng ngần ngại liên hệ với chúng tôi.</p>"
+                    + "<p style='margin-top: 30px;'> Hãy liên hệ 0906184208 hoặc khuongtran2504@gmail.com nếu bạn cần hỗ trợ về đơn hàng (Hủy, đổi địa chỉ, ...)</p>"
 
                     + "<hr style='margin: 30px 0;'>"
                     + "<p style='font-size: 14px;'>Trân trọng,<br><strong>Đội ngũ AuroraSound</strong></p>"

@@ -76,7 +76,7 @@ public class SanPhamController {
 //        model.addAttribute("danhsachsanpham",sanPhamService.getAllSanPhams());
         model.addAttribute("dsLoai", loaiSanPhamService.getAllLoaiSanPhams());
         model.addAttribute("dsThuongHieu", thuongHieuService.getAllThuongHieus());
-        model.addAttribute("dsXuatXu", xuatXuService.getAll());
+        model.addAttribute("dsXuatXu", xuatXuService.getAllxx());
         return "admin/sanPham"; // This should match the name of your view template
     }
     @GetMapping("/sanphamct/add")
@@ -116,7 +116,7 @@ public class SanPhamController {
         model.addAttribute("danhsachsanpham",sanPhamService.getAllSanPhams());
         model.addAttribute("dsLoai", loaiSanPhamService.getAllLoaiSanPhams());
         model.addAttribute("dsThuongHieu", thuongHieuService.getAllThuongHieus());
-        model.addAttribute("dsXuatXu", xuatXuService.getAll());
+        model.addAttribute("dsXuatXu", xuatXuService.getAllxx());
 
         return "admin/sanPhamChiTiet"; // This should match the name of your view template for adding SanPhamChiTiet
     }

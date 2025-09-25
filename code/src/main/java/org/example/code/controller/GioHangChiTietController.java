@@ -1,9 +1,11 @@
 package org.example.code.controller;
 
 import org.example.code.model.AnhSanPham;
+import org.example.code.model.SanPhamChiTiet;
 import org.example.code.service.AnhSanPhamService;
 import org.example.code.service.GioHangChiTietService;
 import org.example.code.service.GioHangService;
+import org.example.code.service.SanPhamChiTietService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -27,6 +29,8 @@ public class GioHangChiTietController {
     private GioHangService gioHangService;
     @Autowired
     private AnhSanPhamService anhSanPhamService;
+    @Autowired
+    private SanPhamChiTietService sanPhamChiTietService;
 
     @GetMapping("/gio-hang")
     public String getGioHangChiTiet(Model model) {
@@ -49,6 +53,12 @@ public class GioHangChiTietController {
     @PostMapping("/gio-hang/add/{sanPhamCTId}/{soLuong}")
     public ResponseEntity<String> addGioHangChiTiet(@PathVariable Integer sanPhamCTId, @PathVariable Integer soLuong) {
         try {
+            SanPhamChiTiet sanPhamChiTiet = sanPhamChiTietService
+                    .getSanPhamChiTietById(sanPhamCTId)
+                    .orElseThrow(() -> new RuntimeException("Không tìm thấy sản phẩm chi tiết với ID: " + sanPhamCTId));
+            if (sanPhamChiTiet.getSoLuongTon()<soLuong){
+                return ResponseEntity.status(500).body("không đủ số lượng");
+            }
             gioHangChiTietService.addGioHangChiTiet(sanPhamCTId, soLuong);
             return ResponseEntity.ok("Thêm vào giỏ hàng thành công");
         } catch (Exception e) {

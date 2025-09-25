@@ -52,7 +52,7 @@
 
     <!-- Danh sách -->
     <table class="table table-bordered table-hover">
-        <thead class="table-dark">
+        <thead class="table">
         <tr>
             <th>ID</th>
             <th>Mã</th>
@@ -71,7 +71,7 @@
                 <span class="badge bg-secondary" th:if="${!loai.trangThai}">Ngưng</span>
             </td>
             <td>
-                <button class="btn btn-primary btn-sm"
+                <button class="btn btn-warning btn-sm"
                         th:attr="data-id=${loai.id},
                                  data-ma=${loai.maLoaiSanPham},
                                  data-ten=${loai.tenLoaiSanPham},
@@ -123,7 +123,7 @@
 
             document.getElementById("modalTitle").innerText = "Cập nhật Loại Sản Phẩm";
             document.getElementById("submitBtn").innerText = "Cập nhật";
-            document.getElementById("loaiForm").action = "/admin/loai-san-pham/edit/" + id;
+            document.getElementById("loaiForm").action = "/admin/loai-san-pham1/edit/" + id;
 
             document.getElementById("id").value = id;
             document.getElementById("maLoaiSanPham").value = ma;
