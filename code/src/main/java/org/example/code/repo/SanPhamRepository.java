@@ -37,6 +37,7 @@ public interface SanPhamRepository extends JpaRepository<SanPham, Integer> {
     List<SanPham> findAllByTrangThai(String trangThai);
 
 
-
+    @Query("SELECT sp FROM SanPham sp WHERE LOWER(sp.tenSanPham) LIKE LOWER(CONCAT('%', :keyword, '%'))")
+    List<SanPham> searchByTen(@Param("keyword") String keyword);
 
 }

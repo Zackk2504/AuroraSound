@@ -37,7 +37,7 @@ public class LoaiSanPhanController {
         return "redirect:/admin/loai-san-pham";
     }
 
-    @GetMapping("/edit/{id}")
+    @PostMapping("/edit/{id}")
     public String editLoai(@PathVariable Integer id, Model model,
                            @RequestParam(defaultValue = "0") int page,
                            @RequestParam(defaultValue = "5") int size) {

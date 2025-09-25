@@ -3,6 +3,8 @@ package org.example.code.controller;
 import org.example.code.model.XuatXu;
 import org.example.code.service.XuatXuService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
@@ -17,11 +19,19 @@ public class XuatXuController {
     private XuatXuService xuatXuService;
 
     @GetMapping("/xuat-xu")
-    public String getAllXuatXu(Model model) {
+    public String getAllXuatXu(Model model,
+                               @RequestParam(defaultValue = "0") int page,
+                               @RequestParam(defaultValue = "5") int size) {
+        Page<XuatXu> xuatXuPage = xuatXuService.getAllpage(PageRequest.of(page, size));
+
         model.addAttribute("xuatXu", new XuatXu());
-        model.addAttribute("list", xuatXuService.getAll());
-        return "admin/xuatXu"; // This should be the name of your view template
+        model.addAttribute("list", xuatXuPage.getContent());
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", xuatXuPage.getTotalPages());
+
+        return "admin/xuatXu";
     }
+
 
     @GetMapping("/xuat-xu/save")
     public String addXuatXuForm(Model model) {

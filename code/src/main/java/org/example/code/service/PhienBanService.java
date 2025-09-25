@@ -3,6 +3,8 @@ package org.example.code.service;
 import org.example.code.model.PhienBan;
 import org.example.code.repo.PhienBanRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,5 +25,8 @@ public class PhienBanService {
 
     public PhienBan save(PhienBan phienBan) {
         return phienBanRepository.save(phienBan);
+    }
+    public Page<PhienBan> getAllpage(Pageable pageable) {
+        return phienBanRepository.findAll(pageable);
     }
 }

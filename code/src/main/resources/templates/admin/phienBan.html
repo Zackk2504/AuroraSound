@@ -84,6 +84,28 @@
         </tr>
         </tbody>
     </table>
+    <!-- Phân trang -->
+    <nav th:if="${totalPages > 1}">
+        <ul class="pagination justify-content-center">
+
+            <!-- Previous -->
+            <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                <a class="page-link" th:href="@{|/admin/phien-ban?page=${currentPage - 1}&size=5|}">Previous</a>
+            </li>
+
+            <!-- Số trang -->
+            <li class="page-item"
+                th:each="i : ${#numbers.sequence(0, totalPages-1)}"
+                th:classappend="${i == currentPage} ? 'active'">
+                <a class="page-link" th:href="@{|/admin/phien-ban?page=${i}&size=5|}" th:text="${i+1}"></a>
+            </li>
+
+            <!-- Next -->
+            <li class="page-item" th:classappend="${currentPage + 1 >= totalPages} ? 'disabled'">
+                <a class="page-link" th:href="@{|/admin/phien-ban?page=${currentPage + 1}&size=5|}">Next</a>
+            </li>
+        </ul>
+    </nav>
 
     <!-- JS xử lý modal -->
     <script>

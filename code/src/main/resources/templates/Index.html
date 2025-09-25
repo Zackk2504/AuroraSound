@@ -172,13 +172,20 @@
 </nav>
 
 <div class="bg-dark py-3 shadow-sm">
-    <div class="container">
-        <form class="d-flex w-50 mx-auto">
-            <input class="form-control me-2" type="search" placeholder="Tìm kiếm tai nghe..." aria-label="Search">
+    <div class="container position-relative">
+        <form class="d-flex w-50 mx-auto" onsubmit="return false;">
+            <input id="searchBox" class="form-control me-2" type="search"
+                   placeholder="Tìm kiếm tai nghe..." aria-label="Search">
             <button class="btn btn-outline-light" type="submit" title="Tìm kiếm">
                 <i class="bi bi-search fs-5"></i>
             </button>
         </form>
+
+        <!-- Kết quả search xổ xuống -->
+        <ul id="suggestions"
+            class="list-group position-absolute w-50 mx-auto"
+            style="top: 60px; left: 25%; z-index: 1000;">
+        </ul>
     </div>
 </div>
 
@@ -322,6 +329,27 @@
                     }
                 });
         }
+    });
+
+    document.getElementById("searchBox").addEventListener("input", async function() {
+        const keyword = this.value.trim();
+        const suggestions = document.getElementById("suggestions");
+        suggestions.innerHTML = "";
+
+        if (keyword.length < 2) return; // chỉ search khi nhập >= 2 ký tự
+
+        const res = await fetch(`/khach-hang/search?keyword=${encodeURIComponent(keyword)}`);
+        const data = await res.json();
+
+        data.forEach(sp => {
+            const li = document.createElement("li");
+            li.classList.add("list-group-item", "list-group-item-action");
+            li.textContent = sp.ten;
+            li.onclick = () => {
+                window.location.href = `/khach-hang/san-pham/${sp.id}`;
+            };
+            suggestions.appendChild(li);
+        });
     });
 </script>
 

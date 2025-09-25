@@ -135,6 +135,22 @@ public class NhanVienController {
 
         return "redirect:/ban-hang-tai-quay/hoa-don/chi-tiet/" + id; // Trang hiển thị danh sách hóa đơn
     }
+    @GetMapping("/nhan-vien/xac-nhan-da-dua-hang-cho-ben-van-chuyen/{id}")
+    public String daduahang(Model model,@PathVariable Integer id,
+                                @RequestParam(required = false) String ghiChu,
+                                @RequestParam(required = false) String diaChimoi,
+                                @RequestParam(required = false) String tienTraSau) {
+        Optional<HoaDon> hoaDon = hoaDonService.getHoaDonById(id);
+        if (hoaDon.isEmpty()) {
+            throw new RuntimeException("Không tìm thấy hóa đơn với ID: " + id);
+        }
+        System.out.println("Ghi chú: " + ghiChu);
+        System.out.println("Dia chỉ mới: " + diaChimoi);
+        System.out.println("Tien trả sau: " + tienTraSau);
+        hoaDonService.xacNhanDonHang(hoaDon.get().getId(), ghiChu, diaChimoi, tienTraSau);
+
+        return "redirect:/ban-hang-tai-quay/hoa-don/chi-tiet/" + id; // Trang hiển thị danh sách hóa đơn
+    }
 
     @GetMapping("/nhan-vien/huy-don-hang/{id}")
     public String giaohangthatbai(Model model,@PathVariable Integer id,

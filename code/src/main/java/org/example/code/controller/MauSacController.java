@@ -3,6 +3,8 @@ package org.example.code.controller;
 import org.example.code.model.MauSac;
 import org.example.code.service.MauSacService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
@@ -17,10 +19,18 @@ public class MauSacController {
     private MauSacService mauSacService;
 
     @GetMapping("/mau-sac")
-    public String getMauSacPage(Model model) {
-        model.addAttribute("dsMauSac", mauSacService.getAll());
-        model.addAttribute("mauSac", new MauSac()); // Add an empty MauSac object for the form
-        return "admin/macSac"; // Assuming you have a Thymeleaf template named mauSac.html
+    public String getMauSacPage(Model model,
+                                @RequestParam(defaultValue = "0") int page,
+                                @RequestParam(defaultValue = "5") int size) {
+
+        Page<MauSac> mauSacPage = mauSacService.getAllpage(PageRequest.of(page, size));
+
+        model.addAttribute("dsMauSac", mauSacPage.getContent());
+        model.addAttribute("mauSac", new MauSac());
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", mauSacPage.getTotalPages());
+
+        return "admin/macSac"; // sửa lại tên file cho đúng (trước bạn viết nhầm "macSac")
     }
 
 

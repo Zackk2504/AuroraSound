@@ -3,6 +3,8 @@ package org.example.code.controller;
 import org.example.code.model.ThuongHieu;
 import org.example.code.service.ThuongHieuService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
@@ -16,12 +18,20 @@ public class ThuongHieuController {
     @Autowired
     private ThuongHieuService thuongHieuService;
 
+
     @GetMapping("/thuong-hieu")
-    public String getAllThuongHieus(Model model) {
-        // Logic to retrieve all Thuong Hieus and return a view
+    public String getAllThuongHieus(Model model,
+                                    @RequestParam(defaultValue = "0") int page,
+                                    @RequestParam(defaultValue = "5") int size) {
+
+        Page<ThuongHieu> thuongHieuPage = thuongHieuService.getAllpage(PageRequest.of(page, size));
+
         model.addAttribute("thuongHieu", new ThuongHieu());
-        model.addAttribute("dsThuongHieu", thuongHieuService.getAllThuongHieus());
-        return "admin/thuongHieu"; // This should be the name of your view template
+        model.addAttribute("dsThuongHieu", thuongHieuPage.getContent());
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", thuongHieuPage.getTotalPages());
+
+        return "admin/thuongHieu";
     }
 
 
