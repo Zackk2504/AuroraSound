@@ -51,7 +51,7 @@ public class NhanVienController {
         return "admin/Index"; // Redirect to employee home page
     }
 
-    @PostMapping("/admin/nhan-vien/create")
+    @PostMapping("/admin/nhan-vien/add")
     public String createNhanVien(Model model, @ModelAttribute ("NhanVien") NhanVien nhanVien) {
         nhanVienService.themNhanVien(nhanVien);
         return "redirect:/admin/nhan-vien"; // Redirect to employee creation page

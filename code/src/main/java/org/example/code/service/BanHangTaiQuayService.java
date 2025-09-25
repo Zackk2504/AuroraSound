@@ -1,5 +1,6 @@
 package org.example.code.service;
 
+import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
 import org.example.code.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -251,4 +252,8 @@ public class BanHangTaiQuayService {
         this.xoaHoaDonChoCu();
     }
 
+    @PostConstruct
+    public void runOnStartup() {
+        this.xoaHoaDonChoCu();
+    }
 }
