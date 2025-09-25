@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.List;
@@ -32,27 +33,38 @@ public class ThongKeService {
         return hoaDonRepository.findAll().stream()
                 .filter(hd -> "THANH_CONG".equalsIgnoreCase(hd.getTrangThaiHoaDon()))
                 .collect(Collectors.groupingBy(
-                        hd -> hd.getNgayTao().toLocalDate().format(fmt),
+                        hd -> hd.getNgayTao().toLocalDate(),
                         Collectors.reducing(
                                 BigDecimal.ZERO,
                                 hd -> {
                                     BigDecimal giaTri = hd.getGiaTriThanhToan() != null ? hd.getGiaTriThanhToan() : BigDecimal.ZERO;
                                     BigDecimal ship = hd.getTienship() != null ? hd.getTienship() : BigDecimal.ZERO;
-                                    return giaTri.subtract(ship);
+
+                                    // Tính thêm tiền trả sau
+                                    BigDecimal traSau = BigDecimal.ZERO;
+                                    if (hd.getTienTraSau() != null && !hd.getTienTraSau().toString().isEmpty()) {
+                                        traSau = new BigDecimal(hd.getTienTraSau().toString());
+                                    }
+
+                                    return giaTri.subtract(ship).add(traSau);
                                 },
                                 BigDecimal::add
                         )
                 ))
                 .entrySet().stream()
-                .map(e -> new ThongKeDoanhThuDTO(e.getKey(), e.getValue()))
-                .sorted(Comparator.comparing(ThongKeDoanhThuDTO::getLabel))
+                .map(e -> new ThongKeDoanhThuDTO(e.getKey().format(fmt), e.getValue()))
+                .sorted(Comparator.comparing(e -> LocalDate.parse(e.getLabel(), fmt))) // sort theo LocalDate thật
                 .toList();
     }
+
 
 
     // Top 5 sản phẩm bán chạy
     public List<TopSanPhamDTO> topSanPhamBanChay() {
         return hoaDonChiTietRepository.findAll().stream()
+                // chỉ tính các chi tiết nằm trong hóa đơn thành công
+                .filter(hdct -> hdct.getIdHoadon() != null
+                        && "THANH_CONG".equalsIgnoreCase(hdct.getIdHoadon().getTrangThaiHoaDon()))
                 .collect(Collectors.groupingBy(
                         hdct -> hdct.getIdSanphamchitiet().getIdSanpham().getTenSanPham(),
                         Collectors.summingLong(HoaDonChiTiet::getSoLuong)
@@ -63,4 +75,6 @@ public class ThongKeService {
                 .limit(5)
                 .toList();
     }
+
+
 }
